@@ -3500,6 +3500,8 @@ document.getElementById('saveProfile').onclick=function(){
 };
 
 document.querySelectorAll('.toggle').forEach(t=>{
+  // bookingToggle has its own onclick handler — skip it
+  if(t.id === 'bookingToggle') return;
   t.onclick=function(){this.classList.toggle('on')}
 });
 
@@ -3864,13 +3866,16 @@ function saveBookingSettings(){
   var ws=document.getElementById('workStart');
   var we=document.getElementById('workEnd');
   var mp=document.getElementById('masterPhone');
+  var slugEl=document.getElementById('customSlug');
   if(ws)s.workStart=ws.value;
   if(we)s.workEnd=we.value;
   if(mp)s.masterPhone=mp.value.trim();
+  if(slugEl)s.customSlug=slugEl.value.trim();
   var sess=load('km_session',{});
   s.masterName=sess.name||'Мастер';
   s.masterProf=sess.prof||'Специалист';
   saveBookingSettingsData(s);
+  refreshBookingLink();
 }
 
 function toggleDay(btn){
@@ -3981,8 +3986,8 @@ function getShortDisplayUrl(){
 
 function copyBookLink(){
   var s = getBookingSettings();
-  if(!s.isOpen || !s.services || !s.services.length){
-    toast('Включи приём заявок и добавь услуги','error'); return;
+  if(!s.isOpen){
+    toast('Сначала включи тумблер «Приём заявок»','error'); return;
   }
   var url = buildBookUrl();
   // If slug set, use it as display but real URL is the key URL
