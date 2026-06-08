@@ -3856,7 +3856,7 @@ function toggleTheme(){
 // ════════════════════════════════════════════
 // ONLINE BOOKING — MASTER SIDE
 // ════════════════════════════════════════════
-function getBookingSettings(){return load('km_booking_settings',{isOpen:false,services:[],workDays:[1,2,3,4,5],workStart:'10:00',workEnd:'19:00',masterName:'',masterProf:''})}
+function getBookingSettings(){return load('km_booking_settings',{isOpen:false,services:[],workDays:[1,2,3,4,5],workStart:'10:00',workEnd:'19:00',masterName:'',masterProf:'',masterPhone:'',customSlug:''})}
 function saveBookingSettingsData(d){store('km_booking_settings',d)}
 
 function saveBookingSettings(){
@@ -3891,7 +3891,16 @@ function toggleBooking(){
   s.masterName=sess.name||'Мастер';
   s.masterProf=sess.prof||'Специалист';
   saveBookingSettingsData(s);
-  renderBookingPage();
+  // Update toggle button
+  var tog=document.getElementById('bookingToggle');
+  if(tog){ if(s.isOpen)tog.classList.add('on'); else tog.classList.remove('on'); }
+  // Update status KPI
+  var bs=document.getElementById('bookStatus');
+  if(bs) bs.textContent=s.isOpen?'✅ Открыта':'⏸ Выкл';
+  // Refresh link immediately
+  refreshBookingLink();
+  // Show toast
+  toast(s.isOpen ? '✅ Приём заявок включён' : '⏸ Приём заявок выключен');
 }
 
 function addService(){
@@ -3906,6 +3915,7 @@ function addService(){
   document.getElementById('svcDur').value='60';
   document.getElementById('svcPrice').value='';
   renderServiceList();
+  refreshBookingLink();
   toast('Услуга добавлена ✓');
 }
 
@@ -3934,20 +3944,7 @@ function renderServiceList(){
 }
 
 
-function updateLinkPreview(){
-  var slugEl=document.getElementById('customSlug');
-  var preview=document.getElementById('slugPreview');
-  var li=document.getElementById('bookLinkInlineUrl');
-  var s=getBookingSettings();
-  var slug=slugEl?slugEl.value.trim():'';
-  if(slug){
-    var url=window.location.origin+'/'+slug;
-    if(preview) preview.innerHTML='Ссылка: <strong style="color:var(--em)">'+url+'</strong>';
-    if(li) li.textContent=buildBookUrl();
-  } else {
-    if(preview) preview.innerHTML='Введи имя — например: <em>olga-myagkikh</em>, <em>nail-studio</em>';
-  }
-}
+function updateLinkPreview(){ refreshBookingLink(); }
 
 function buildBookUrl(){
   var s=getBookingSettings();
