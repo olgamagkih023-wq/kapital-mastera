@@ -2597,7 +2597,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
                 <span style="padding:14px 12px;background:var(--cream2);font-size:0.82rem;color:var(--muted);white-space:nowrap;border-right:1px solid var(--border)">kapital-mastera.vercel.app/</span>
                 <input id="customSlug" type="text" placeholder="olga-myagkikh" maxlength="40"
                   style="flex:1;padding:14px 12px;border:none;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--ink);outline:none"
-                  oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9\-]/g,'').replace(/\s/g,'-')"
+                  oninput="sanitizeSlug(this)"
                   onchange="saveBookingSettings();updateLinkPreview()">
               </div>
               <div id="slugPreview" style="font-size:0.75rem;color:var(--muted);margin-top:6px">
@@ -3947,45 +3947,58 @@ function renderServiceList(){
 function updateLinkPreview(){ refreshBookingLink(); }
 
 function buildBookUrl(){
-  var s=getBookingSettings();
-  var base=window.location.origin+'/booking.html';
-  var params=new URLSearchParams();
-  params.set('open','1');
-  if(s.masterPhone) params.set('phone',s.masterPhone.replace(/\D/g,''));
-  if(s.masterName)  params.set('name',s.masterName);
-  if(s.masterProf)  params.set('prof',s.masterProf);
-  if(s.workDays&&s.workDays.length) params.set('days',s.workDays.join(','));
-  if(s.workStart)   params.set('from',s.workStart);
-  if(s.workEnd)     params.set('to',s.workEnd);
-  if(s.services&&s.services.length){
-    // Encode services compactly (name|dur|price)
-    var svcsCompact=s.services.map(function(x){
-      return {n:x.name,d:x.dur,p:x.price};
-    });
-    params.set('svcs',JSON.stringify(svcsCompact));
+  var s = getBookingSettings();
+  // Generate a short public key for this master's settings
+  // Store full settings under this key so client can read them
+  var key = s.bookingKey;
+  if(!key){
+    key = Math.random().toString(36).substr(2,6);
+    s.bookingKey = key;
+    saveBookingSettingsData(s);
   }
-  // Custom slug if set
-  var slug=s.customSlug?s.customSlug.trim():'';
-  if(slug){
-    return window.location.origin+'/'+slug+'?booking=1&'+params.toString();
-  }
-  return base+'?'+params.toString();
+  // Save full settings under public key
+  localStorage.setItem('bk_pub_'+key, JSON.stringify({
+    isOpen: true,
+    masterName: s.masterName,
+    masterProf: s.masterProf,
+    masterPhone: s.masterPhone,
+    services: s.services,
+    workDays: s.workDays,
+    workStart: s.workStart,
+    workEnd: s.workEnd,
+  }));
+  var slug = s.customSlug ? s.customSlug.trim() : '';
+  var base = window.location.origin + '/booking.html?key=' + key;
+  return base;
+}
+
+function getShortDisplayUrl(){
+  var s = getBookingSettings();
+  var slug = s.customSlug ? s.customSlug.trim() : '';
+  if(slug) return window.location.origin + '/' + slug;
+  return buildBookUrl();
 }
 
 function copyBookLink(){
-  var url=buildBookUrl();
+  var s = getBookingSettings();
+  if(!s.isOpen || !s.services || !s.services.length){
+    toast('Включи приём заявок и добавь услуги','error'); return;
+  }
+  var url = buildBookUrl();
+  // If slug set, use it as display but real URL is the key URL
+  var slug = s.customSlug ? s.customSlug.trim() : '';
+  var copyUrl = slug ? (window.location.origin + '/' + slug) : url;
+  // Always copy the working key URL (slug redirects not supported without server)
   if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(function(){toast('✓ Ссылка скопирована')});
+    navigator.clipboard.writeText(url).then(function(){
+      toast('✓ Ссылка скопирована — отправь клиентам!');
+    });
   } else {
     var inp=document.createElement('input');
-    inp.value=url;document.body.appendChild(inp);inp.select();
-    document.execCommand('copy');document.body.removeChild(inp);
+    inp.value=url; document.body.appendChild(inp); inp.select();
+    document.execCommand('copy'); document.body.removeChild(inp);
     toast('✓ Ссылка скопирована');
   }
-  var lu=document.getElementById('bookLinkUrl');
-  if(lu)lu.textContent=url;
-  var li=document.getElementById('bookLinkInlineUrl');
-  if(li)li.textContent=url;
 }
 
 function renderIncomingList(){
