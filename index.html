@@ -2581,34 +2581,49 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
           </div>
 
           <div class="settings-card" style="margin-top:16px">
-            <div class="settings-title">Рабочие часы</div>
-            <div style="margin-bottom:14px">
-              <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-weight:600">Телефон для записи (WhatsApp / MAX)</div>
-              <div style="display:flex;gap:8px">
-                <input id="masterPhone" type="tel" placeholder="+7 (999) 000-00-00" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none" onchange="saveBookingSettings()">
-                <button onclick="saveBookingSettings();toast('Сохранено ✓')" style="padding:10px 14px;background:var(--em);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Сохранить</button>
-              </div>
-              <div style="font-size:0.72rem;color:var(--muted);margin-top:5px">Клиент сможет написать вам напрямую после записи</div>
+            <div class="settings-title">Настройки записи</div>
+
+            <!-- Телефон -->
+            <div class="form-field-app" style="margin-bottom:14px">
+              <label>Телефон для клиентов (WhatsApp / MAX)</label>
+              <input id="masterPhone" type="tel" placeholder="+7 (999) 000-00-00" onchange="saveBookingSettings()">
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">После записи клиент сможет написать вам напрямую</div>
             </div>
 
-            <div style="margin-bottom:14px">
-              <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-weight:600">✨ Красивое имя ссылки</div>
-              <div style="display:flex;gap:8px;align-items:center">
-                <div style="font-size:0.82rem;color:var(--muted);white-space:nowrap;flex-shrink:0">kapital-mastera.vercel.app/</div>
+            <!-- Красивая ссылка -->
+            <div class="form-field-app" style="margin-bottom:16px">
+              <label>✨ Красивое имя ссылки</label>
+              <div style="display:flex;align-items:center;gap:0;border:2px solid var(--border)">
+                <span style="padding:14px 12px;background:var(--cream2);font-size:0.82rem;color:var(--muted);white-space:nowrap;border-right:1px solid var(--border)">kapital-mastera.vercel.app/</span>
                 <input id="customSlug" type="text" placeholder="olga-myagkikh" maxlength="40"
-                  style="flex:1;padding:10px 12px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none"
-                  oninput="this.value=this.value.toLowerCase().replace(/[^a-zа-яё0-9\-]/gi,'').replace(/\s/g,'-')"
+                  style="flex:1;padding:14px 12px;border:none;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--ink);outline:none"
+                  oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9\-]/g,'').replace(/\s/g,'-')"
                   onchange="saveBookingSettings();updateLinkPreview()">
               </div>
-              <div id="slugPreview" style="font-size:0.75rem;color:var(--muted);margin-top:6px;word-break:break-all">
-                Введи имя — например: <em>olga-myagkikh</em>, <em>nail-studio</em>, <em>beauty-anna</em>
+              <div id="slugPreview" style="font-size:0.75rem;color:var(--muted);margin-top:6px">
+                Например: <em>olga-myagkikh</em>, <em>nail-studio</em>, <em>beauty-anna</em>
               </div>
-              <div style="font-size:0.7rem;color:var(--muted);margin-top:4px;opacity:0.7">Только латиница, цифры и дефис. Клиент увидит эту ссылку.</div>
             </div>
+
+            <!-- Рабочие часы -->
             <div style="display:flex;gap:10px;margin-bottom:16px">
-              <div style="flex:1"><label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:5px">С</label><select id="workStart" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none"><option>08:00</option><option>09:00</option><option selected>10:00</option><option>11:00</option><option>12:00</option></select></div>
-              <div style="flex:1"><label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:5px">До</label><select id="workEnd" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none"><option>17:00</option><option>18:00</option><option selected>19:00</option><option>20:00</option><option>21:00</option></select></div>
+              <div style="flex:1">
+                <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--ink);margin-bottom:6px">Начало дня</label>
+                <select id="workStart" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none">
+                  <option>08:00</option><option>09:00</option><option selected>10:00</option>
+                  <option>11:00</option><option>12:00</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--ink);margin-bottom:6px">Конец дня</label>
+                <select id="workEnd" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none">
+                  <option>17:00</option><option>18:00</option><option selected>19:00</option>
+                  <option>20:00</option><option>21:00</option>
+                </select>
+              </div>
             </div>
+
+            <!-- Рабочие дни -->
             <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:600">Рабочие дни</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
               <button class="slot-chip active" data-day="1" onclick="toggleDay(this)">Пн</button>
@@ -2619,28 +2634,27 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
               <button class="slot-chip" data-day="6" onclick="toggleDay(this)" style="color:var(--red)">Сб</button>
               <button class="slot-chip" data-day="0" onclick="toggleDay(this)" style="color:var(--red)">Вс</button>
             </div>
-            <div class="form-field-app" style="margin-bottom:14px">
-              <label style="display:block;font-size:0.78rem;font-weight:700;color:var(--ink);margin-bottom:6px">Телефон для WhatsApp / MAX</label>
-              <input type="tel" id="masterPhone" placeholder="+79001234567" style="width:100%;padding:12px 14px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--ink);outline:none" oninput="saveBookingSettings()">
-              <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">Клиент нажмёт кнопку и напишет вам напрямую</div>
-            </div>
-            <div class="setting-row">
-              <div><div class="setting-label">Приём заявок активен</div><div class="setting-desc">Клиенты смогут записаться по ссылке</div></div>
+
+            <!-- Тумблер -->
+            <div class="setting-row" style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--border)">
+              <div>
+                <div class="setting-label">Приём заявок активен</div>
+                <div class="setting-desc">Клиенты смогут записаться по ссылке</div>
+              </div>
               <button class="toggle" id="bookingToggle" onclick="toggleBooking()"></button>
             </div>
-            <div style="margin-top:14px;padding:16px;background:rgba(13,110,74,0.07);border-left:3px solid var(--em)" id="bookLinkInline">
-              <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:600">Ссылка для клиентов</div>
-              <div style="font-size:0.82rem;color:var(--em);word-break:break-all;margin-bottom:10px;font-weight:500" id="bookLinkInlineUrl">—</div>
+
+            <!-- Ссылка — всегда видна, меняется при включении -->
+            <div id="bookLinkInline" style="padding:16px;border:2px dashed var(--border);transition:border-color 0.3s">
+              <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Ссылка для клиентов</div>
+              <div id="bookLinkInlineUrl" style="font-size:0.82rem;color:var(--muted);word-break:break-all;margin-bottom:12px;line-height:1.5">
+                Введи настройки и включи приём заявок
+              </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button onclick="copyBookLink()" style="padding:9px 16px;background:var(--em);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.06em">📋 Скопировать</button>
-                <button onclick="openHelp('booking')" style="padding:9px 14px;background:none;border:1.5px solid var(--border);color:var(--muted);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">? Как работает</button>
+                <button onclick="copyBookLink()" style="padding:10px 18px;background:var(--em);color:#fff;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation">📋 Скопировать</button>
+                <button onclick="openHelp('booking')" style="padding:10px 14px;background:none;border:1.5px solid var(--border);color:var(--muted);font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif">? Как работает</button>
               </div>
             </div>
-          </div>
-
-          <div class="book-link-block" id="bookLinkBlock" style="display:none">
-            <div style="flex:1"><div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:6px">Ссылка для клиентов</div><div class="book-link-url" id="bookLinkUrl">—</div></div>
-            <button class="book-link-copy" onclick="copyBookLink()">📋 Скопировать</button>
           </div>
         </div>
 
@@ -4062,12 +4076,20 @@ function renderBookingPage(){
   }
   var lu=document.getElementById('bookLinkUrl');
   if(lu) lu.textContent = bookUrl;
-  // Inline link block (always visible, shows URL when open)
+  // Link inline block
   var inlineUrl = document.getElementById('bookLinkInlineUrl');
   var inlineBlock = document.getElementById('bookLinkInline');
-  if(inlineUrl) inlineUrl.textContent = s.isOpen ? bookUrl : 'Включи тумблер «Приём заявок» чтобы получить ссылку';
-  if(inlineBlock) inlineBlock.style.borderColor = s.isOpen ? 'var(--em)' : 'var(--border)';
-  if(inlineUrl) inlineUrl.style.color = s.isOpen ? 'var(--em)' : 'var(--muted)';
+  if(s.isOpen && s.services && s.services.length){
+    if(inlineUrl){inlineUrl.textContent = bookUrl; inlineUrl.style.color='var(--em)'; inlineUrl.style.fontWeight='500';}
+    if(inlineBlock){inlineBlock.style.borderColor='var(--em)'; inlineBlock.style.borderStyle='solid';}
+  } else if(!s.isOpen){
+    if(inlineUrl){inlineUrl.textContent='Включи тумблер выше чтобы получить ссылку'; inlineUrl.style.color='var(--muted)'; inlineUrl.style.fontWeight='400';}
+    if(inlineBlock){inlineBlock.style.borderColor='var(--border)'; inlineBlock.style.borderStyle='dashed';}
+  } else {
+    if(inlineUrl){inlineUrl.textContent='Добавь хотя бы одну услугу выше'; inlineUrl.style.color='var(--gold)'; inlineUrl.style.fontWeight='400';}
+    if(inlineBlock){inlineBlock.style.borderColor='var(--gold)'; inlineBlock.style.borderStyle='dashed';}
+  }
+  updateLinkPreview();
   // Phone field
   var mpEl=document.getElementById('masterPhone');
   if(mpEl && s.masterPhone) mpEl.value=s.masterPhone;
