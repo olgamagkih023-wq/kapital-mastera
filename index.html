@@ -2590,6 +2590,21 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
               </div>
               <div style="font-size:0.72rem;color:var(--muted);margin-top:5px">Клиент сможет написать вам напрямую после записи</div>
             </div>
+
+            <div style="margin-bottom:14px">
+              <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-weight:600">✨ Красивое имя ссылки</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div style="font-size:0.82rem;color:var(--muted);white-space:nowrap;flex-shrink:0">kapital-mastera.vercel.app/</div>
+                <input id="customSlug" type="text" placeholder="olga-myagkikh" maxlength="40"
+                  style="flex:1;padding:10px 12px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none"
+                  oninput="this.value=this.value.toLowerCase().replace(/[^a-zа-яё0-9\-]/gi,'').replace(/\s/g,'-')"
+                  onchange="saveBookingSettings();updateLinkPreview()">
+              </div>
+              <div id="slugPreview" style="font-size:0.75rem;color:var(--muted);margin-top:6px;word-break:break-all">
+                Введи имя — например: <em>olga-myagkikh</em>, <em>nail-studio</em>, <em>beauty-anna</em>
+              </div>
+              <div style="font-size:0.7rem;color:var(--muted);margin-top:4px;opacity:0.7">Только латиница, цифры и дефис. Клиент увидит эту ссылку.</div>
+            </div>
             <div style="display:flex;gap:10px;margin-bottom:16px">
               <div style="flex:1"><label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:5px">С</label><select id="workStart" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none"><option>08:00</option><option>09:00</option><option selected>10:00</option><option>11:00</option><option>12:00</option></select></div>
               <div style="flex:1"><label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:5px">До</label><select id="workEnd" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none"><option>17:00</option><option>18:00</option><option selected>19:00</option><option>20:00</option><option>21:00</option></select></div>
@@ -3904,10 +3919,50 @@ function renderServiceList(){
   }).join('');
 }
 
-function copyBookLink(){
+
+function updateLinkPreview(){
+  var slugEl=document.getElementById('customSlug');
+  var preview=document.getElementById('slugPreview');
+  var li=document.getElementById('bookLinkInlineUrl');
   var s=getBookingSettings();
-  var phone=s.masterPhone?s.masterPhone.replace(/\D/g,''):'';
-  var url=window.location.origin+'/booking.html'+(phone?'?phone='+phone:'');
+  var slug=slugEl?slugEl.value.trim():'';
+  if(slug){
+    var url=window.location.origin+'/'+slug;
+    if(preview) preview.innerHTML='Ссылка: <strong style="color:var(--em)">'+url+'</strong>';
+    if(li) li.textContent=buildBookUrl();
+  } else {
+    if(preview) preview.innerHTML='Введи имя — например: <em>olga-myagkikh</em>, <em>nail-studio</em>';
+  }
+}
+
+function buildBookUrl(){
+  var s=getBookingSettings();
+  var base=window.location.origin+'/booking.html';
+  var params=new URLSearchParams();
+  params.set('open','1');
+  if(s.masterPhone) params.set('phone',s.masterPhone.replace(/\D/g,''));
+  if(s.masterName)  params.set('name',s.masterName);
+  if(s.masterProf)  params.set('prof',s.masterProf);
+  if(s.workDays&&s.workDays.length) params.set('days',s.workDays.join(','));
+  if(s.workStart)   params.set('from',s.workStart);
+  if(s.workEnd)     params.set('to',s.workEnd);
+  if(s.services&&s.services.length){
+    // Encode services compactly (name|dur|price)
+    var svcsCompact=s.services.map(function(x){
+      return {n:x.name,d:x.dur,p:x.price};
+    });
+    params.set('svcs',JSON.stringify(svcsCompact));
+  }
+  // Custom slug if set
+  var slug=s.customSlug?s.customSlug.trim():'';
+  if(slug){
+    return window.location.origin+'/'+slug+'?booking=1&'+params.toString();
+  }
+  return base+'?'+params.toString();
+}
+
+function copyBookLink(){
+  var url=buildBookUrl();
   if(navigator.clipboard){
     navigator.clipboard.writeText(url).then(function(){toast('✓ Ссылка скопирована')});
   } else {
@@ -3997,9 +4052,8 @@ function renderBookingPage(){
   // Status KPI
   var bs=document.getElementById('bookStatus');
   if(bs)bs.textContent=s.isOpen?'✅ Открыта':'⏸ Выкл';
-  // Link block — build URL with phone param
-  var phone = (s.masterPhone||'').replace(/\D/g,'');
-  var bookUrl = window.location.origin + '/booking.html' + (phone ? '?phone='+phone : '');
+  // Link block — build full URL with all settings encoded
+  var bookUrl = buildBookUrl();
   var lb=document.getElementById('bookLinkBlock');
   if(lb){
     lb.style.display = s.isOpen ? 'flex' : 'none';
@@ -4030,6 +4084,9 @@ function renderBookingPage(){
   if(ws)ws.value=s.workStart;
   if(we)we.value=s.workEnd;
   if(mp&&s.masterPhone)mp.value=s.masterPhone;
+  var slugEl=document.getElementById('customSlug');
+  if(slugEl&&s.customSlug)slugEl.value=s.customSlug;
+  updateLinkPreview();
   renderServiceList();
   renderIncomingList();
 }
