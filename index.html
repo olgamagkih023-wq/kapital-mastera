@@ -2153,22 +2153,41 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
         </div>
         <div>
           <div class="appt-form" id="apptForm">
-            <div class="appt-form-title" style="display:flex;align-items:center">Новая запись <button class="help-btn" onclick="openHelp('calendar')">?</button></div>
+            <div class="appt-form-title" style="display:flex;align-items:center;justify-content:space-between">
+              <span>Новая запись <button class="help-btn" onclick="openHelp('calendar')">?</button></span>
+            </div>
             <div class="form-field-app">
-              <label>Имя клиента</label>
+              <label>Имя клиента *</label>
               <input type="text" id="apptClient" placeholder="Анна Иванова">
+            </div>
+            <div class="form-field-app">
+              <label>Телефон клиента</label>
+              <div style="display:flex;gap:6px;align-items:center">
+                <input type="tel" id="apptPhone" placeholder="+7 (999) 000-00-00" style="flex:1">
+                <button id="sendWaBtn" onclick="sendApptWhatsApp()" title="Отправить в WhatsApp"
+                  style="padding:10px 12px;background:#25D366;color:#fff;border:none;cursor:pointer;font-size:1rem;flex-shrink:0;touch-action:manipulation;display:none">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                </button>
+                <button id="sendMaxBtn" onclick="sendApptMax()" title="Отправить в MAX"
+                  style="padding:10px 12px;background:#005BFF;color:#fff;border:none;cursor:pointer;font-size:0.75rem;font-weight:700;flex-shrink:0;touch-action:manipulation;font-family:'DM Sans',sans-serif;display:none">
+                  MAX
+                </button>
+              </div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Введи телефон — появятся кнопки отправки уведомления</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div class="form-field-app">
+                <label>Дата *</label>
+                <input type="date" id="apptDate">
+              </div>
+              <div class="form-field-app">
+                <label>Время *</label>
+                <input type="time" id="apptTime" value="10:00">
+              </div>
             </div>
             <div class="form-field-app">
               <label>Услуга</label>
               <input type="text" id="apptService" placeholder="Стрижка, маникюр...">
-            </div>
-            <div class="form-field-app">
-              <label>Дата</label>
-              <input type="date" id="apptDate">
-            </div>
-            <div class="form-field-app">
-              <label>Время</label>
-              <input type="time" id="apptTime" value="10:00">
             </div>
             <div class="form-field-app">
               <label>Стоимость (₽)</label>
@@ -2176,9 +2195,24 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
             </div>
             <div class="form-field-app">
               <label>Заметка</label>
-              <textarea id="apptNote" placeholder="Особые пожелания..."></textarea>
+              <textarea id="apptNote" placeholder="Особые пожелания..." style="min-height:52px"></textarea>
             </div>
-            <button class="auth-btn" id="saveAppt">Сохранить запись</button>
+            <button class="auth-btn" id="saveAppt" style="margin-bottom:8px">Сохранить запись</button>
+            <!-- Notification buttons (shown after save) -->
+            <div id="notifyPanel" style="display:none;padding:12px;background:var(--cream2);border:1px solid var(--border)">
+              <div style="font-size:0.78rem;font-weight:700;color:var(--ink);margin-bottom:10px">📣 Отправить подтверждение клиенту</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button id="notifyWaBtn"
+                  style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:#25D366;color:#fff;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  WhatsApp
+                </button>
+                <button id="notifyMaxBtn"
+                  style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:#005BFF;color:#fff;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation">
+                  MAX
+                </button>
+              </div>
+            </div>
           </div>
           <div class="appt-list" style="margin-top:20px">
             <div class="appt-list-title" id="apptListTitle" style="display:flex;align-items:center;justify-content:space-between">Все записи <button onclick="renderApptList()" style="font-size:0.72rem;color:var(--em);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">Все →</button></div>
@@ -2560,72 +2594,69 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
     <!-- ═══ PAGE: ОНЛАЙН-ЗАПИСЬ ═══ -->
     <div class="page" id="page-booking">
-      <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi-card business"><div class="kpi-label">Новых заявок</div><div class="kpi-val" id="bookPending">0</div></div>
-        <div class="kpi-card"><div class="kpi-label">Всего через форму</div><div class="kpi-val" id="bookTotal">0</div></div>
-        <div class="kpi-card capital"><div class="kpi-label">Ожидаемая выручка</div><div class="kpi-val" id="bookRevenue">0 <small>₽</small></div></div>
-        <div class="kpi-card clients"><div class="kpi-label">Приём заявок</div><div class="kpi-val" id="bookStatus" style="font-size:1rem;padding-top:6px">⏸ Выкл</div></div>
+
+      <!-- Tab switcher -->
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px">
+        <button class="atab active" id="btab1" onclick="switchBookTab(1)" style="font-size:0.8rem">
+          📋 Заявки клиентов
+        </button>
+        <button class="atab" id="btab2" onclick="switchBookTab(2)" style="font-size:0.8rem">
+          ⚙️ Настройка записи
+        </button>
+        <button class="atab" id="btab3" onclick="switchBookTab(3)" style="font-size:0.8rem">
+          🔗 Ссылка для клиентов
+        </button>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-        <div>
+      <!-- TAB 1: Incoming requests -->
+      <div id="bookTab1">
+        <div class="kpi-grid" style="margin-bottom:20px">
+          <div class="kpi-card business"><div class="kpi-label">Новых заявок</div><div class="kpi-val" id="bookPending">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Всего заявок</div><div class="kpi-val" id="bookTotal">0</div></div>
+          <div class="kpi-card capital"><div class="kpi-label">Ожид. выручка</div><div class="kpi-val" id="bookRevenue">0 <small>₽</small></div></div>
+        </div>
+        <div id="incomingList">
+          <div class="empty"><div class="empty-icon">🔗</div><div class="empty-text">Заявок пока нет.<br>Отправь ссылку клиентам.</div></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Settings -->
+      <div id="bookTab2" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
           <div class="settings-card">
-            <div class="settings-title" style="display:flex;align-items:center">Услуги и цены <button class="help-btn" onclick="openHelp('booking')">?</button></div>
+            <div class="settings-title">Услуги и цены</div>
             <div class="service-list" id="serviceList"></div>
-            <div class="service-add-form" style="margin-top:14px">
+            <div class="service-add-form" style="margin-top:12px">
               <input id="svcName" placeholder="Название услуги" type="text">
               <input id="svcDur" placeholder="мин" type="number" min="15" step="15" value="60">
               <input id="svcPrice" placeholder="Цена ₽" type="number" min="0">
               <button class="service-add-btn" onclick="addService()">+ Добавить</button>
             </div>
           </div>
-
-          <div class="settings-card" style="margin-top:16px">
-            <div class="settings-title">Настройки записи</div>
-
-            <!-- Телефон -->
-            <div class="form-field-app" style="margin-bottom:14px">
-              <label>Телефон для клиентов (WhatsApp / MAX)</label>
+          <div class="settings-card">
+            <div class="settings-title">Контакт мастера</div>
+            <div class="form-field-app" style="margin-bottom:12px">
+              <label>Телефон (WhatsApp / MAX)</label>
               <input id="masterPhone" type="tel" placeholder="+7 (999) 000-00-00" onchange="saveBookingSettings()">
-              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">После записи клиент сможет написать вам напрямую</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Клиент напишет вам после записи</div>
             </div>
-
-            <!-- Красивая ссылка -->
-            <div class="form-field-app" style="margin-bottom:16px">
-              <label>✨ Красивое имя ссылки</label>
-              <div style="display:flex;align-items:center;gap:0;border:2px solid var(--border)">
-                <span style="padding:14px 12px;background:var(--cream2);font-size:0.82rem;color:var(--muted);white-space:nowrap;border-right:1px solid var(--border)">kapital-mastera.vercel.app/</span>
-                <input id="customSlug" type="text" placeholder="olga-myagkikh" maxlength="40"
-                  style="flex:1;padding:14px 12px;border:none;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--ink);outline:none"
-                  oninput="sanitizeSlug(this)"
-                  onchange="saveBookingSettings();updateLinkPreview()">
-              </div>
-              <div id="slugPreview" style="font-size:0.75rem;color:var(--muted);margin-top:6px">
-                Например: <em>olga-myagkikh</em>, <em>nail-studio</em>, <em>beauty-anna</em>
-              </div>
-            </div>
-
-            <!-- Рабочие часы -->
-            <div style="display:flex;gap:10px;margin-bottom:16px">
+            <div class="settings-title" style="margin-top:16px">Рабочие часы</div>
+            <div style="display:flex;gap:8px;margin-bottom:12px">
               <div style="flex:1">
-                <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--ink);margin-bottom:6px">Начало дня</label>
-                <select id="workStart" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none">
-                  <option>08:00</option><option>09:00</option><option selected>10:00</option>
-                  <option>11:00</option><option>12:00</option>
+                <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">С</label>
+                <select id="workStart" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none">
+                  <option>08:00</option><option>09:00</option><option selected>10:00</option><option>11:00</option>
                 </select>
               </div>
               <div style="flex:1">
-                <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--ink);margin-bottom:6px">Конец дня</label>
-                <select id="workEnd" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);outline:none">
-                  <option>17:00</option><option>18:00</option><option selected>19:00</option>
-                  <option>20:00</option><option>21:00</option>
+                <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">До</label>
+                <select id="workEnd" onchange="saveBookingSettings()" style="width:100%;padding:10px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none">
+                  <option>17:00</option><option>18:00</option><option selected>19:00</option><option>20:00</option><option>21:00</option>
                 </select>
               </div>
             </div>
-
-            <!-- Рабочие дни -->
-            <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:600">Рабочие дни</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+            <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Рабочие дни</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
               <button class="slot-chip active" data-day="1" onclick="toggleDay(this)">Пн</button>
               <button class="slot-chip active" data-day="2" onclick="toggleDay(this)">Вт</button>
               <button class="slot-chip active" data-day="3" onclick="toggleDay(this)">Ср</button>
@@ -2634,38 +2665,76 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
               <button class="slot-chip" data-day="6" onclick="toggleDay(this)" style="color:var(--red)">Сб</button>
               <button class="slot-chip" data-day="0" onclick="toggleDay(this)" style="color:var(--red)">Вс</button>
             </div>
-
-            <!-- Тумблер -->
-            <div class="setting-row" style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--border)">
-              <div>
-                <div class="setting-label">Приём заявок активен</div>
-                <div class="setting-desc">Клиенты смогут записаться по ссылке</div>
-              </div>
-              <button class="toggle" id="bookingToggle" onclick="toggleBooking()"></button>
-            </div>
-
-            <!-- Ссылка — всегда видна, меняется при включении -->
-            <div id="bookLinkInline" style="padding:16px;border:2px dashed var(--border);transition:border-color 0.3s">
-              <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Ссылка для клиентов</div>
-              <div id="bookLinkInlineUrl" style="font-size:0.82rem;color:var(--muted);word-break:break-all;margin-bottom:12px;line-height:1.5">
-                Введи настройки и включи приём заявок
-              </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button onclick="copyBookLink()" style="padding:10px 18px;background:var(--em);color:#fff;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation">📋 Скопировать</button>
-                <button onclick="openHelp('booking')" style="padding:10px 14px;background:none;border:1.5px solid var(--border);color:var(--muted);font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif">? Как работает</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="settings-card">
-            <div class="settings-title" style="display:flex;align-items:center">Входящие заявки <span class="pending-badge" id="pendingBadge2" style="display:none;margin-left:6px">0</span> <button class="help-btn" onclick="openHelp('booking')" style="margin-left:8px">?</button></div>
-            <div id="incomingList"><div class="empty"><div class="empty-icon">🔗</div><div class="empty-text">Заявок пока нет.<br>Включи приём и отправь ссылку клиентам.</div></div></div>
           </div>
         </div>
       </div>
+
+      <!-- TAB 3: Public link -->
+      <div id="bookTab3" style="display:none">
+        <div class="settings-card">
+          <div class="settings-title">Ссылка для самостоятельной записи клиентов</div>
+          <div style="font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:20px;font-weight:300">
+            Клиент открывает ссылку → выбирает услугу, дату и время → оставляет контакты → заявка появляется у вас в «Заявках».
+          </div>
+
+          <!-- Toggle -->
+          <div class="setting-row" style="margin-bottom:20px">
+            <div>
+              <div class="setting-label">Приём онлайн-заявок</div>
+              <div class="setting-desc" id="bookStatusText">Выключено — клиенты не могут записаться</div>
+            </div>
+            <button class="toggle" id="bookingToggle" onclick="toggleBooking()"></button>
+          </div>
+
+          <!-- Custom slug -->
+          <div style="margin-bottom:20px">
+            <label style="display:block;font-size:0.78rem;font-weight:700;color:var(--ink);margin-bottom:8px">✨ Красивое имя ссылки (необязательно)</label>
+            <div style="display:flex;border:2px solid var(--border);overflow:hidden">
+              <span style="padding:12px 10px;background:var(--cream2);font-size:0.8rem;color:var(--muted);border-right:1px solid var(--border);white-space:nowrap;align-self:center">kapital-mastera.vercel.app/b/</span>
+              <input id="customSlug" type="text" placeholder="olga" maxlength="30"
+                style="flex:1;padding:12px;border:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--ink);outline:none;background:var(--white)"
+                oninput="onSlugInput(this)"
+                onchange="saveBookingSettings()">
+            </div>
+            <div id="slugPreview" style="font-size:0.75rem;color:var(--muted);margin-top:6px">
+              Например: <em>olga</em>, <em>anna-nail</em>, <em>beauty-pro</em> — только латиница и цифры
+            </div>
+          </div>
+
+          <!-- Link result -->
+          <div id="bookLinkResult" style="padding:16px;background:var(--cream2);border-left:3px solid var(--border)">
+            <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Ссылка для клиентов</div>
+            <div id="bookLinkUrl" style="font-size:0.9rem;font-weight:600;color:var(--muted);word-break:break-all;margin-bottom:12px">
+              Включи приём заявок чтобы получить ссылку
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onclick="copyBookLink()" style="padding:11px 20px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;touch-action:manipulation">
+                📋 Скопировать ссылку
+              </button>
+              <button onclick="openHelp('booking')" style="padding:11px 14px;background:none;border:1.5px solid var(--border);color:var(--muted);font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif">
+                ? Как работает
+              </button>
+            </div>
+          </div>
+
+          <!-- How to share -->
+          <div style="margin-top:20px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+            <div style="padding:14px;background:var(--cream2);border:1px solid var(--border)">
+              <div style="font-size:1.2rem;margin-bottom:6px">💬</div>
+              <div style="font-size:0.82rem;font-weight:600;color:var(--ink);margin-bottom:3px">WhatsApp / Telegram</div>
+              <div style="font-size:0.75rem;color:var(--muted)">Отправь ссылку в переписке</div>
+            </div>
+            <div style="padding:14px;background:var(--cream2);border:1px solid var(--border)">
+              <div style="font-size:1.2rem;margin-bottom:6px">📸</div>
+              <div style="font-size:0.82rem;font-weight:600;color:var(--ink);margin-bottom:3px">Instagram Bio</div>
+              <div style="font-size:0.75rem;color:var(--muted)">Поставь в шапку профиля</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+
 
   </main>
 
@@ -3856,276 +3925,377 @@ function toggleTheme(){
 })();
 
 // ════════════════════════════════════════════
-// ONLINE BOOKING — MASTER SIDE
+// BOOKING SYSTEM — NEW CLEAN VERSION
 // ════════════════════════════════════════════
-function getBookingSettings(){return load('km_booking_settings',{isOpen:false,services:[],workDays:[1,2,3,4,5],workStart:'10:00',workEnd:'19:00',masterName:'',masterProf:'',masterPhone:'',customSlug:''})}
-function saveBookingSettingsData(d){store('km_booking_settings',d)}
 
-function saveBookingSettings(){
-  var s=getBookingSettings();
-  var ws=document.getElementById('workStart');
-  var we=document.getElementById('workEnd');
-  var mp=document.getElementById('masterPhone');
-  var slugEl=document.getElementById('customSlug');
-  if(ws)s.workStart=ws.value;
-  if(we)s.workEnd=we.value;
-  if(mp)s.masterPhone=mp.value.trim();
-  if(slugEl)s.customSlug=slugEl.value.trim();
-  var sess=load('km_session',{});
-  s.masterName=sess.name||'Мастер';
-  s.masterProf=sess.prof||'Специалист';
-  saveBookingSettingsData(s);
-  refreshBookingLink();
+function getBookingSettings(){
+  return load('km_booking_settings',{
+    isOpen:false, services:[], workDays:[1,2,3,4,5],
+    workStart:'10:00', workEnd:'19:00',
+    masterName:'', masterProf:'',
+    masterPhone:'', customSlug:''
+  });
+}
+function saveBookingSettingsData(d){ store('km_booking_settings', d); }
+
+function switchBookTab(n){
+  [1,2,3].forEach(function(i){
+    document.getElementById('bookTab'+i).style.display = i===n ? 'block' : 'none';
+    var btn = document.getElementById('btab'+i);
+    if(btn) btn.classList.toggle('active', i===n);
+  });
+  if(n===1) renderIncomingList();
+  if(n===2) renderBookingSettings();
+  if(n===3) renderBookingLink();
 }
 
-function toggleDay(btn){
-  btn.classList.toggle('active');
-  var s=getBookingSettings();
-  var day=parseInt(btn.dataset.day);
-  var idx=s.workDays.indexOf(day);
-  if(idx>-1)s.workDays.splice(idx,1);
-  else s.workDays.push(day);
-  s.workDays.sort();
+function renderBookingPage(){
+  renderIncomingList();
+  renderBookingSettings();
+  renderBookingLink();
+}
+
+// ── TAB 2: Settings ─────────────────────────────────────────
+function renderBookingSettings(){
+  var s = getBookingSettings();
+  var mp = document.getElementById('masterPhone');
+  var ws = document.getElementById('workStart');
+  var we = document.getElementById('workEnd');
+  var slugEl = document.getElementById('customSlug');
+  if(mp && s.masterPhone) mp.value = s.masterPhone;
+  if(ws) ws.value = s.workStart || '10:00';
+  if(we) we.value = s.workEnd || '19:00';
+  if(slugEl && s.customSlug) slugEl.value = s.customSlug;
+  // Work day chips
+  document.querySelectorAll('#bookTab2 .slot-chip[data-day]').forEach(function(btn){
+    var day = parseInt(btn.dataset.day);
+    btn.classList.toggle('active', (s.workDays||[]).indexOf(day) > -1);
+  });
+  renderServiceList();
+}
+
+function saveBookingSettings(){
+  var s = getBookingSettings();
+  var mp = document.getElementById('masterPhone');
+  var ws = document.getElementById('workStart');
+  var we = document.getElementById('workEnd');
+  var slugEl = document.getElementById('customSlug');
+  if(mp) s.masterPhone = mp.value.trim();
+  if(ws) s.workStart = ws.value;
+  if(we) s.workEnd = we.value;
+  if(slugEl) s.customSlug = slugEl.value.trim();
+  var sess = load('km_session', {});
+  s.masterName = sess.name || 'Мастер';
+  s.masterProf = sess.prof || 'Специалист';
   saveBookingSettingsData(s);
+}
+
+function onSlugInput(el){
+  el.value = el.value.toLowerCase().replace(/[^a-z0-9-]/g,'').replace(/\s/g,'-').replace(/-{2,}/g,'-');
+  saveBookingSettings();
+  renderBookingLink();
+}
+
+// ── TAB 3: Link ──────────────────────────────────────────────
+function renderBookingLink(){
+  var s = getBookingSettings();
+  var tog = document.getElementById('bookingToggle');
+  var statusText = document.getElementById('bookStatusText');
+  var linkDiv = document.getElementById('bookLinkUrl');
+  var linkResult = document.getElementById('bookLinkResult');
+  var slugEl = document.getElementById('customSlug');
+  var slugPreview = document.getElementById('slugPreview');
+  var slug = (slugEl ? slugEl.value.trim() : '') || s.customSlug || '';
+
+  // Toggle state
+  if(tog){ if(s.isOpen) tog.classList.add('on'); else tog.classList.remove('on'); }
+
+  if(s.isOpen){
+    var url = window.location.origin + '/booking.html';
+    var display = slug
+      ? window.location.origin + '/b/' + slug
+      : url;
+    if(statusText) statusText.textContent = '✅ Клиенты могут записаться по ссылке';
+    if(linkDiv){
+      linkDiv.textContent = display;
+      linkDiv.style.color = 'var(--em)';
+      linkDiv.style.fontWeight = '600';
+    }
+    if(linkResult){
+      linkResult.style.borderLeftColor = 'var(--em)';
+      linkResult.style.background = 'rgba(13,110,74,0.06)';
+    }
+    // Update KPI status
+    var bs = document.getElementById('bookStatus');
+    if(bs) bs.textContent = '✅ Открыта';
+  } else {
+    if(statusText) statusText.textContent = 'Выключено — клиенты не могут записаться';
+    if(linkDiv){
+      linkDiv.textContent = 'Включи приём заявок чтобы получить ссылку';
+      linkDiv.style.color = 'var(--muted)';
+      linkDiv.style.fontWeight = '400';
+    }
+    if(linkResult){
+      linkResult.style.borderLeftColor = 'var(--border)';
+      linkResult.style.background = 'var(--cream2)';
+    }
+    var bs2 = document.getElementById('bookStatus');
+    if(bs2) bs2.textContent = '⏸ Выкл';
+  }
+
+  if(slugPreview && slug){
+    slugPreview.innerHTML = 'Красивая ссылка: <strong style="color:var(--em)">' +
+      window.location.origin + '/b/' + slug + '</strong>';
+  }
 }
 
 function toggleBooking(){
-  var s=getBookingSettings();
-  s.isOpen=!s.isOpen;
-  var sess=load('km_session',{});
-  s.masterName=sess.name||'Мастер';
-  s.masterProf=sess.prof||'Специалист';
+  var s = getBookingSettings();
+  s.isOpen = !s.isOpen;
+  var sess = load('km_session', {});
+  s.masterName = sess.name || 'Мастер';
+  s.masterProf = sess.prof || 'Специалист';
   saveBookingSettingsData(s);
-  // Update toggle button
-  var tog=document.getElementById('bookingToggle');
-  if(tog){ if(s.isOpen)tog.classList.add('on'); else tog.classList.remove('on'); }
-  // Update status KPI
-  var bs=document.getElementById('bookStatus');
-  if(bs) bs.textContent=s.isOpen?'✅ Открыта':'⏸ Выкл';
-  // Refresh link immediately
-  refreshBookingLink();
-  // Show toast
+  renderBookingLink();
+  renderIncomingList();
   toast(s.isOpen ? '✅ Приём заявок включён' : '⏸ Приём заявок выключен');
-}
-
-function addService(){
-  var name=document.getElementById('svcName').value.trim();
-  var dur=parseInt(document.getElementById('svcDur').value)||60;
-  var price=parseFloat(document.getElementById('svcPrice').value)||0;
-  if(!name){toast('Введите название услуги','error');return;}
-  var s=getBookingSettings();
-  s.services.push({id:uid(),name:name,dur:dur,price:price});
-  saveBookingSettingsData(s);
-  document.getElementById('svcName').value='';
-  document.getElementById('svcDur').value='60';
-  document.getElementById('svcPrice').value='';
-  renderServiceList();
-  refreshBookingLink();
-  toast('Услуга добавлена ✓');
-}
-
-function deleteService(id){
-  var s=getBookingSettings();
-  s.services=s.services.filter(function(x){return x.id!==id});
-  saveBookingSettingsData(s);
-  renderServiceList();
-}
-
-function renderServiceList(){
-  var s=getBookingSettings();
-  var el=document.getElementById('serviceList');
-  if(!el)return;
-  if(!s.services.length){
-    el.innerHTML='<div style="font-size:0.85rem;color:var(--muted);padding:8px 0">Добавьте услуги ниже</div>';
-    return;
-  }
-  el.innerHTML=s.services.map(function(svc){
-    return '<div class="service-item">'
-      +'<div><div class="service-name">'+svc.name+'</div><div class="service-dur">'+svc.dur+' мин</div></div>'
-      +'<div class="service-price">'+Math.round(svc.price).toLocaleString('ru-RU')+' ₽</div>'
-      +'<button class="service-del" onclick="deleteService(\''+svc.id+'\')" title="Удалить">×</button>'
-    +'</div>';
-  }).join('');
-}
-
-
-function updateLinkPreview(){ refreshBookingLink(); }
-
-function buildBookUrl(){
-  var s = getBookingSettings();
-  // Generate a short public key for this master's settings
-  // Store full settings under this key so client can read them
-  var key = s.bookingKey;
-  if(!key){
-    key = Math.random().toString(36).substr(2,6);
-    s.bookingKey = key;
-    saveBookingSettingsData(s);
-  }
-  // Save full settings under public key
-  localStorage.setItem('bk_pub_'+key, JSON.stringify({
-    isOpen: true,
-    masterName: s.masterName,
-    masterProf: s.masterProf,
-    masterPhone: s.masterPhone,
-    services: s.services,
-    workDays: s.workDays,
-    workStart: s.workStart,
-    workEnd: s.workEnd,
-  }));
-  var slug = s.customSlug ? s.customSlug.trim() : '';
-  var base = window.location.origin + '/booking.html?key=' + key;
-  return base;
-}
-
-function getShortDisplayUrl(){
-  var s = getBookingSettings();
-  var slug = s.customSlug ? s.customSlug.trim() : '';
-  if(slug) return window.location.origin + '/' + slug;
-  return buildBookUrl();
 }
 
 function copyBookLink(){
   var s = getBookingSettings();
-  if(!s.isOpen){
-    toast('Сначала включи тумблер «Приём заявок»','error'); return;
-  }
-  var url = buildBookUrl();
-  // If slug set, use it as display but real URL is the key URL
-  var slug = s.customSlug ? s.customSlug.trim() : '';
-  var copyUrl = slug ? (window.location.origin + '/' + slug) : url;
-  // Always copy the working key URL (slug redirects not supported without server)
+  if(!s.isOpen){ toast('Сначала включи приём заявок','error'); return; }
+  var url = window.location.origin + '/booking.html';
   if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(function(){
-      toast('✓ Ссылка скопирована — отправь клиентам!');
-    });
+    navigator.clipboard.writeText(url).then(function(){ toast('✓ Ссылка скопирована!'); });
   } else {
-    var inp=document.createElement('input');
-    inp.value=url; document.body.appendChild(inp); inp.select();
+    var inp = document.createElement('input');
+    inp.value = url; document.body.appendChild(inp); inp.select();
     document.execCommand('copy'); document.body.removeChild(inp);
-    toast('✓ Ссылка скопирована');
+    toast('✓ Ссылка скопирована!');
   }
 }
 
-function renderIncomingList(){
-  var el=document.getElementById('incomingList');
-  if(!el)return;
-  var appts=getAppts().filter(function(a){return a.source==='online'});
-  var pending=appts.filter(function(a){return a.status==='pending'});
+// ── Services ─────────────────────────────────────────────────
+function addService(){
+  var name = (document.getElementById('svcName')||{}).value;
+  name = name ? name.trim() : '';
+  var dur = parseInt((document.getElementById('svcDur')||{}).value)||60;
+  var price = parseFloat((document.getElementById('svcPrice')||{}).value)||0;
+  if(!name){ toast('Введите название услуги','error'); return; }
+  var s = getBookingSettings();
+  if(!s.services) s.services = [];
+  s.services.push({id:uid(), name:name, dur:dur, price:price});
+  saveBookingSettingsData(s);
+  if(document.getElementById('svcName')) document.getElementById('svcName').value='';
+  if(document.getElementById('svcDur')) document.getElementById('svcDur').value='60';
+  if(document.getElementById('svcPrice')) document.getElementById('svcPrice').value='';
+  renderServiceList();
+  toast('Услуга добавлена ✓');
+}
 
-  // Update badges
-  ['pendingCount','pendingCountMob','pendingBadge2'].forEach(function(id){
-    var b=document.getElementById(id);
-    if(b){b.textContent=pending.length;b.style.display=pending.length?'inline-flex':'none';}
-  });
-  var bookPending=document.getElementById('bookPending');
-  var bookTotal=document.getElementById('bookTotal');
-  var bookRevenue=document.getElementById('bookRevenue');
-  if(bookPending)bookPending.textContent=pending.length;
-  if(bookTotal)bookTotal.textContent=appts.length;
-  if(bookRevenue){
-    var rev=pending.reduce(function(a,x){return a+(+x.price||0)},0);
-    bookRevenue.innerHTML=rev.toLocaleString('ru-RU')+' <small>\u20bd</small>';
-  }
-
-  if(!appts.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">🔗</div><div class="empty-text">Заявок пока нет.<br>Включи приём и отправь ссылку клиентам.</div></div>';
+function renderServiceList(){
+  var s = getBookingSettings();
+  var el = document.getElementById('serviceList');
+  if(!el) return;
+  if(!s.services || !s.services.length){
+    el.innerHTML = '<div style="font-size:0.85rem;color:var(--muted);padding:8px 0">Добавьте услуги ниже</div>';
     return;
   }
+  el.innerHTML = '';
+  s.services.forEach(function(svc){
+    var row = document.createElement('div');
+    row.className = 'service-item';
+    row.innerHTML =
+      '<div><div class="service-name">'+svc.name+'</div><div class="service-dur">'+svc.dur+' мин</div></div>'+
+      '<div class="service-price">'+Math.round(svc.price).toLocaleString('ru-RU')+' ₽</div>';
+    var delBtn = document.createElement('button');
+    delBtn.className = 'service-del';
+    delBtn.title = 'Удалить';
+    delBtn.textContent = '×';
+    delBtn.onclick = (function(id){ return function(){ deleteService(id); }; })(svc.id);
+    row.appendChild(delBtn);
+    el.appendChild(row);
+  });
+}
 
-  el.innerHTML=appts.sort(function(a,b){return (b.created||0)-(a.created||0)}).map(function(a){
-    var statusColor={pending:'var(--gold)',confirmed:'var(--em)',cancelled:'var(--red)'}[a.status]||'var(--muted)';
-    var statusLabel={pending:'Ожидает',confirmed:'Подтверждена',cancelled:'Отменена'}[a.status]||a.status;
-    return '<div class="appt-item" style="border-left:3px solid '+statusColor+';padding:14px 16px;margin-bottom:8px;background:var(--cream)">'
-      +'<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">'
-        +'<div><div style="font-size:0.92rem;font-weight:700;color:var(--ink)">'+a.client+'</div>'
-        +'<div style="font-size:0.78rem;color:var(--muted)">📞 '+(a.phone||'—')+'</div></div>'
-        +'<span style="font-size:0.7rem;font-weight:600;padding:3px 10px;background:'+statusColor+';color:#fff;opacity:0.9">'+statusLabel+'</span>'
-      +'</div>'
-      +'<div style="font-size:0.82rem;color:var(--muted);margin-bottom:8px">'+a.service+' · '+a.date+' в '+a.time+(a.price?' · '+Math.round(a.price).toLocaleString('ru-RU')+' ₽':'')+'</div>'
-      +(a.note?'<div style="font-size:0.78rem;color:var(--muted);font-style:italic;margin-bottom:8px">💬 '+a.note+'</div>':'')
-      +(a.status==='pending'
-        ?'<div style="display:flex;gap:8px">'
-          +'<button onclick="confirmAppt(\''+a.id+'\')" style="flex:1;padding:8px;background:var(--em);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:\'DM Sans\',sans-serif">✓ Подтвердить</button>'
-          +'<button onclick="cancelAppt(\''+a.id+'\')" style="flex:1;padding:8px;background:none;border:1.5px solid var(--border);color:var(--muted);font-size:0.78rem;cursor:pointer;font-family:\'DM Sans\',sans-serif">✕ Отменить</button>'
-        +'</div>'
-        :'')
-    +'</div>';
-  }).join('');
+function deleteService(id){
+  var s = getBookingSettings();
+  s.services = s.services.filter(function(x){ return x.id !== id; });
+  saveBookingSettingsData(s);
+  renderServiceList();
+}
+
+// ── Incoming requests ────────────────────────────────────────
+function renderIncomingList(){
+  var el = document.getElementById('incomingList');
+  if(!el) return;
+  var appts = getAppts().filter(function(a){ return a.source === 'online'; });
+  var pending = appts.filter(function(a){ return a.status === 'pending'; });
+  var pendingBadges = ['pendingCount','pendingCountMob'];
+  pendingBadges.forEach(function(id){
+    var b = document.getElementById(id);
+    if(b){ b.textContent=pending.length; b.style.display=pending.length?'inline-flex':'none'; }
+  });
+  var bookPending = document.getElementById('bookPending');
+  var bookTotal = document.getElementById('bookTotal');
+  var bookRevenue = document.getElementById('bookRevenue');
+  if(bookPending) bookPending.textContent = pending.length;
+  if(bookTotal) bookTotal.textContent = appts.length;
+  if(bookRevenue){
+    var rev = pending.reduce(function(a,x){ return a+(+x.price||0); },0);
+    bookRevenue.innerHTML = rev.toLocaleString('ru-RU')+' <small>₽</small>';
+  }
+  if(!appts.length){
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔗</div><div class="empty-text">Заявок пока нет.<br>Отправь ссылку клиентам — они запишутся сами.</div></div>';
+    return;
+  }
+  el.innerHTML = '';
+  var sorted = appts.slice().sort(function(a,b){ return (b.created||0)-(a.created||0); });
+  sorted.forEach(function(a){
+    var sc = {pending:'var(--gold)', confirmed:'var(--em)', cancelled:'var(--red)'}[a.status]||'var(--muted)';
+    var sl = {pending:'Ожидает', confirmed:'Подтверждена', cancelled:'Отменена'}[a.status]||a.status;
+    var phone = a.phone ? a.phone.replace(/\D/g,'') : '';
+    var nl = '%0A';
+    var msg = 'text='+encodeURIComponent('Здравствуйте, '+a.client+'! Запись подтверждена. Услуга: '+a.service+'. '+a.date+' в '+a.time+(a.price?' Стоимость: '+Math.round(a.price).toLocaleString('ru-RU')+' руб.':''));
+    var div = document.createElement('div');
+    div.style.cssText = 'padding:16px;border-left:3px solid '+sc+';margin-bottom:10px;background:var(--cream)';
+    div.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'+
+        '<div><div style="font-size:0.95rem;font-weight:700;color:var(--ink)">'+a.client+'</div>'+
+        (a.phone?'<div style="font-size:0.78rem;color:var(--muted)">📞 '+a.phone+'</div>':'')+
+        '</div>'+
+        '<span style="font-size:0.68rem;font-weight:700;padding:3px 10px;background:'+sc+';color:#fff">'+sl+'</span>'+
+      '</div>'+
+      '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px">'+a.service+' · '+a.date+' в '+a.time+(a.price?' · '+Math.round(a.price).toLocaleString('ru-RU')+' ₽':'')+'</div>'+
+      (a.note?'<div style="font-size:0.78rem;font-style:italic;color:var(--muted);margin-bottom:8px">💬 '+a.note+'</div>':'')+
+      '<div class="appt-actions" style="display:flex;gap:6px;flex-wrap:wrap"></div>';
+    var actions = div.querySelector('.appt-actions');
+    if(a.status==='pending'){
+      var confBtn = document.createElement('button');
+      confBtn.style.cssText = 'flex:1;padding:8px;background:var(--em);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif';
+      confBtn.textContent = '✓ Подтвердить';
+      confBtn.onclick = (function(id){ return function(){ confirmAppt(id); }; })(a.id);
+      var canBtn = document.createElement('button');
+      canBtn.style.cssText = 'flex:1;padding:8px;background:none;border:1.5px solid var(--border);color:var(--muted);font-size:0.78rem;cursor:pointer;font-family:DM Sans,sans-serif';
+      canBtn.textContent = '✕ Отменить';
+      canBtn.onclick = (function(id){ return function(){ cancelAppt(id); }; })(a.id);
+      actions.appendChild(confBtn);
+      actions.appendChild(canBtn);
+    }
+    if(phone){
+      var waA = document.createElement('a');
+      waA.href = 'https://wa.me/'+phone+'?'+msg;
+      waA.target = '_blank';
+      waA.style.cssText = 'padding:8px 12px;background:#25D366;color:#fff;font-size:0.75rem;font-weight:700;text-decoration:none';
+      waA.textContent = 'WA';
+      var maxA = document.createElement('a');
+      maxA.href = 'https://max.ru/chat/'+phone+'?'+msg;
+      maxA.target = '_blank';
+      maxA.style.cssText = 'padding:8px 12px;background:#005BFF;color:#fff;font-size:0.75rem;font-weight:700;text-decoration:none';
+      maxA.textContent = 'MAX';
+      actions.appendChild(waA);
+      actions.appendChild(maxA);
+    }
+    el.appendChild(div);
+  });
 }
 
 function confirmAppt(id){
-  var appts=getAppts();
-  var a=appts.find(function(x){return x.id===id});
-  if(a){a.status='confirmed';}
-  saveAppts(appts);
-  toast('Запись подтверждена ✓');
-  renderIncomingList();
-  renderCalendar();
+  var appts = getAppts();
+  var a = appts.find(function(x){ return x.id===id; });
+  if(a){ a.status='confirmed'; saveAppts(appts); toast('Запись подтверждена ✓'); renderIncomingList(); renderCalendar(); }
 }
-
 function cancelAppt(id){
-  var appts=getAppts();
-  var a=appts.find(function(x){return x.id===id});
-  if(a){a.status='cancelled';}
-  saveAppts(appts);
-  toast('Запись отменена');
-  renderIncomingList();
-  renderCalendar();
+  var appts = getAppts();
+  var a = appts.find(function(x){ return x.id===id; });
+  if(a){ a.status='cancelled'; saveAppts(appts); toast('Запись отменена'); renderIncomingList(); renderCalendar(); }
 }
 
-function renderBookingPage(){
-  var s=getBookingSettings();
-  // Toggle button state
-  var tog=document.getElementById('bookingToggle');
-  if(tog){if(s.isOpen)tog.classList.add('on');else tog.classList.remove('on');}
-  // Status KPI
-  var bs=document.getElementById('bookStatus');
-  if(bs)bs.textContent=s.isOpen?'✅ Открыта':'⏸ Выкл';
-  // Link block — build full URL with all settings encoded
-  var bookUrl = buildBookUrl();
-  var lb=document.getElementById('bookLinkBlock');
-  if(lb){
-    lb.style.display = s.isOpen ? 'flex' : 'none';
-    lb.style.visibility = 'visible';
-    lb.style.opacity = '1';
-  }
-  var lu=document.getElementById('bookLinkUrl');
-  if(lu) lu.textContent = bookUrl;
-  // Link inline block
-  var inlineUrl = document.getElementById('bookLinkInlineUrl');
-  var inlineBlock = document.getElementById('bookLinkInline');
-  if(s.isOpen && s.services && s.services.length){
-    if(inlineUrl){inlineUrl.textContent = bookUrl; inlineUrl.style.color='var(--em)'; inlineUrl.style.fontWeight='500';}
-    if(inlineBlock){inlineBlock.style.borderColor='var(--em)'; inlineBlock.style.borderStyle='solid';}
-  } else if(!s.isOpen){
-    if(inlineUrl){inlineUrl.textContent='Включи тумблер выше чтобы получить ссылку'; inlineUrl.style.color='var(--muted)'; inlineUrl.style.fontWeight='400';}
-    if(inlineBlock){inlineBlock.style.borderColor='var(--border)'; inlineBlock.style.borderStyle='dashed';}
-  } else {
-    if(inlineUrl){inlineUrl.textContent='Добавь хотя бы одну услугу выше'; inlineUrl.style.color='var(--gold)'; inlineUrl.style.fontWeight='400';}
-    if(inlineBlock){inlineBlock.style.borderColor='var(--gold)'; inlineBlock.style.borderStyle='dashed';}
-  }
-  updateLinkPreview();
-  // Phone field
-  var mpEl=document.getElementById('masterPhone');
-  if(mpEl && s.masterPhone) mpEl.value=s.masterPhone;
-  // Work day chips
-  document.querySelectorAll('.slot-chip[data-day]').forEach(function(btn){
-    var day=parseInt(btn.dataset.day);
-    if(s.workDays.indexOf(day)>-1)btn.classList.add('active');
-    else btn.classList.remove('active');
+// ── Calendar: phone input + notification ─────────────────────
+document.getElementById('apptPhone') && document.getElementById('apptPhone').addEventListener('input', function(){
+  var phone = this.value.trim();
+  var waBtn = document.getElementById('sendWaBtn');
+  var maxBtn = document.getElementById('sendMaxBtn');
+  if(waBtn) waBtn.style.display = phone.length > 5 ? 'block' : 'none';
+  if(maxBtn) maxBtn.style.display = phone.length > 5 ? 'block' : 'none';
+});
+
+function buildApptMessage(a){
+  var sess = load('km_session', {});
+  var nl = '\n';
+  return encodeURIComponent(
+    'Здравствуйте, '+a.client+'! Вы записаны:'+nl+
+    'Дата: '+a.date+' в '+a.time+nl+
+    'Услуга: '+a.service+nl+
+    (a.price ? 'Стоимость: '+Math.round(a.price).toLocaleString('ru-RU')+' руб.'+nl : '')+
+    'Мастер: '+(sess.name||'Мастер')+nl+
+    'Ждём вас!'
+  );
+}
+
+function sendApptWhatsApp(){
+  var phone = (document.getElementById('apptPhone')||{}).value||'';
+  var client = (document.getElementById('apptClient')||{}).value||'';
+  var service = (document.getElementById('apptService')||{}).value||'';
+  var date = (document.getElementById('apptDate')||{}).value||'';
+  var time = (document.getElementById('apptTime')||{}).value||'';
+  var price = (document.getElementById('apptPrice')||{}).value||'';
+  var phoneClean = phone.replace(/\D/g,'');
+  if(!phoneClean){ toast('Введи телефон клиента','error'); return; }
+  var msg = buildApptMessage({client:client,service:service,date:date,time:time,price:price});
+  window.open('https://wa.me/'+phoneClean+'?text='+msg,'_blank');
+}
+
+function sendApptMax(){
+  var phone = (document.getElementById('apptPhone')||{}).value||'';
+  var client = (document.getElementById('apptClient')||{}).value||'';
+  var service = (document.getElementById('apptService')||{}).value||'';
+  var date = (document.getElementById('apptDate')||{}).value||'';
+  var time = (document.getElementById('apptTime')||{}).value||'';
+  var price = (document.getElementById('apptPrice')||{}).value||'';
+  var phoneClean = phone.replace(/\D/g,'');
+  if(!phoneClean){ toast('Введи телефон клиента','error'); return; }
+  var msg = buildApptMessage({client:client,service:service,date:date,time:time,price:price});
+  window.open('https://max.ru/chat/'+phoneClean+'?text='+msg,'_blank');
+}
+
+// After save appt — show notify panel
+(function(){
+  var saveBtn = document.getElementById('saveAppt');
+  if(!saveBtn) return;
+  var origOnclick = saveBtn.onclick;
+  saveBtn.addEventListener('click', function(){
+    setTimeout(function(){
+      var phone = (document.getElementById('apptPhone')||{}).value||'';
+      var panel = document.getElementById('notifyPanel');
+      if(panel && phone.trim().length > 5){
+        panel.style.display = 'block';
+        var phoneClean = phone.replace(/\D/g,'');
+        var client = (document.getElementById('apptClient')||{}).value||'';
+        var service = (document.getElementById('apptService')||{}).value||'';
+        var date = (document.getElementById('apptDate')||{}).value||'';
+        var time = (document.getElementById('apptTime')||{}).value||'';
+        var price = (document.getElementById('apptPrice')||{}).value||'';
+        var msg = buildApptMessage({client:client,service:service,date:date,time:time,price:price});
+        var waBtn = document.getElementById('notifyWaBtn');
+        var maxBtn = document.getElementById('notifyMaxBtn');
+        if(waBtn) waBtn.onclick = function(){ window.open('https://wa.me/'+phoneClean+'?text='+msg,'_blank'); };
+        if(maxBtn) maxBtn.onclick = function(){ window.open('https://max.ru/chat/'+phoneClean+'?text='+msg,'_blank'); };
+      }
+    }, 300);
   });
-  // Work hours
-  var ws=document.getElementById('workStart');
-  var we=document.getElementById('workEnd');
-  var mp=document.getElementById('masterPhone');
-  if(ws)ws.value=s.workStart;
-  if(we)we.value=s.workEnd;
-  if(mp&&s.masterPhone)mp.value=s.masterPhone;
-  var slugEl=document.getElementById('customSlug');
-  if(slugEl&&s.customSlug)slugEl.value=s.customSlug;
-  updateLinkPreview();
-  renderServiceList();
-  renderIncomingList();
+})();
+
+// toggleDay for booking settings
+function toggleDay(btn){
+  btn.classList.toggle('active');
+  var s = getBookingSettings();
+  var day = parseInt(btn.dataset.day);
+  var idx = s.workDays.indexOf(day);
+  if(idx>-1) s.workDays.splice(idx,1);
+  else s.workDays.push(day);
+  s.workDays.sort();
+  saveBookingSettingsData(s);
 }
 
 // ════════════════════════════════════════════
