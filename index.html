@@ -1712,6 +1712,23 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
   <link rel="apple-touch-icon" sizes="512x512" href="/app/icons/icon-512.png">
   <!-- Splash screens iOS -->
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyCSshaGE_C9oLJJ7p_qRlhzuRR4iz-rKrs",
+      authDomain: "kapital-mastera.firebaseapp.com",
+      databaseURL: "https://kapital-mastera-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "kapital-mastera",
+      storageBucket: "kapital-mastera.firebasestorage.app",
+      messagingSenderId: "85234511419",
+      appId: "1:85234511419:web:fef38bfb35fc11bbd0761e"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+  </script>
 </head>
 <body>
 
@@ -3925,6 +3942,78 @@ function toggleTheme(){
 })();
 
 // ════════════════════════════════════════════
+// FIREBASE — BOOKING SYNC
+// ════════════════════════════════════════════
+
+// Save master booking settings to Firebase under their user ID
+function fbSaveBookingSettings(s){
+  var sess = load('km_session', {});
+  var uid = sess.id || 'default';
+  if(typeof db === 'undefined') return;
+  db.ref('masters/' + uid + '/settings').set({
+    isOpen:       s.isOpen || false,
+    masterName:   s.masterName || '',
+    masterProf:   s.masterProf || '',
+    masterPhone:  s.masterPhone || '',
+    services:     s.services || [],
+    workDays:     s.workDays || [1,2,3,4,5],
+    workStart:    s.workStart || '10:00',
+    workEnd:      s.workEnd || '19:00',
+    customSlug:   s.customSlug || '',
+    updatedAt:    Date.now()
+  }).then(function(){
+    console.log('Firebase: settings saved');
+  }).catch(function(e){ console.warn('Firebase save error:', e); });
+}
+
+// Save incoming appointment to Firebase (from booking.html)
+function fbSaveAppointment(masterUid, appt){
+  if(typeof db === 'undefined') return Promise.reject('no db');
+  return db.ref('masters/' + masterUid + '/appointments/' + appt.id).set(appt);
+}
+
+// Load master settings from Firebase by UID
+function fbLoadMasterSettings(masterUid){
+  if(typeof db === 'undefined') return Promise.resolve(null);
+  return db.ref('masters/' + masterUid + '/settings').once('value').then(function(snap){
+    return snap.val();
+  });
+}
+
+// Listen for new appointments in real-time
+function fbListenAppointments(){
+  var sess = load('km_session', {});
+  var uid = sess.id || 'default';
+  if(typeof db === 'undefined') return;
+  db.ref('masters/' + uid + '/appointments').on('value', function(snap){
+    var fbAppts = snap.val() || {};
+    // Merge Firebase appointments with local
+    var local = getAppts().filter(function(a){ return a.source !== 'online'; });
+    var online = Object.values(fbAppts);
+    saveAppts(local.concat(online));
+    // Refresh if booking page is open
+    var bookPage = document.getElementById('page-booking');
+    if(bookPage && bookPage.classList.contains('active')){
+      renderIncomingList();
+    }
+    // Update pending badge
+    var pending = online.filter(function(a){ return a.status === 'pending'; });
+    ['pendingCount','pendingCountMob'].forEach(function(id){
+      var b = document.getElementById(id);
+      if(b){ b.textContent=pending.length; b.style.display=pending.length?'inline-flex':'none'; }
+    });
+  });
+}
+
+// Sync status confirm/cancel to Firebase
+function fbUpdateApptStatus(apptId, status){
+  var sess = load('km_session', {});
+  var uid = sess.id || 'default';
+  if(typeof db === 'undefined') return;
+  db.ref('masters/' + uid + '/appointments/' + apptId + '/status').set(status);
+}
+
+// ════════════════════════════════════════════
 // BOOKING SYSTEM — NEW CLEAN VERSION
 // ════════════════════════════════════════════
 
@@ -3936,7 +4025,10 @@ function getBookingSettings(){
     masterPhone:'', customSlug:''
   });
 }
-function saveBookingSettingsData(d){ store('km_booking_settings', d); }
+function saveBookingSettingsData(d){
+  store('km_booking_settings', d);
+  fbSaveBookingSettings(d);  // sync to Firebase
+}
 
 function switchBookTab(n){
   [1,2,3].forEach(function(i){
@@ -4011,7 +4103,9 @@ function renderBookingLink(){
   if(tog){ if(s.isOpen) tog.classList.add('on'); else tog.classList.remove('on'); }
 
   if(s.isOpen){
-    var url = window.location.origin + '/booking.html';
+    var sess2 = load('km_session', {});
+    var uid2 = sess2.id || 'default';
+    var url = window.location.origin + '/booking.html?master=' + uid2;
     var display = slug
       ? window.location.origin + '/b/' + slug
       : url;
@@ -4064,7 +4158,9 @@ function toggleBooking(){
 function copyBookLink(){
   var s = getBookingSettings();
   if(!s.isOpen){ toast('Сначала включи приём заявок','error'); return; }
-  var url = window.location.origin + '/booking.html';
+  var sess = load('km_session', {});
+  var uid = sess.id || 'default';
+  var url = window.location.origin + '/booking.html?master=' + uid;
   if(navigator.clipboard){
     navigator.clipboard.writeText(url).then(function(){ toast('✓ Ссылка скопирована!'); });
   } else {
@@ -4203,12 +4299,20 @@ function renderIncomingList(){
 function confirmAppt(id){
   var appts = getAppts();
   var a = appts.find(function(x){ return x.id===id; });
-  if(a){ a.status='confirmed'; saveAppts(appts); toast('Запись подтверждена ✓'); renderIncomingList(); renderCalendar(); }
+  if(a){
+    a.status='confirmed'; saveAppts(appts);
+    fbUpdateApptStatus(id, 'confirmed');
+    toast('Запись подтверждена ✓'); renderIncomingList(); renderCalendar();
+  }
 }
 function cancelAppt(id){
   var appts = getAppts();
   var a = appts.find(function(x){ return x.id===id; });
-  if(a){ a.status='cancelled'; saveAppts(appts); toast('Запись отменена'); renderIncomingList(); renderCalendar(); }
+  if(a){
+    a.status='cancelled'; saveAppts(appts);
+    fbUpdateApptStatus(id, 'cancelled');
+    toast('Запись отменена'); renderIncomingList(); renderCalendar();
+  }
 }
 
 // ── Calendar: phone input + notification ─────────────────────
@@ -4957,6 +5061,8 @@ function refreshAll(){
   seedDemo();
   navigateTo('dashboard');
   renderFinances();
+  // Start Firebase real-time listener for appointments
+  setTimeout(fbListenAppointments, 500);
 }
 
 checkSession();

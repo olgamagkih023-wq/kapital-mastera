@@ -85,6 +85,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);m
 .success-details{background:var(--cream2);padding:16px 18px;margin:20px 0;text-align:left}
 .err-msg{color:var(--red);font-size:0.82rem;padding:10px 14px;background:rgba(192,57,43,0.08);margin-bottom:10px;display:none}
 </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyCSshaGE_C9oLJJ7p_qRlhzuRR4iz-rKrs",
+      authDomain: "kapital-mastera.firebaseapp.com",
+      databaseURL: "https://kapital-mastera-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "kapital-mastera",
+      storageBucket: "kapital-mastera.firebasestorage.app",
+      messagingSenderId: "85234511419",
+      appId: "1:85234511419:web:fef38bfb35fc11bbd0761e"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+  </script>
 </head>
 <body>
 <div class="page-wrap">
@@ -327,7 +344,17 @@ function submitBooking(){
     phone:phone, status:'pending',
     source:'online', created:Date.now()
   });
-  localStorage.setItem('km_appts',JSON.stringify(appts));
+  // Save to Firebase (works across devices)
+  var apptToSave = {
+    id:id, client:name, service:state.svc ? state.svc.name : '',
+    date:state.date, time:state.time,
+    price:state.svc ? state.svc.price : 0,
+    note:note, phone:phone, status:'pending',
+    source:'online', created:Date.now()
+  };
+  db.ref('masters/' + masterUidGlobal + '/appointments/' + id).set(apptToSave)
+    .then(function(){ console.log('Appointment saved to Firebase'); })
+    .catch(function(e){ console.warn('Firebase error:', e); });
   // Build messenger message
   var masterPhone = (settings.masterPhone||'').replace(/\D/g,'');
   var msg = encodeURIComponent(
@@ -462,7 +489,13 @@ function copyStatusLink(url){
   }
 }
 
-if(!checkStatusMode()) init();
+// Don't call init() directly — loadSettings() calls it after Firebase responds
+var p0 = new URLSearchParams(window.location.search);
+if(p0.get('status')){
+  checkStatusMode();
+} else {
+  loadSettings();  // async — calls init() when Firebase data arrives
+}
 </script>
 </body>
 </html>

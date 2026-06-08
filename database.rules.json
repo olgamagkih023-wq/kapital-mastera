@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "masters": {
+      "$uid": {
+        "settings": {
+          ".read": true,
+          ".write": true
+        },
+        "appointments": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    }
+  }
+}
