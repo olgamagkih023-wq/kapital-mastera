@@ -2,586 +2,567 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Онлайн-запись</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCSshaGE_C9oLJJ7p_qRlhzuRR4iz-rKrs",
+  authDomain:"kapital-mastera.firebaseapp.com",
+  databaseURL:"https://kapital-mastera-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"kapital-mastera",
+  storageBucket:"kapital-mastera.firebasestorage.app",
+  messagingSenderId:"85234511419",
+  appId:"1:85234511419:web:fef38bfb35fc11bbd0761e"
+});
+var db = firebase.database();
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--em:#0D6E4A;--em3:#13C47E;--ink:#0C0D0A;--cream:#F9F5EE;--cream2:#F0E9DC;--border:#DDD4C4;--muted:#5A5750;--gold:#B8975A;--red:#C0392B;--white:#fff}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
-.page-wrap{max-width:480px;margin:0 auto;padding:0 0 60px}
+
+/* Loading screen */
+.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--em);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:0.9rem;color:var(--muted);font-weight:300}
+
+/* Main content */
+.wrap{max-width:500px;margin:0 auto;display:none}
+.wrap.ready{display:block}
 
 /* Header */
-.book-header{background:var(--ink);padding:32px 24px 28px;text-align:center}
-.book-logo{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:500;color:rgba(255,255,255,0.5);margin-bottom:16px}
-.book-logo span{color:var(--em3)}
-.master-name{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:#fff;margin-bottom:6px;line-height:1.1}
-.master-prof{font-size:0.82rem;color:rgba(255,255,255,0.4);letter-spacing:0.08em}
-.book-status-closed{background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);color:var(--red);padding:10px 16px;font-size:0.85rem;font-weight:500;text-align:center;margin:16px 24px 0}
-
-/* Steps */
-.step{display:none;padding:24px}
-.step.active{display:block}
-.step-label{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;font-weight:600}
-.step-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--ink);margin-bottom:20px}
+.bk-header{background:var(--ink);padding:28px 24px;text-align:center}
+.bk-logo{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:12px}
+.master-av{width:64px;height:64px;border-radius:50%;background:var(--em);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#fff;font-weight:500}
+.master-name{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:#fff;margin-bottom:4px}
+.master-prof{font-size:0.8rem;color:rgba(255,255,255,0.4);letter-spacing:0.06em}
+.closed-banner{background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);color:var(--red);padding:12px 16px;font-size:0.88rem;font-weight:500;text-align:center;margin:0}
 
 /* Progress */
-.progress{display:flex;gap:6px;padding:16px 24px 0}
-.prog-dot{flex:1;height:3px;background:var(--border);border-radius:2px;transition:background 0.3s}
-.prog-dot.done{background:var(--em)}
+.progress{display:flex;gap:4px;padding:14px 24px 0;background:var(--ink)}
+.prog-step{flex:1;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;transition:background 0.3s}
+.prog-step.done{background:var(--em3)}
+
+/* Steps */
+.step{display:none;padding:20px 20px 32px}
+.step.active{display:block}
+.step-tag{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;font-weight:600}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--ink);margin-bottom:18px}
 
 /* Service cards */
-.svc-grid{display:flex;flex-direction:column;gap:8px}
-.svc-card{padding:16px 18px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all 0.2s;text-align:left}
-.svc-card:hover,.svc-card.sel{border-color:var(--em);background:rgba(13,110,74,0.05)}
-.svc-card.sel{border-width:2px}
-.svc-n{font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:4px}
-.svc-meta{font-size:0.82rem;color:var(--muted)}
-.svc-price{font-size:1rem;font-weight:700;color:var(--em)}
+.svc-list{display:flex;flex-direction:column;gap:8px}
+.svc-card{padding:14px 16px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all 0.18s;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.svc-card:active,.svc-card.sel{border-color:var(--em);background:rgba(13,110,74,0.04)}
+.svc-name{font-size:0.95rem;font-weight:600;color:var(--ink);margin-bottom:3px}
+.svc-dur{font-size:0.78rem;color:var(--muted)}
+.svc-price{font-size:1rem;font-weight:700;color:var(--em);white-space:nowrap;margin-left:12px}
 
-/* Date picker */
-.date-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
-.date-wd{font-size:0.6rem;font-weight:700;text-align:center;color:var(--muted);padding:4px 0;text-transform:uppercase}
-.date-cell{height:40px;display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:500;border:1.5px solid transparent;cursor:pointer;border-radius:4px;transition:all 0.15s}
-.date-cell.avail:hover,.date-cell.sel{background:var(--em);color:#fff;border-color:var(--em)}
-.date-cell.today{border-color:var(--em);color:var(--em)}
-.date-cell.off{color:var(--border);cursor:default}
-.date-cell.past{color:var(--border);cursor:default}
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.cal-nav-btn{width:34px;height:34px;background:none;border:1.5px solid var(--border);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s}
-.cal-nav-btn:hover{border-color:var(--em)}
-.cal-month-lbl{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400}
+/* Calendar */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav-btn{width:36px;height:36px;background:none;border:1.5px solid var(--border);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s;flex-shrink:0;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+.cal-nav-btn:active{border-color:var(--em)}
+.cal-month{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px}
+.cal-wd{font-size:0.6rem;font-weight:700;text-align:center;color:var(--muted);padding:4px 0;text-transform:uppercase}
+.cal-day{height:38px;display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:500;cursor:pointer;border-radius:4px;transition:all 0.15s;-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.cal-day.off{color:var(--border);cursor:default}
+.cal-day.past{color:var(--border);cursor:default;text-decoration:line-through}
+.cal-day.avail:hover{background:rgba(13,110,74,0.1)}
+.cal-day.today{border:2px solid var(--em);color:var(--em);font-weight:700}
+.cal-day.sel{background:var(--em);color:#fff;border-radius:50%}
 
 /* Time slots */
-.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.time-slot{padding:12px 8px;text-align:center;border:1.5px solid var(--border);cursor:pointer;font-size:0.88rem;font-weight:500;transition:all 0.15s;background:var(--white)}
-.time-slot:hover,.time-slot.sel{background:var(--em);color:#fff;border-color:var(--em)}
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.time-slot{padding:12px 6px;text-align:center;border:1.5px solid var(--border);cursor:pointer;font-size:0.88rem;font-weight:500;transition:all 0.15s;background:var(--white);-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.time-slot:active,.time-slot.sel{background:var(--em);color:#fff;border-color:var(--em)}
 .time-slot.taken{background:var(--cream2);color:var(--border);cursor:default;text-decoration:line-through}
+.time-note{font-size:0.75rem;color:var(--muted);margin-bottom:14px}
 
 /* Form */
 .field{margin-bottom:14px}
-.field label{display:block;font-size:0.78rem;font-weight:600;color:var(--ink);margin-bottom:6px}
-.field input,.field textarea{width:100%;padding:14px 16px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--ink);outline:none;transition:border-color 0.2s}
+.field label{display:block;font-size:0.78rem;font-weight:600;color:var(--ink);margin-bottom:5px}
+.field input,.field textarea{width:100%;padding:13px 14px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--ink);outline:none;transition:border-color 0.2s;-webkit-appearance:none;border-radius:0}
 .field input:focus,.field textarea:focus{border-color:var(--em)}
-.field textarea{resize:vertical;min-height:60px}
+.field textarea{resize:vertical;min-height:56px}
 
-/* Summary */
-.summary-box{background:var(--cream2);padding:16px 18px;margin-bottom:20px}
-.sum-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.88rem}
-.sum-row:last-child{border-bottom:none;font-weight:700;font-size:1rem;color:var(--em);padding-top:10px}
+/* Summary box */
+.sum-box{background:var(--cream2);padding:14px 16px;margin-bottom:16px;border-left:3px solid var(--em)}
+.sum-row{display:flex;justify-content:space-between;font-size:0.88rem;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.sum-row:last-child{border:none;padding-top:8px;font-weight:700;font-size:0.95rem;color:var(--em)}
 
 /* Buttons */
-.btn-next{width:100%;padding:16px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:8px}
-.btn-next:hover{background:var(--ink)}
-.btn-next:disabled{background:var(--border);cursor:default}
-.btn-back{width:100%;padding:14px;background:none;border:2px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;margin-top:8px;transition:border-color 0.2s}
-.btn-back:hover{border-color:var(--ink)}
+.btn-next{width:100%;padding:15px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:8px;-webkit-tap-highlight-color:rgba(0,0,0,0.1)}
+.btn-next:active{background:var(--ink)}
+.btn-back{width:100%;padding:13px;background:none;border:2px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;margin-top:8px;transition:border-color 0.2s;-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.btn-back:active{border-color:var(--ink)}
+.err-msg{color:var(--red);font-size:0.82rem;padding:10px 14px;background:rgba(192,57,43,0.08);margin-bottom:10px;display:none;border-left:3px solid var(--red)}
 
 /* Success */
-.success-box{text-align:center;padding:40px 24px}
-.success-icon{font-size:3.5rem;margin-bottom:20px;display:block}
-.success-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:var(--ink);margin-bottom:12px}
-.success-sub{font-size:0.92rem;color:var(--muted);line-height:1.75;font-weight:300}
-.success-details{background:var(--cream2);padding:16px 18px;margin:20px 0;text-align:left}
-.err-msg{color:var(--red);font-size:0.82rem;padding:10px 14px;background:rgba(192,57,43,0.08);margin-bottom:10px;display:none}
+.success{text-align:center;padding:36px 20px 40px}
+.success-icon{font-size:3rem;display:block;margin-bottom:16px}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--ink);margin-bottom:8px}
+.success-det{background:var(--cream2);padding:14px 16px;margin:16px 0;text-align:left;border-left:3px solid var(--em)}
+.success-det-row{display:flex;justify-content:space-between;font-size:0.88rem;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.success-det-row:last-child{border:none}
+.success-note{font-size:0.85rem;color:var(--muted);line-height:1.65;margin-bottom:16px}
+.msg-btns{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.msg-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;color:#fff;text-decoration:none;font-size:0.9rem;font-weight:700;font-family:'DM Sans',sans-serif;-webkit-tap-highlight-color:rgba(0,0,0,0.1);border-radius:0}
 </style>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-  <script>
-    var firebaseConfig = {
-      apiKey: "AIzaSyCSshaGE_C9oLJJ7p_qRlhzuRR4iz-rKrs",
-      authDomain: "kapital-mastera.firebaseapp.com",
-      databaseURL: "https://kapital-mastera-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "kapital-mastera",
-      storageBucket: "kapital-mastera.firebasestorage.app",
-      messagingSenderId: "85234511419",
-      appId: "1:85234511419:web:fef38bfb35fc11bbd0761e"
-    };
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.database();
-  </script>
 </head>
 <body>
-<div class="page-wrap">
 
-  <div class="book-header">
-    <div class="book-logo">Капитал <span>Мастера</span></div>
+<!-- Loading -->
+<div class="loading" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Загружаем расписание...</div>
+</div>
+
+<!-- Main -->
+<div class="wrap" id="mainWrap">
+
+  <div class="bk-header">
+    <div class="bk-logo">Капитал Мастера · Онлайн-запись</div>
+    <div class="master-av" id="masterAv">О</div>
     <div class="master-name" id="masterName">Мастер</div>
     <div class="master-prof" id="masterProf">Запись онлайн</div>
-    <div id="closedBanner" class="book-status-closed" style="display:none">⏸ Запись временно закрыта</div>
+  </div>
+  <div class="closed-banner" id="closedBanner" style="display:none">⏸ Запись временно закрыта. Попробуйте позже.</div>
+
+  <!-- Progress -->
+  <div class="progress" id="progressBar">
+    <div class="prog-step" id="p1"></div>
+    <div class="prog-step" id="p2"></div>
+    <div class="prog-step" id="p3"></div>
+    <div class="prog-step" id="p4"></div>
   </div>
 
-  <div class="progress">
-    <div class="prog-dot done" id="p1"></div>
-    <div class="prog-dot" id="p2"></div>
-    <div class="prog-dot" id="p3"></div>
-    <div class="prog-dot" id="p4"></div>
-  </div>
-
-  <!-- STEP 1: Выбор услуги -->
-  <div class="step active" id="s1">
-    <div class="step-label">Шаг 1 из 4</div>
+  <!-- STEP 1: Услуга -->
+  <div class="step" id="s1">
+    <div class="step-tag">Шаг 1 из 4</div>
     <div class="step-title">Выберите услугу</div>
-    <div class="svc-grid" id="svcGrid"></div>
+    <div class="svc-list" id="svcList"></div>
   </div>
 
-  <!-- STEP 2: Выбор даты -->
+  <!-- STEP 2: Дата -->
   <div class="step" id="s2">
-    <div class="step-label">Шаг 2 из 4</div>
+    <div class="step-tag">Шаг 2 из 4</div>
     <div class="step-title">Выберите дату</div>
     <div class="cal-nav">
       <button class="cal-nav-btn" onclick="prevMonth()">←</button>
-      <div class="cal-month-lbl" id="calLbl"></div>
+      <div class="cal-month" id="calMonthLbl"></div>
       <button class="cal-nav-btn" onclick="nextMonth()">→</button>
     </div>
-    <div class="date-grid" id="dateGrid"></div>
+    <div class="cal-grid" id="calGrid"></div>
     <button class="btn-back" onclick="goStep(1)">← Назад</button>
   </div>
 
-  <!-- STEP 3: Выбор времени -->
+  <!-- STEP 3: Время -->
   <div class="step" id="s3">
-    <div class="step-label">Шаг 3 из 4</div>
+    <div class="step-tag">Шаг 3 из 4</div>
     <div class="step-title">Выберите время</div>
-    <div style="font-size:0.85rem;color:var(--muted);margin-bottom:16px" id="selectedDateLabel"></div>
+    <div class="time-note" id="selDateLabel"></div>
     <div class="time-grid" id="timeGrid"></div>
-    <button class="btn-back" onclick="goStep(2)" style="margin-top:16px">← Назад</button>
+    <button class="btn-back" onclick="goStep(2)">← Назад</button>
   </div>
 
-  <!-- STEP 4: Контактные данные -->
+  <!-- STEP 4: Контакты -->
   <div class="step" id="s4">
-    <div class="step-label">Шаг 4 из 4</div>
+    <div class="step-tag">Шаг 4 из 4</div>
     <div class="step-title">Ваши данные</div>
-    <div class="summary-box">
-      <div class="sum-row"><span>Услуга</span><span id="sumSvc">—</span></div>
-      <div class="sum-row"><span>Дата</span><span id="sumDate">—</span></div>
-      <div class="sum-row"><span>Время</span><span id="sumTime">—</span></div>
-      <div class="sum-row"><span>Стоимость</span><span id="sumPrice">—</span></div>
-    </div>
+    <div class="sum-box" id="sumBox"></div>
     <div class="err-msg" id="formErr"></div>
-    <div class="field"><label>Ваше имя *</label><input type="text" id="clientName" placeholder="Имя и фамилия"></div>
-    <div class="field"><label>Телефон *</label><input type="tel" id="clientPhone" placeholder="+7 (___) ___-__-__"></div>
-    <div class="field"><label>Комментарий</label><textarea id="clientNote" placeholder="Особые пожелания..."></textarea></div>
+    <div class="field"><label>Ваше имя *</label><input type="text" id="cName" placeholder="Анна Иванова" autocomplete="name"></div>
+    <div class="field"><label>Телефон *</label><input type="tel" id="cPhone" placeholder="+7 (999) 000-00-00" autocomplete="tel"></div>
+    <div class="field"><label>Пожелания</label><textarea id="cNote" placeholder="Длина ногтей, дизайн, особые пожелания..."></textarea></div>
     <button class="btn-next" onclick="submitBooking()">Записаться ✓</button>
     <button class="btn-back" onclick="goStep(3)">← Назад</button>
   </div>
 
   <!-- SUCCESS -->
   <div class="step" id="sDone">
-    <div class="success-box">
+    <div class="success">
       <span class="success-icon">✅</span>
       <div class="success-title">Вы записаны!</div>
-      <div class="success-details" id="successDetails"></div>
-      <div class="success-sub">Мастер свяжется с вами для подтверждения.</div>
-  <div id="messengerBtns" style="margin-top:20px;display:flex;flex-direction:column;gap:10px"></div>
+      <div class="success-det" id="successDet"></div>
+      <div class="success-note" id="successNote">Мастер получил уведомление. Вы также можете написать напрямую:</div>
+      <div class="msg-btns" id="msgBtns"></div>
     </div>
   </div>
 
-</div>
+</div><!-- /wrap -->
 
 <script>
-var state = {svc:null, date:null, time:null, calYear:new Date().getFullYear(), calMonth:new Date().getMonth()};
-var settings = {};
-
-function loadSettings(){
-  try{
-    var raw = localStorage.getItem('km_booking_settings');
-    if(raw) settings = JSON.parse(raw);
-  }catch(e){}
-  // Fallback defaults
-  settings.masterName = settings.masterName || 'Мастер';
-  settings.masterProf = settings.masterProf || 'Творческий специалист';
-  settings.isOpen = settings.isOpen || false;
-  settings.services = settings.services || [];
-  settings.workDays = settings.workDays || [1,2,3,4,5];
-  settings.workStart = settings.workStart || '10:00';
-  settings.workEnd = settings.workEnd || '19:00';
-  settings.masterPhone = settings.masterPhone || '';
-}
-
-function init(){
-  loadSettings();
-  document.getElementById('masterName').textContent = settings.masterName;
-  document.getElementById('masterProf').textContent = settings.masterProf;
-  // Pre-fill phone from URL param (for cross-device)
-  var params = new URLSearchParams(window.location.search);
-  if(params.get('phone')) settings.masterPhone = params.get('phone');
-  if(!settings.isOpen){
-    document.getElementById('closedBanner').style.display = 'block';
-    document.getElementById('s1').innerHTML = '<div style="padding:40px 0;text-align:center;color:var(--muted)"><div style="font-size:2.5rem;margin-bottom:16px">⏸</div><div style="font-size:1rem">Запись временно закрыта.<br>Попробуйте позже.</div></div>';
-    return;
-  }
-  renderServices();
-}
-
-function renderServices(){
-  var g = document.getElementById('svcGrid');
-  if(!settings.services.length){
-    g.innerHTML = '<div style="color:var(--muted);font-size:0.9rem;padding:20px 0">Мастер ещё не добавил услуги</div>';
-    return;
-  }
-  g.innerHTML = settings.services.map(function(s,i){
-    return '<div class="svc-card" onclick="selectSvc('+i+')" data-idx="'+i+'"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="svc-n">'+s.name+'</div><div class="svc-meta">⏱ '+s.dur+' мин</div></div><div class="svc-price">'+Math.round(s.price).toLocaleString('ru-RU')+' ₽</div></div></div>';
-  }).join('');
-}
-
-function selectSvc(idx){
-  state.svc = settings.services[idx];
-  document.querySelectorAll('.svc-card').forEach(function(c){c.classList.remove('sel')});
-  document.querySelector('.svc-card[data-idx="'+idx+'"]').classList.add('sel');
-  setTimeout(function(){goStep(2)},200);
-}
-
-// Calendar
+// ── State ────────────────────────────────────────────────────
+var S = { svc:null, date:null, time:null, cy:new Date().getFullYear(), cm:new Date().getMonth() };
+var CFG = { isOpen:false, masterName:'Мастер', masterProf:'', masterPhone:'', masterTelegram:'', services:[], workDays:[1,2,3,4,5], workStart:'10:00', workEnd:'19:00' };
+var MASTER_UID = '';
+var TG_TOKEN = '8897177806:AAGv09R-rc-umrHHU-TrNUlIy1rIA2L12MY';
+var TG_CHAT  = '1164869349';
 var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-function renderCal(){
-  document.getElementById('calLbl').textContent = MONTHS[state.calMonth]+' '+state.calYear;
-  var first = new Date(state.calYear, state.calMonth, 1);
-  var startDow = first.getDay()||7;
-  var days = new Date(state.calYear, state.calMonth+1, 0).getDate();
-  var today = new Date(); today.setHours(0,0,0,0);
-  var g = document.getElementById('dateGrid');
-  var wds = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-  var html = wds.map(function(d){return '<div class="date-wd">'+d+'</div>'}).join('');
-  for(var i=1;i<startDow;i++) html+='<div></div>';
-  for(var d=1;d<=days;d++){
-    var dt = new Date(state.calYear,state.calMonth,d);
-    var dow = dt.getDay();
-    var isPast = dt < today;
-    var isOff = settings.workDays.indexOf(dow)===-1;
-    var dateStr = state.calYear+'-'+((state.calMonth+1).toString().padStart(2,'0'))+'-'+(d.toString().padStart(2,'0'));
-    var cls = 'date-cell';
-    var onclick = '';
-    if(isPast||isOff){cls+=' off';} 
-    else {
-      var isToday = dt.getTime()===today.getTime();
-      if(isToday) cls+=' today avail';
-      else cls+=' avail';
-      if(dateStr===state.date) cls+=' sel';
-      onclick = ' onclick="selectDate(\''+dateStr+'\')"';
-    }
-    html+='<div class="'+cls+'"'+onclick+'>'+d+'</div>';
+var MONTHS_RU = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+
+// ── Boot: load settings from Firebase ───────────────────────
+function boot(){
+  var p = new URLSearchParams(window.location.search);
+
+  // Status page mode
+  if(p.get('status')){ showStatus(p.get('status')); return; }
+
+  MASTER_UID = p.get('master') || '';
+
+  if(!MASTER_UID){
+    // Try local settings (same device as master)
+    try{
+      var raw = localStorage.getItem('km_booking_settings');
+      if(raw){ CFG = Object.assign(CFG, JSON.parse(raw)); showApp(); return; }
+    }catch(e){}
+    showClosed('Ссылка для записи недействительна. Запросите актуальную ссылку у мастера.');
+    return;
   }
-  g.innerHTML=html;
-}
-function prevMonth(){if(state.calMonth===0){state.calMonth=11;state.calYear--;}else state.calMonth--;renderCal();}
-function nextMonth(){if(state.calMonth===11){state.calMonth=0;state.calYear++;}else state.calMonth++;renderCal();}
-function selectDate(d){
-  state.date=d;
-  document.querySelectorAll('.date-cell').forEach(function(c){c.classList.remove('sel')});
-  var cells=document.querySelectorAll('.date-cell.avail');
-  cells.forEach(function(c){if(c.onclick&&c.onclick.toString().includes(d))c.classList.add('sel')});
-  setTimeout(function(){goStep(3)},200);
+
+  db.ref('masters/' + MASTER_UID + '/settings').once('value')
+    .then(function(snap){
+      var data = snap.val();
+      if(data){
+        CFG = Object.assign(CFG, data);
+      }
+      showApp();
+    })
+    .catch(function(e){
+      console.warn('Firebase error:', e);
+      showClosed('Не удалось загрузить расписание. Проверьте соединение и обновите страницу.');
+    });
 }
 
-// Time slots
-function renderTimes(){
-  var start=parseInt(settings.workStart)||10;
-  var end=parseInt(settings.workEnd)||19;
-  var dur=state.svc?parseInt(state.svc.dur)||60:60;
-  // Get existing appointments for this date
-  var appts=[];
-  try{appts=JSON.parse(localStorage.getItem('km_appts')||'[]');}catch(e){}
-  var takenTimes=appts.filter(function(a){return a.date===state.date}).map(function(a){return a.time});
-  var slots=[];
-  for(var h=start;h<end;h++){
-    slots.push((h<10?'0':'')+h+':00');
-    if(dur<=30) slots.push((h<10?'0':'')+h+':30');
+function showApp(){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('mainWrap').classList.add('ready');
+  // Set master info
+  var av = document.getElementById('masterAv');
+  var nm = document.getElementById('masterName');
+  var pf = document.getElementById('masterProf');
+  if(av) av.textContent = (CFG.masterName||'М')[0].toUpperCase();
+  if(nm) nm.textContent = CFG.masterName || 'Мастер';
+  if(pf) pf.textContent = CFG.masterProf || '';
+  if(!CFG.isOpen){
+    showClosed(null); return;
   }
-  var parts=state.date?state.date.split('-'):[];
-  var months2=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-  document.getElementById('selectedDateLabel').textContent=parts.length?((+parts[2])+' '+months2[+parts[1]-1]+' '+parts[0]):'';
-  document.getElementById('timeGrid').innerHTML=slots.map(function(t){
-    var taken=takenTimes.indexOf(t)>-1;
-    return '<div class="time-slot'+(taken?' taken':'')+(t===state.time?' sel':'')+'"'+(taken?'':' onclick="selectTime(\''+t+'\''+')"')+'>'+(taken?'<s>'+t+'</s>':t)+'</div>';
-  }).join('');
-}
-function selectTime(t){
-  state.time=t;
-  document.querySelectorAll('.time-slot').forEach(function(c){c.classList.remove('sel')});
-  event.target.classList.add('sel');
-  setTimeout(function(){goStep(4)},200);
+  if(!CFG.services || !CFG.services.length){
+    showClosed('Мастер ещё не добавил услуги. Попробуйте позже.'); return;
+  }
+  goStep(1);
 }
 
+function showClosed(msg){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('mainWrap').classList.add('ready');
+  var b = document.getElementById('closedBanner');
+  if(b){ b.textContent = msg || '⏸ Запись временно закрыта. Попробуйте позже.'; b.style.display = 'block'; }
+  document.getElementById('progressBar').style.display = 'none';
+}
+
+// ── Navigation ───────────────────────────────────────────────
 function goStep(n){
-  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active')});
-  document.getElementById('s'+n).classList.add('active');
+  document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById(n==='done'?'sDone':'s'+n);
+  if(el) el.classList.add('active');
   for(var i=1;i<=4;i++){
     var d=document.getElementById('p'+i);
-    if(d)d.className='prog-dot'+(i<=n?' done':'');
+    if(d) d.className = 'prog-step' + (i<=(n==='done'?4:n)?' done':'');
   }
-  if(n===2) renderCal();
+  if(n===1) renderServices();
+  if(n===2) renderCalendar();
   if(n===3) renderTimes();
   if(n===4) renderSummary();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function renderSummary(){
-  document.getElementById('sumSvc').textContent=state.svc?state.svc.name:'—';
-  var p=state.date?state.date.split('-'):[];
-  document.getElementById('sumDate').textContent=p.length?(+p[2])+'.'+p[1]+'.'+p[0]:'—';
-  document.getElementById('sumTime').textContent=state.time||'—';
-  document.getElementById('sumPrice').textContent=state.svc?(Math.round(state.svc.price).toLocaleString('ru-RU')+' ₽'):'—';
-}
-
-
-// ════════════════════════════════════════════
-// TELEGRAM AUTO-NOTIFICATION
-// ════════════════════════════════════════════
-var TG_TOKEN   = '8897177806:AAGv09R-rc-umrHHU-TrNUlIy1rIA2L12MY';
-var TG_CHAT_ID = '1164869349';
-
-function sendTelegramNotification(appt, masterName){
-  var lines = [
-    '🔔 *Новая запись!*',
-    '',
-    '👤 *Клиент:* ' + appt.client,
-    appt.phone ? '📞 *Телефон:* ' + appt.phone : '',
-    '💆 *Услуга:* ' + (appt.service||'—'),
-    '📅 *Дата:* ' + appt.date,
-    '🕐 *Время:* ' + appt.time,
-    appt.price ? '💰 *Стоимость:* ' + Math.round(appt.price).toLocaleString('ru-RU') + ' ₽' : '',
-    appt.note ? '💬 *Пожелания:* ' + appt.note : '',
-    '',
-    '✅ Подтвердите запись в приложении.'
-  ].filter(Boolean).join('\n');
-
-  fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      chat_id: TG_CHAT_ID,
-      text: lines,
-      parse_mode: 'Markdown'
-    })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if(d.ok) console.log('Telegram: уведомление отправлено');
-    else console.warn('Telegram error:', d.description);
-  })
-  .catch(function(e){ console.warn('Telegram fetch error:', e); });
-}
-
-function submitBooking(){
-  var name=document.getElementById('clientName').value.trim();
-  var phone=document.getElementById('clientPhone').value.trim();
-  var note=document.getElementById('clientNote').value.trim();
-  var err=document.getElementById('formErr');
-  err.style.display='none';
-  if(!name){err.textContent='Введите ваше имя';err.style.display='block';return;}
-  if(!phone){err.textContent='Введите номер телефона';err.style.display='block';return;}
-  // Save booking request to localStorage (master will see it)
-  var appts=[];
-  try{appts=JSON.parse(localStorage.getItem('km_appts')||'[]');}catch(e){}
-  var id='bk_'+Date.now();
-  appts.push({
-    id:id, client:name, service:state.svc.name,
-    date:state.date, time:state.time,
-    price:state.svc.price, note:note,
-    phone:phone, status:'pending',
-    source:'online', created:Date.now()
+// ── Step 1: Services ─────────────────────────────────────────
+function renderServices(){
+  var el = document.getElementById('svcList');
+  el.innerHTML = '';
+  CFG.services.forEach(function(svc, i){
+    var card = document.createElement('div');
+    card.className = 'svc-card' + (S.svc && S.svc.id===svc.id?' sel':'');
+    card.innerHTML =
+      '<div><div class="svc-name">'+svc.name+'</div><div class="svc-dur">⏱ '+svc.dur+' мин</div></div>'+
+      '<div class="svc-price">'+Math.round(svc.price||0).toLocaleString('ru-RU')+' ₽</div>';
+    card.onclick = (function(s){ return function(){
+      S.svc = s;
+      document.querySelectorAll('.svc-card').forEach(function(c){ c.classList.remove('sel'); });
+      this.classList.add('sel');
+      setTimeout(function(){ goStep(2); }, 180);
+    }; })(svc);
+    el.appendChild(card);
   });
-  // Save to Firebase (works across devices)
-  var apptToSave = {
-    id:id, client:name, service:state.svc ? state.svc.name : '',
-    date:state.date, time:state.time,
-    price:state.svc ? state.svc.price : 0,
-    note:note, phone:phone, status:'pending',
+}
+
+// ── Step 2: Calendar ─────────────────────────────────────────
+function renderCalendar(){
+  document.getElementById('calMonthLbl').textContent = MONTHS[S.cm] + ' ' + S.cy;
+  var first = new Date(S.cy, S.cm, 1);
+  var dow = first.getDay() || 7; // Mon=1
+  var days = new Date(S.cy, S.cm+1, 0).getDate();
+  var today = new Date(); today.setHours(0,0,0,0);
+  var wds = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  var g = document.getElementById('calGrid');
+  g.innerHTML = wds.map(function(d){ return '<div class="cal-wd">'+d+'</div>'; }).join('');
+  // Padding
+  for(var i=1;i<dow;i++) g.innerHTML += '<div></div>';
+  // Days
+  for(var d=1;d<=days;d++){
+    var dt = new Date(S.cy, S.cm, d);
+    var wd = dt.getDay();
+    var isPast = dt < today;
+    var isOff  = CFG.workDays.indexOf(wd) === -1;
+    var dateStr = S.cy+'-'+pad(S.cm+1)+'-'+pad(d);
+    var isToday = dt.getTime() === today.getTime();
+    var isSel   = dateStr === S.date;
+    var cls = 'cal-day';
+    if(isPast || isOff) cls += ' off';
+    else { cls += ' avail'; if(isToday) cls += ' today'; if(isSel) cls += ' sel'; }
+    var div = document.createElement('div');
+    div.className = cls;
+    div.textContent = d;
+    if(!isPast && !isOff){
+      div.onclick = (function(ds){ return function(){
+        S.date = ds;
+        goStep(3);
+      }; })(dateStr);
+    }
+    g.appendChild(div);
+  }
+}
+function prevMonth(){ if(S.cm===0){S.cm=11;S.cy--;}else S.cm--; renderCalendar(); }
+function nextMonth(){ if(S.cm===11){S.cm=0;S.cy++;}else S.cm++; renderCalendar(); }
+function pad(n){ return n<10?'0'+n:n; }
+
+// ── Step 3: Time slots ───────────────────────────────────────
+function renderTimes(){
+  var parts = S.date ? S.date.split('-') : [];
+  document.getElementById('selDateLabel').textContent = parts.length
+    ? (+parts[2]) + ' ' + MONTHS_RU[+parts[1]-1] + ' ' + parts[0] : '';
+  var sh = parseInt(CFG.workStart)||10;
+  var eh = parseInt(CFG.workEnd)||19;
+  var dur = S.svc ? (parseInt(S.svc.dur)||60) : 60;
+  // Slots every 30 min if dur<=30, else every 60 min
+  var step = dur <= 30 ? 30 : 60;
+  var slots = [];
+  for(var h=sh; h<eh; h++){
+    slots.push(pad(h)+':00');
+    if(step===30 && h+0.5<eh) slots.push(pad(h)+':30');
+  }
+  // Get taken slots from Firebase
+  var g = document.getElementById('timeGrid');
+  g.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0">Загрузка...</div>';
+  var uid = MASTER_UID || '';
+  var ref = uid ? db.ref('masters/'+uid+'/appointments') : null;
+  var promise = ref
+    ? ref.orderByChild('date').equalTo(S.date).once('value').then(function(snap){ var t=[]; snap.forEach(function(c){ var a=c.val(); if(a.status!=='cancelled') t.push(a.time); }); return t; })
+    : Promise.resolve([]);
+  promise.then(function(takenTimes){
+    g.innerHTML = '';
+    if(!slots.length){
+      g.innerHTML = '<div style="color:var(--muted);padding:12px 0">Нет доступного времени</div>';
+      return;
+    }
+    slots.forEach(function(t){
+      var taken = takenTimes.indexOf(t) > -1;
+      var sel   = t === S.time;
+      var div = document.createElement('div');
+      div.className = 'time-slot' + (taken?' taken':'') + (sel?' sel':'');
+      div.textContent = taken ? '✕ '+t : t;
+      if(!taken){
+        div.onclick = (function(tm){ return function(){
+          S.time = tm;
+          document.querySelectorAll('.time-slot').forEach(function(x){ x.classList.remove('sel'); });
+          this.classList.add('sel');
+          setTimeout(function(){ goStep(4); }, 180);
+        }; })(t);
+      }
+      g.appendChild(div);
+    });
+  });
+}
+
+// ── Step 4: Summary ──────────────────────────────────────────
+function renderSummary(){
+  var p = S.date ? S.date.split('-') : [];
+  var dateStr = p.length ? (+p[2])+'.'+p[1]+'.'+p[0] : '—';
+  document.getElementById('sumBox').innerHTML =
+    row('Услуга',  S.svc ? S.svc.name : '—') +
+    row('Дата',    dateStr) +
+    row('Время',   S.time || '—') +
+    row('Стоимость', S.svc ? Math.round(S.svc.price||0).toLocaleString('ru-RU')+' ₽' : '—');
+}
+function row(l,v){ return '<div class="sum-row"><span style="color:var(--muted)">'+l+'</span><span style="font-weight:600">'+v+'</span></div>'; }
+
+// ── Submit ───────────────────────────────────────────────────
+function submitBooking(){
+  var name  = (document.getElementById('cName').value||'').trim();
+  var phone = (document.getElementById('cPhone').value||'').trim();
+  var note  = (document.getElementById('cNote').value||'').trim();
+  var err   = document.getElementById('formErr');
+  err.style.display = 'none';
+  if(!name)  { err.textContent='Введите ваше имя'; err.style.display='block'; return; }
+  if(!phone) { err.textContent='Введите номер телефона'; err.style.display='block'; return; }
+
+  var id = 'bk_' + Date.now();
+  var appt = {
+    id:id, client:name, phone:phone,
+    service: S.svc ? S.svc.name : '',
+    date: S.date, time: S.time,
+    price: S.svc ? (S.svc.price||0) : 0,
+    note: note, status:'pending',
     source:'online', created:Date.now()
   };
-  db.ref('masters/' + masterUidGlobal + '/appointments/' + id).set(apptToSave)
-    .then(function(){
-      console.log('Appointment saved to Firebase');
-      // Auto-notify master via Telegram immediately
-      sendTelegramNotification(apptToSave, settings.masterName || 'Мастер');
-    })
-    .catch(function(e){ console.warn('Firebase error:', e); });
-  // Build auto-notification for master
-  var nl = '%0A';
-  var svcName = state.svc ? state.svc.name : '';
-  var svcPrice = state.svc ? Math.round(state.svc.price).toLocaleString('ru-RU')+' руб.' : '';
-  var msgText = 'Новая запись!'+nl+
-    'Имя: '+name+nl+
-    (phone ? 'Телефон: '+phone+nl : '')+
-    'Услуга: '+svcName+nl+
-    'Дата: '+state.date+nl+
-    'Время: '+state.time+nl+
-    (svcPrice ? 'Стоимость: '+svcPrice+nl : '')+
-    (note ? 'Пожелания: '+note+nl : '')+
-    'Статус: ожидает подтверждения';
-  var msgEnc = encodeURIComponent(msgText.replace(/%0A/g, '
-'));
-  var masterPhone = (settings.masterPhone||'').replace(/\D/g,'');
-  var masterTg = (settings.masterTelegram||'').replace(/^@/,'');
-  var notifyBtns = document.getElementById('notifyBtns');
-  if(notifyBtns){
-    notifyBtns.innerHTML = '';
-    // WhatsApp
-    if(masterPhone){
-      var wa = document.createElement('a');
-      wa.href = 'https://wa.me/'+masterPhone+'?text='+msgEnc;
-      wa.target = '_blank';
-      wa.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:#25D366;color:#fff;text-decoration:none;font-size:0.9rem;font-weight:700;font-family:DM Sans,sans-serif;border-radius:8px';
-      wa.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Написать мастеру в WhatsApp';
-      notifyBtns.appendChild(wa);
-    }
-    // Telegram
-    if(masterTg){
-      var tg = document.createElement('a');
-      var tgTarget = isNaN(masterTg) ? 'https://t.me/'+masterTg+'?text='+msgEnc : 'https://t.me/+'+masterTg;
-      tg.href = tgTarget;
-      tg.target = '_blank';
-      tg.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:#229ED9;color:#fff;text-decoration:none;font-size:0.9rem;font-weight:700;font-family:DM Sans,sans-serif;border-radius:8px';
-      tg.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg> Написать мастеру в Telegram';
-      notifyBtns.appendChild(tg);
-    }
-    // MAX
-    if(masterPhone){
-      var mx = document.createElement('a');
-      mx.href = 'https://max.ru/chat/'+masterPhone+'?text='+msgEnc;
-      mx.target = '_blank';
-      mx.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:#005BFF;color:#fff;text-decoration:none;font-size:0.9rem;font-weight:700;font-family:DM Sans,sans-serif;border-radius:8px';
-      mx.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> Написать мастеру в MAX';
-      notifyBtns.appendChild(mx);
-    }
-    if(!masterPhone && !masterTg){
-      notifyBtns.innerHTML = '<div style="font-size:0.85rem;color:var(--muted);text-align:center">Ждите звонка от мастера для подтверждения</div>';
-    }
-  }
-  // Fill success details
-  var det = document.getElementById('successDetails');
-  if(det){
-    det.innerHTML =
-      '<div class="ok-det-row"><span style="color:var(--muted)">Имя</span><span style="font-weight:500">'+name+'</span></div>'+
-      '<div class="ok-det-row"><span style="color:var(--muted)">Услуга</span><span style="font-weight:500">'+svcName+'</span></div>'+
-      '<div class="ok-det-row"><span style="color:var(--muted)">Дата</span><span style="font-weight:500">'+state.date+'</span></div>'+
-      '<div class="ok-det-row"><span style="color:var(--muted)">Время</span><span style="font-weight:500">'+state.time+'</span></div>'+
-      (svcPrice ? '<div class="ok-det-row"><span style="color:var(--muted)">Стоимость</span><span style="font-weight:500;color:var(--em)">'+svcPrice+'</span></div>' : '');
-  }
-  // Show success
-  var statusUrl = window.location.origin + '/booking.html?status=' + id;
-  _lastStatusUrl = statusUrl;
-  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active')});
-  document.getElementById('sDone').classList.add('active');
-  var detailsHtml =
-    '<div style="display:flex;flex-direction:column;gap:6px">'+
-    '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Имя</span><span style="font-weight:500">'+name+'</span></div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Услуга</span><span style="font-weight:500">'+state.svc.name+'</span></div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Дата</span><span style="font-weight:500">'+state.date+'</span></div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Время</span><span style="font-weight:500">'+state.time+'</span></div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0"><span style="color:var(--muted)">Стоимость</span><span style="font-weight:500;color:var(--em)">'+Math.round(state.svc.price).toLocaleString('ru-RU')+' ₽</span></div>'+
-    '</div>'+
-    '<div style="margin-top:14px;padding:12px 14px;background:rgba(13,110,74,0.07);border-left:3px solid var(--em)">'+
-      '<div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">Ссылка на статус записи:</div>'+
-      '<div style="font-size:0.82rem;color:var(--em);word-break:break-all;margin-bottom:8px">'+statusUrl+'</div>'+
-      '<button onclick="doCopyLink()" style="font-size:0.78rem;font-weight:700;padding:7px 14px;background:var(--em);color:#fff;border:none;cursor:pointer;font-family:DM Sans,sans-serif">Скопировать ссылку</button>'+
-    '</div>';
-  document.getElementById('successDetails').innerHTML = detailsHtml;
 
-  // Messenger buttons
-  var msg = 'Привет! Я записалась к вам через онлайн-форму.%0AИмя: '+encodeURIComponent(name)+'%0AУслуга: '+encodeURIComponent(state.svc.name)+'%0AДата: '+encodeURIComponent(state.date)+' в '+encodeURIComponent(state.time)+'%0AСтоимость: '+Math.round(state.svc.price).toLocaleString('ru-RU')+' ₽%0AСтатус записи: '+encodeURIComponent(statusUrl);
-  var masterPhone = settings.masterPhone ? settings.masterPhone.replace(/\D/g,'') : '';
-  var btnsEl = document.getElementById('messengerBtns');
-  if(btnsEl){
-    var btnsHtml = '';
-    if(masterPhone){
-      btnsHtml +=
-        '<a href="https://wa.me/'+masterPhone+'?text='+msg+'" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:#25D366;color:#fff;text-decoration:none;font-family:DM Sans,sans-serif;font-size:0.9rem;font-weight:700;border-radius:4px">'+
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>'+
-          'Написать в WhatsApp'+
-        '</a>'+
-        '<a href="https://vk.me/+'+masterPhone+'?text='+msg+'" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:#0077FF;color:#fff;text-decoration:none;font-family:DM Sans,sans-serif;font-size:0.9rem;font-weight:700;border-radius:4px">'+
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.391 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.862-.523-2.049-1.726-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4.03 8.57 4.03 8.096c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.677.863 2.49 2.303 4.675 2.896 4.675.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.204.17-.407.44-.407h2.744c.373 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.254-1.406 2.151-3.574 2.151-3.574.119-.254.322-.491.762-.491h1.744c.525 0 .643.27.525.643-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.049.17.49-.085.744-.576.744z"/></svg>'+
-          'Написать в MAX (VK)'+
-        '</a>';
-    } else {
-      btnsHtml = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:8px">Мастер свяжется с вами в ближайшее время</div>';
-    }
-    btnsEl.innerHTML = btnsHtml;
-  }
+  // Save to Firebase
+  var savePromise = MASTER_UID
+    ? db.ref('masters/'+MASTER_UID+'/appointments/'+id).set(appt)
+    : Promise.resolve();
+
+  savePromise
+    .then(function(){ sendTelegramNotify(appt); })
+    .catch(function(e){ console.warn('Firebase save error:', e); });
+
+  // Show success immediately (don't wait)
+  showSuccess(appt);
 }
-// Status page mode
-function checkStatusMode(){
-  var params = new URLSearchParams(window.location.search);
-  var statusId = params.get('status');
-  if(!statusId) return false;
-  // Show status of a specific booking
-  var appts = [];
-  try{appts = JSON.parse(localStorage.getItem('km_appts')||'[]');}catch(e){}
-  var appt = appts.find(function(a){return a.id===statusId});
-  // Hide all steps, show status panel
-  document.querySelector('.progress').style.display='none';
-  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active')});
-  var statusColors = {pending:'#BA7517',confirmed:'#0D6E4A',cancelled:'#C0392B'};
-  var statusLabels = {pending:'Ожидает подтверждения',confirmed:'Подтверждена ✓',cancelled:'Отменена'};
-  if(!appt){
-    document.getElementById('s1').innerHTML = '<div style="padding:32px 24px;text-align:center"><div style="font-size:2rem;margin-bottom:12px">🔍</div><div style="font-size:1rem;font-weight:500;color:var(--ink);margin-bottom:8px">Запись не найдена</div><div style="font-size:0.85rem;color:var(--muted)">Возможно запись была сделана с другого устройства</div></div>';
-    document.getElementById('s1').classList.add('active');
-    return true;
+
+// ── Telegram notification ────────────────────────────────────
+function sendTelegramNotify(a){
+  var nl = '\n';
+  var p = a.date ? a.date.split('-') : [];
+  var dateRu = p.length ? (+p[2])+' '+MONTHS_RU[+p[1]-1] : a.date;
+  var text = [
+    '🔔 *Новая запись онлайн!*', '',
+    '👤 *' + a.client + '*',
+    a.phone ? '📞 ' + a.phone : '',
+    '💆 ' + (a.service||'—'),
+    '📅 ' + dateRu + '  🕐 ' + (a.time||'—'),
+    a.price ? '💰 ' + Math.round(a.price).toLocaleString('ru-RU') + ' ₽' : '',
+    a.note  ? '💬 ' + a.note : '',
+    '', '✅ Подтвердите в приложении «Капитал Мастера»'
+  ].filter(Boolean).join(nl);
+
+  fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:TG_CHAT, text:text, parse_mode:'Markdown'})
+  }).catch(function(){});
+}
+
+// ── Success screen ───────────────────────────────────────────
+function showSuccess(a){
+  var p = a.date ? a.date.split('-') : [];
+  var dateRu = p.length ? (+p[2])+' '+MONTHS_RU[+p[1]-1]+' '+p[0] : a.date;
+  document.getElementById('successDet').innerHTML =
+    srow('Имя',       a.client) +
+    srow('Услуга',    a.service) +
+    srow('Дата',      dateRu) +
+    srow('Время',     a.time) +
+    srow('Стоимость', a.price ? Math.round(a.price).toLocaleString('ru-RU')+' ₽' : 'по договорённости');
+
+  // Messenger buttons for client to write master
+  var btns = document.getElementById('msgBtns');
+  btns.innerHTML = '';
+  var phone = (CFG.masterPhone||'').replace(/\D/g,'');
+  var tg    = (CFG.masterTelegram||'').replace(/^@/,'');
+  var msgText = 'Здравствуйте! Я записалась через форму.\nИмя: '+a.client+'\nУслуга: '+a.service+'\nДата: '+dateRu+' в '+a.time;
+  var msgEnc = encodeURIComponent(msgText);
+
+  if(phone){
+    btns.appendChild(makeBtn('https://wa.me/'+phone+'?text='+msgEnc, '#25D366', waIcon(), ' WhatsApp мастеру'));
+    btns.appendChild(makeBtn('https://max.ru/chat/'+phone+'?text='+msgEnc, '#005BFF', msgIcon(), ' MAX мастеру'));
   }
-  var color = statusColors[appt.status]||'#5A5750';
-  var label = statusLabels[appt.status]||appt.status;
-  document.getElementById('s1').innerHTML =
-    '<div style="padding:20px">'+
-    '<div style="text-align:center;margin-bottom:20px">'+
-      '<div style="display:inline-block;padding:8px 20px;background:'+color+';color:#fff;font-size:0.82rem;font-weight:700;border-radius:20px;margin-bottom:8px">'+label+'</div>'+
-      '<div style="font-size:1.6rem;font-family:Cormorant Garamond,serif;font-weight:400;color:var(--ink)">Ваша запись</div>'+
-    '</div>'+
-    '<div style="background:var(--cream2);padding:16px 18px;margin-bottom:16px">'+
-      '<div style="display:flex;flex-direction:column;gap:8px">'+
-      '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Имя</span><span style="font-weight:600">'+appt.client+'</span></div>'+
-      '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Услуга</span><span style="font-weight:600">'+appt.service+'</span></div>'+
-      '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Дата</span><span style="font-weight:600">'+appt.date+'</span></div>'+
-      '<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Время</span><span style="font-weight:600">'+appt.time+'</span></div>'+
-      (appt.price?'<div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:5px 0"><span style="color:var(--muted)">Стоимость</span><span style="font-weight:600;color:var(--em)">'+Math.round(appt.price).toLocaleString('ru-RU')+' ₽</span></div>':'')+ 
-      '</div>'+
-    '</div>'+
-    (appt.status==='pending'?
-      '<button data-aid="'+appt.id+'" onclick="cancelMyAppt(this.dataset.aid)" style="width:100%;padding:13px;background:none;border:2px solid var(--border);color:var(--muted);font-family:DM Sans,sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer">Отменить запись</button>'
-    : '')+
-    '</div>';
+  if(tg){
+    var tgUrl = isNaN(tg) ? 'https://t.me/'+tg+'?text='+msgEnc : 'https://t.me/+'+tg;
+    btns.appendChild(makeBtn(tgUrl, '#229ED9', tgIcon(), ' Telegram мастеру'));
+  }
+  if(!phone && !tg){
+    btns.innerHTML = '<div style="font-size:0.85rem;color:var(--muted);text-align:center;padding:12px 0">Мастер свяжется с вами для подтверждения.</div>';
+  }
+
+  goStep('done');
+}
+function srow(l,v){ return '<div class="success-det-row"><span style="color:var(--muted)">'+l+'</span><span style="font-weight:600">'+v+'</span></div>'; }
+function makeBtn(href, bg, icon, label){
+  var a = document.createElement('a');
+  a.href = href; a.target = '_blank';
+  a.className = 'msg-btn';
+  a.style.background = bg;
+  a.innerHTML = icon + label;
+  return a;
+}
+function waIcon(){ return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>'; }
+function tgIcon(){ return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>'; }
+function msgIcon(){ return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>'; }
+
+// ── Status page ──────────────────────────────────────────────
+function showStatus(apptId){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('mainWrap').classList.add('ready');
+  document.getElementById('progressBar').style.display = 'none';
+  // Try to find in Firebase
+  db.ref('masters').once('value').then(function(snap){
+    var found = null;
+    snap.forEach(function(master){
+      var appts = master.child('appointments');
+      appts.forEach(function(a){
+        if(a.key === apptId) found = a.val();
+      });
+    });
+    renderStatusPage(found, apptId);
+  }).catch(function(){ renderStatusPage(null, apptId); });
+}
+function renderStatusPage(appt, apptId){
+  var colors = {pending:'var(--gold)',confirmed:'var(--em)',cancelled:'var(--red)'};
+  var labels = {pending:'Ожидает подтверждения',confirmed:'✅ Подтверждена',cancelled:'❌ Отменена'};
   document.getElementById('s1').classList.add('active');
-  return true;
+  if(!appt){
+    document.getElementById('s1').innerHTML = '<div style="padding:32px 20px;text-align:center"><div style="font-size:2.5rem;margin-bottom:12px">🔍</div><div style="font-size:1rem;font-weight:500">Запись не найдена</div><div style="font-size:0.85rem;color:var(--muted);margin-top:8px">Возможно запись сделана с другого устройства</div></div>';
+    return;
+  }
+  var color = colors[appt.status]||'var(--muted)';
+  var label = labels[appt.status]||appt.status;
+  var p = appt.date ? appt.date.split('-') : [];
+  var dateRu = p.length ? (+p[2])+' '+MONTHS_RU[+p[1]-1]+' '+p[0] : appt.date;
+  var html = '<div style="padding:20px">' +
+    '<div style="text-align:center;margin-bottom:20px">' +
+      '<div style="display:inline-block;padding:8px 20px;background:'+color+';color:#fff;font-size:0.85rem;font-weight:700;margin-bottom:10px">'+label+'</div>' +
+      '<div style="font-family:Cormorant Garamond,serif;font-size:1.6rem;font-weight:400">Ваша запись</div>' +
+    '</div>' +
+    '<div style="background:var(--cream2);padding:14px 16px;border-left:3px solid '+color+'">' +
+      srow('Клиент',    appt.client) +
+      srow('Услуга',    appt.service) +
+      srow('Дата',      dateRu) +
+      srow('Время',     appt.time) +
+      (appt.price ? srow('Стоимость', Math.round(appt.price).toLocaleString('ru-RU')+' ₽') : '') +
+    '</div>';
+  if(appt.status === 'pending'){
+    html += '<button onclick="cancelMyAppt(\''+apptId+'\')" style="width:100%;margin-top:14px;padding:13px;background:none;border:2px solid var(--border);color:var(--muted);font-family:DM Sans,sans-serif;font-size:0.88rem;cursor:pointer">Отменить запись</button>';
+  }
+  html += '</div>';
+  document.getElementById('s1').innerHTML = html;
 }
-
 function cancelMyAppt(id){
   if(!confirm('Отменить запись?')) return;
-  var appts = [];
-  try{appts = JSON.parse(localStorage.getItem('km_appts')||'[]');}catch(e){}
-  var a = appts.find(function(x){return x.id===id});
-  if(a) a.status = 'cancelled';
-  localStorage.setItem('km_appts', JSON.stringify(appts));
-  checkStatusMode();
-}
-
-var _lastStatusUrl="";
-function doCopyLink(){copyStatusLink(_lastStatusUrl)}
-function copyStatusLink(url){
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(function(){
-      var btn = event.target;
-      btn.textContent = 'Скопировано ✓';
-      setTimeout(function(){btn.textContent='Скопировать ссылку'},2000);
+  db.ref('masters').once('value').then(function(snap){
+    snap.forEach(function(master){
+      if(master.child('appointments/'+id).exists()){
+        db.ref('masters/'+master.key+'/appointments/'+id+'/status').set('cancelled');
+      }
     });
-  } else {
-    var inp = document.createElement('input');
-    inp.value = url;
-    document.body.appendChild(inp);
-    inp.select();
-    document.execCommand('copy');
-    document.body.removeChild(inp);
-  }
+    setTimeout(function(){ location.reload(); }, 500);
+  });
 }
 
-// Don't call init() directly — loadSettings() calls it after Firebase responds
-var p0 = new URLSearchParams(window.location.search);
-if(p0.get('status')){
-  checkStatusMode();
-} else {
-  loadSettings();  // async — calls init() when Firebase data arrives
-}
+boot();
 </script>
 </body>
 </html>
