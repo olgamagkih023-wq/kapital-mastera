@@ -620,6 +620,21 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 }
 .appt-action-btn:hover{border-color:var(--em);color:var(--em)}
 .appt-action-btn.cancel:hover{border-color:var(--red);color:var(--red)}
+.appt-action-btn.income-btn{
+  background:var(--em);color:#fff;border-color:var(--em);
+  font-size:0.78rem;padding:7px 14px;font-weight:700;
+  animation:pulsePay 2s ease-in-out infinite;
+}
+.appt-action-btn.income-btn:hover{background:var(--ink);border-color:var(--ink);animation:none}
+.appt-action-btn.paid-btn{
+  background:rgba(13,110,74,0.08);color:var(--em);
+  border-color:rgba(13,110,74,0.3);
+  font-size:0.78rem;padding:7px 14px;cursor:default;
+}
+@keyframes pulsePay{
+  0%,100%{box-shadow:0 0 0 0 rgba(13,110,74,0.35)}
+  50%{box-shadow:0 0 0 5px rgba(13,110,74,0)}
+}
 
 /* ===== CAPITAL PAGE ===== */
 .capital-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
@@ -3382,10 +3397,59 @@ function addApptForDate(){
 }
 function renderMobileApptItem(a){
   var colors={confirmed:' style="border-left-color:var(--em)"',pending:' style="border-left-color:var(--gold)"',cancelled:' style="border-left-color:var(--red);opacity:0.6"'};
-  return '<div class="appt-item '+(a.status||'confirmed')+'"'+(colors[a.status]||'')+'>'+
+  var div = document.createElement('div');
+  div.className = 'appt-item ' + (a.status||'confirmed');
+  if(colors[a.status]) div.setAttribute('style', colors[a.status].replace(' style="','').replace('"',''));
+  var paid = a.paid;
+  var hasPriceAndNotCancelled = a.price && a.status !== 'cancelled';
+  div.innerHTML =
     '<div class="appt-name">'+a.client+'</div>'+
     '<div class="appt-time">'+a.time+' · '+a.service+(a.price?' · '+Math.round(a.price).toLocaleString('ru-RU')+' ₽':'')+'</div>'+
-  '</div>';
+    (a.phone ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:2px">📞 '+a.phone+'</div>' : '');
+  if(hasPriceAndNotCancelled){
+    var incBtn = document.createElement('button');
+    incBtn.className = paid ? 'appt-action-btn paid-btn' : 'appt-action-btn income-btn';
+    incBtn.style.marginTop = '8px';
+    incBtn.textContent = paid ? '✓ Зачислено в доход' : '💰 ' + Math.round(a.price).toLocaleString('ru-RU') + ' ₽ → Зачислить';
+    incBtn.disabled = !!paid;
+    if(!paid){
+      incBtn.onclick = (function(appt){ return function(){ chargeApptIncome(appt, this); }; })(a);
+    }
+    div.appendChild(incBtn);
+  }
+  return div.outerHTML;
+}
+
+// ── Charge appointment income into finances ──────────────────────────────
+function chargeApptIncome(appt, btn){
+  var price = parseFloat(appt.price)||0;
+  if(!price){ toast('У записи не указана стоимость','error'); return; }
+  // Add income transaction
+  var txs = getTx();
+  txs.push({
+    id: uid(),
+    date: appt.date || new Date().toISOString().split('T')[0],
+    desc: appt.service + ' — ' + appt.client,
+    cat: 'Клиент',
+    type: 'income',
+    segment: 'business',
+    amount: price
+  });
+  saveTx(txs);
+  // Mark appointment as paid
+  var appts = getAppts();
+  var found = appts.find(function(x){ return x.id === appt.id; });
+  if(found){ found.paid = true; saveAppts(appts); }
+  // Update button instantly
+  if(btn){
+    btn.textContent = '✓ Зачислено';
+    btn.className = 'appt-action-btn paid-btn';
+    btn.disabled = true;
+  }
+  // Refresh finances
+  renderFinances();
+  renderDashboard && renderDashboard();
+  toast('💰 ' + Math.round(price).toLocaleString('ru-RU') + ' ₽ добавлено в доход!');
 }
 
 function selectCalDay(dateStr){
@@ -3418,17 +3482,51 @@ function renderApptList(filterDate){
   document.getElementById('apptListTitle').textContent=filterDate?'Записи на '+filterDate:'Все записи';
   const el=document.getElementById('apptListContainer');
   if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">◐</div><div class="empty-text">Записей нет</div></div>';return}
-  el.innerHTML=list.map(a=>`
-    <div class="appt-item ${a.status||'confirmed'}" id="appt-${a.id}">
-      <div class="appt-name">${a.client}</div>
-      <div class="appt-time">${a.date} · ${a.time} · ${a.service}${a.price?' · '+fmt(a.price)+' ₽':''}</div>
-      ${a.note?`<div style="font-size:0.75rem;color:var(--muted);margin-top:4px">${a.note}</div>`:''}
-      <div class="appt-actions">
-        <button class="appt-action-btn" onclick="confirmAppt('${a.id}')">✓ Подтвердить</button>
-        <button class="appt-action-btn cancel" onclick="cancelAppt('${a.id}')">✕ Отменить</button>
-        <button class="appt-action-btn cancel" onclick="deleteAppt('${a.id}')">Удалить</button>
-      </div>
-    </div>`).join('');
+  el.innerHTML='';
+  list.forEach(function(a){
+    var paid = a.paid;
+    var hasPriceAndNotCancelled = a.price && a.status !== 'cancelled';
+    var div = document.createElement('div');
+    div.className = 'appt-item ' + (a.status||'confirmed');
+    div.id = 'appt-' + a.id;
+    div.innerHTML =
+      '<div class="appt-name">' + a.client + '</div>' +
+      '<div class="appt-time">' + a.date + ' · ' + a.time + ' · ' + a.service +
+        (a.price ? ' · ' + fmt(a.price) + ' ₽' : '') + '</div>' +
+      (a.phone ? '<div style="font-size:0.75rem;color:var(--muted);margin-top:3px">📞 ' + a.phone + '</div>' : '') +
+      (a.note ? '<div style="font-size:0.75rem;color:var(--muted);margin-top:3px">' + a.note + '</div>' : '') +
+      '<div class="appt-actions"></div>';
+    var actions = div.querySelector('.appt-actions');
+    // Confirm / Cancel / Delete
+    var confBtn = document.createElement('button');
+    confBtn.className = 'appt-action-btn';
+    confBtn.textContent = '✓ Подтвердить';
+    confBtn.onclick = (function(id){ return function(){ confirmAppt(id); }; })(a.id);
+    var canBtn = document.createElement('button');
+    canBtn.className = 'appt-action-btn cancel';
+    canBtn.textContent = '✕ Отменить';
+    canBtn.onclick = (function(id){ return function(){ cancelAppt(id); }; })(a.id);
+    var delBtn = document.createElement('button');
+    delBtn.className = 'appt-action-btn cancel';
+    delBtn.textContent = 'Удалить';
+    delBtn.onclick = (function(id){ return function(){ deleteAppt(id); }; })(a.id);
+    actions.appendChild(confBtn);
+    actions.appendChild(canBtn);
+    actions.appendChild(delBtn);
+    // ✦ INCOME BUTTON
+    if(hasPriceAndNotCancelled){
+      var incBtn = document.createElement('button');
+      incBtn.className = 'appt-action-btn' + (paid ? ' paid-btn' : ' income-btn');
+      incBtn.textContent = paid ? '✓ Зачислено' : '💰 ' + fmt(a.price) + ' ₽ → Доход';
+      incBtn.disabled = !!paid;
+      if(!paid){
+        incBtn.title = 'Добавить ' + fmt(a.price) + ' ₽ в финансы как доход';
+        incBtn.onclick = (function(appt){ return function(){ chargeApptIncome(appt, this); }; })(a);
+      }
+      actions.appendChild(incBtn);
+    }
+    el.appendChild(div);
+  });
 }
 
 document.getElementById('calPrev').onclick=()=>{calMonth--;if(calMonth<0){calMonth=11;calYear--}renderCalendar()};
