@@ -1851,146 +1851,149 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
 <!-- ===== AUTH ===== -->
 <div id="authScreen">
+<style>
+#authScreen{position:fixed;inset:0;z-index:9999;background:var(--cream);overflow-y:auto;-webkit-overflow-scrolling:touch;display:block}
+.al-landing{background:#0C0D0A;padding:48px 24px 32px;text-align:center}
+.al-logo-text{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;color:rgba(255,255,255,0.4);margin-bottom:20px;letter-spacing:0.04em}
+.al-logo-text span{color:#13C47E}
+.al-main-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,7vw,3.5rem);font-weight:300;color:#fff;line-height:1;letter-spacing:-0.02em;margin-bottom:12px}
+.al-main-title em{font-style:italic;color:#13C47E}
+.al-subtitle{font-size:0.95rem;color:rgba(255,255,255,0.4);font-weight:300;line-height:1.7;margin-bottom:24px;max-width:420px;margin-left:auto;margin-right:auto}
+.al-stats-row{display:flex;justify-content:center;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:24px}
+.al-stat{flex:1;max-width:130px;padding:14px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.08)}
+.al-stat:last-child{border-right:none}
+.al-stat-v{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:#fff;line-height:1}
+.al-stat-l{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:3px}
+.al-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:520px;margin:0 auto 20px}
+.al-pain{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);padding:10px 12px;text-align:left}
+.al-sol{background:rgba(13,110,74,0.1);border:1px solid rgba(19,196,126,0.15);padding:10px 12px;text-align:left}
+.al-cell-icon{font-size:1.1rem;display:block;margin-bottom:5px}
+.al-cell-t{font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.75);margin-bottom:2px;line-height:1.2}
+.al-cell-d{font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.4}
+.al-feats{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+.al-feat{font-size:0.72rem;color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:4px 10px}
+.al-author-strip{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:rgba(255,255,255,0.03);border-top:1px solid rgba(255,255,255,0.06)}
+.al-av{width:34px;height:34px;border-radius:50%;background:#0D6E4A;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1rem;color:#fff;font-weight:600;flex-shrink:0}
+.al-author-name{font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.6);display:block}
+.al-author-role{font-size:0.72rem;color:rgba(255,255,255,0.28)}
+/* Form section */
+.auth-form-wrap{background:var(--cream);padding:36px 20px 60px;display:flex;flex-direction:column;align-items:center}
+.auth-form-label{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.auth-form-label::before,.auth-form-label::after{content:'';flex:1;max-width:36px;height:1px;background:var(--gold);opacity:0.35}
+.auth-card{background:#fff;width:100%;max-width:440px;border:1px solid var(--border);padding:32px 28px 28px;box-shadow:0 4px 24px rgba(0,0,0,0.06)}
+.auth-card-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--ink);margin-bottom:3px}
+.auth-card-logo span{color:var(--em)}
+.auth-card-sub{font-size:0.82rem;color:var(--muted);font-weight:300;margin-bottom:20px}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:22px}
+.auth-tab-btn{flex:1;padding:0 0 13px;font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif}
+.auth-tab-btn.active{color:var(--ink);border-bottom-color:var(--em)}
+.auth-err{font-size:0.82rem;color:var(--red);background:rgba(192,57,43,0.08);border-left:3px solid var(--red);padding:9px 12px;margin-bottom:12px;display:none}
+.auth-input{width:100%;padding:13px 14px;border:2px solid var(--border);background:#fff;font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--ink);outline:none;transition:border-color 0.2s;margin-bottom:10px;-webkit-appearance:none;border-radius:0}
+.auth-input:focus{border-color:var(--em)}
+.auth-select{width:100%;padding:13px 14px;border:2px solid var(--border);background:#fff;font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--ink);outline:none;margin-bottom:10px}
+.auth-submit{width:100%;padding:15px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:4px;-webkit-tap-highlight-color:rgba(0,0,0,0.1)}
+.auth-submit:hover{background:var(--ink)}
+.auth-submit:disabled{background:var(--muted);cursor:not-allowed}
+.auth-switch-text{font-size:0.85rem;color:var(--muted);text-align:center;margin-top:14px}
+.auth-switch-text a{color:var(--em);cursor:pointer;font-weight:600}
+.auth-extra-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;margin-top:10px;background:none;border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:var(--ink);cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.auth-extra-btn:hover{border-color:var(--em);color:var(--em)}
+.auth-demo-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;margin-top:8px;background:none;border:1.5px dashed var(--border);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s}
+.auth-demo-btn:hover{border-color:var(--em);color:var(--em)}
+.auth-legal-bar{background:var(--ink);padding:16px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.auth-legal-links{display:flex;flex-wrap:wrap;gap:14px}
+.auth-legal-links button{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;transition:color 0.2s}
+.auth-legal-links button:hover{color:var(--em3)}
+.auth-legal-copy{font-size:0.68rem;color:rgba(255,255,255,0.15);letter-spacing:0.06em}
+</style>
 
-  <!-- ── MINI LANDING ── -->
-  <div class="auth-landing">
-    <div class="al-logo">Капитал <span>Мастера</span></div>
-
-    <h1 class="al-title">Твоё искусство —<br><em>твой капитал</em></h1>
-    <p class="al-sub">Финансовая экосистема для бьюти-мастеров, фотографов, дизайнеров и всех, кто превращает талант в профессию.</p>
-
-    <!-- Stats -->
-    <div class="al-stats">
+  <!-- Mini landing -->
+  <div class="al-landing">
+    <div class="al-logo-text">Капитал <span>Мастера</span></div>
+    <h1 class="al-main-title">Твоё искусство —<br><em>твой капитал</em></h1>
+    <p class="al-subtitle">Финансовая экосистема для бьюти-мастеров, фотографов, дизайнеров и всех, кто превращает талант в профессию.</p>
+    <div class="al-stats-row">
       <div class="al-stat"><div class="al-stat-v">56+</div><div class="al-stat-l">Профессий</div></div>
       <div class="al-stat"><div class="al-stat-v">0 ₽</div><div class="al-stat-l">Старт</div></div>
       <div class="al-stat"><div class="al-stat-v">AES</div><div class="al-stat-l">Шифрование</div></div>
     </div>
-
-    <!-- Pain vs Solution grid -->
     <div class="al-grid">
-      <div class="al-pain">
-        <span class="al-pain-icon">💸</span>
-        <div class="al-pain-t">Деньги «испаряются»</div>
-        <div class="al-pain-d">Хороший месяц — потратил всё. Плохой — долги.</div>
-      </div>
-      <div class="al-sol">
-        <span class="al-sol-icon">◎</span>
-        <div class="al-sol-t">Правило 50/30/20</div>
-        <div class="al-sol-d">Капитал откладывается автоматически с каждого рубля.</div>
-      </div>
-      <div class="al-pain">
-        <span class="al-pain-icon">🗂️</span>
-        <div class="al-pain-t">Бизнес и личное — каша</div>
-        <div class="al-pain-d">Не видишь реальную прибыль за хаосом.</div>
-      </div>
-      <div class="al-sol">
-        <span class="al-sol-icon">◈</span>
-        <div class="al-sol-t">Раздельный учёт</div>
-        <div class="al-sol-d">Бизнес и личное отдельно. Чистая прибыль как на ладони.</div>
-      </div>
-      <div class="al-pain">
-        <span class="al-pain-icon">😰</span>
-        <div class="al-pain-t">Страшно поднять цену</div>
-        <div class="al-pain-d">Синдром самозванца держит в бедности.</div>
-      </div>
-      <div class="al-sol">
-        <span class="al-sol-icon">◑</span>
-        <div class="al-sol-t">Цена часа растёт</div>
-        <div class="al-sol-d">Трекер показывает рост и помогает поднять прайс.</div>
-      </div>
-      <div class="al-pain">
-        <span class="al-pain-icon">📉</span>
-        <div class="al-pain-t">Нет капитала</div>
-        <div class="al-pain-d">Каждый месяц с нуля. Активов нет.</div>
-      </div>
-      <div class="al-sol">
-        <span class="al-sol-icon">▣</span>
-        <div class="al-sol-t">Капитал растёт</div>
-        <div class="al-sol-d">Инвестиции, подушка, прогноз на 10 лет.</div>
-      </div>
+      <div class="al-pain"><span class="al-cell-icon">💸</span><div class="al-cell-t">Деньги исчезают</div><div class="al-cell-d">Хороший месяц — потратил всё</div></div>
+      <div class="al-sol"><span class="al-cell-icon">◎</span><div class="al-cell-t">Правило 50/30/20</div><div class="al-cell-d">Капитал откладывается автоматически</div></div>
+      <div class="al-pain"><span class="al-cell-icon">🗂️</span><div class="al-cell-t">Бизнес и личное</div><div class="al-cell-d">Не видишь реальную прибыль</div></div>
+      <div class="al-sol"><span class="al-cell-icon">◈</span><div class="al-cell-t">Раздельный учёт</div><div class="al-cell-d">Чистая прибыль как на ладони</div></div>
+      <div class="al-pain"><span class="al-cell-icon">😰</span><div class="al-cell-t">Страшно поднять цену</div><div class="al-cell-d">Синдром самозванца</div></div>
+      <div class="al-sol"><span class="al-cell-icon">◑</span><div class="al-cell-t">Цена часа растёт</div><div class="al-cell-d">Трекер помогает поднять прайс</div></div>
+      <div class="al-pain"><span class="al-cell-icon">📉</span><div class="al-cell-t">Нет капитала</div><div class="al-cell-d">Каждый месяц с нуля</div></div>
+      <div class="al-sol"><span class="al-cell-icon">▣</span><div class="al-cell-t">Капитал растёт</div><div class="al-cell-d">Инвестиции и прогноз на 10 лет</div></div>
     </div>
-
-    <!-- Features strip -->
-    <div class="al-features">
-      <div class="al-feat"><span class="al-feat-dot">✦</span>Быстрый ввод операций</div>
-      <div class="al-feat"><span class="al-feat-dot">✦</span>Календарь клиентов</div>
-      <div class="al-feat"><span class="al-feat-dot">✦</span>Зарплата владельца</div>
-      <div class="al-feat"><span class="al-feat-dot">✦</span>Финансовый пульс</div>
-      <div class="al-feat"><span class="al-feat-dot">✦</span>Блог сообщества</div>
-      <div class="al-feat"><span class="al-feat-dot">✦</span>Работает офлайн</div>
+    <div class="al-feats">
+      <span class="al-feat">✦ Быстрый ввод</span>
+      <span class="al-feat">✦ Календарь клиентов</span>
+      <span class="al-feat">✦ Зарплата владельца</span>
+      <span class="al-feat">✦ Финансовый пульс</span>
+      <span class="al-feat">✦ Онлайн-запись</span>
+      <span class="al-feat">✦ Работает офлайн</span>
     </div>
-
-    <!-- Scroll hint -->
-    <div class="al-scroll-hint" onclick="document.querySelector('.auth-form-section').scrollIntoView({behavior:'smooth'})">
-      <div class="al-scroll-line"></div>
-      Зарегистрироваться
-    </div>
-
-    <!-- Author -->
-    <div class="al-author">
-      <div class="al-author-av">О</div>
-      <div class="al-author-text">
-        <strong>Ольга Мягких</strong>
-        Автор сервиса · 20 лет в креативной индустрии
-      </div>
+    <div class="al-author-strip">
+      <div class="al-av">О</div>
+      <div><span class="al-author-name">Ольга Мягких</span><span class="al-author-role">Автор · 20 лет в индустрии</span></div>
     </div>
   </div>
 
-  <!-- ── AUTH FORM ── -->
-  <div class="auth-form-section">
-    <div class="auth-form-tag">Начать бесплатно</div>
-    <div class="auth-box">
-      <div class="auth-logo">Капитал <span>Мастера</span></div>
-      <div class="auth-sub">Финансовая экосистема для творческих</div>
+  <!-- Auth form -->
+  <div class="auth-form-wrap">
+    <div class="auth-form-label">Начать бесплатно</div>
+    <div class="auth-card">
+      <div class="auth-card-logo">Капитал <span>Мастера</span></div>
+      <div class="auth-card-sub">Финансовая экосистема для творческих</div>
+
       <div class="auth-tabs">
-        <button class="atab active" id="atLogin" onclick="authShowPanel('login')">Вход</button>
-        <button class="atab" id="atReg" onclick="authShowPanel('reg')">Регистрация</button>
+        <button class="auth-tab-btn active" id="tabLogin" onclick="showAuthTab('login')">Вход</button>
+        <button class="auth-tab-btn" id="tabReg" onclick="showAuthTab('reg')">Регистрация</button>
       </div>
-      <div id="aLogin">
+
+      <!-- Login form -->
+      <div id="formLogin">
         <div class="auth-err" id="loginErr"></div>
-        <div class="auth-field"><input type="tel" id="lPhone" placeholder="Телефон" autocomplete="tel" onkeydown="if(event.key==='Enter')authDoLogin()"></div>
-        <div class="auth-field"><input type="password" id="lPass" placeholder="Пароль" autocomplete="current-password" onkeydown="if(event.key==='Enter')authDoLogin()"></div>
-        <button class="auth-btn" onclick="authDoLogin()">Войти</button>
-        <div class="auth-switch">Нет аккаунта? <a onclick="authShowPanel('reg')" style="cursor:pointer;color:var(--em)">Создать</a></div>
-        <button class="dl-trigger-btn" onclick="openDlPopup()">
-          <span class="dl-trigger-btn-icon">📲</span> Скачать приложение
-        </button>
-        <button onclick="enterDemoMode()" style="width:100%;margin-top:12px;padding:14px;background:var(--cream2);border:2px dashed var(--border);font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;color:var(--ink);cursor:pointer;transition:all 0.2s;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.borderColor='var(--em)';this.style.color='var(--em)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink)'">
-          🎯 Попробовать без регистрации
-        </button>
+        <input class="auth-input" type="tel" id="lPhone" placeholder="Телефон" autocomplete="tel">
+        <input class="auth-input" type="password" id="lPass" placeholder="Пароль" autocomplete="current-password">
+        <button class="auth-submit" id="btnLogin" onclick="doAuthLogin()">Войти</button>
+        <div class="auth-switch-text">Нет аккаунта? <a onclick="showAuthTab('reg')">Создать →</a></div>
+        <button class="auth-extra-btn" onclick="openDlPopup()">📲 Скачать приложение</button>
+        <button class="auth-demo-btn" onclick="enterDemoMode()">🎯 Попробовать без регистрации</button>
       </div>
-      <div id="aReg" style="display:none">
+
+      <!-- Register form -->
+      <div id="formReg" style="display:none">
         <div class="auth-err" id="regErr"></div>
-        <div class="auth-field"><input type="text" id="rName" placeholder="Имя и фамилия" autocomplete="name"></div>
-        <div class="auth-field">
-          <select id="rProf" style="width:100%;padding:18px 18px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);outline:none;font-weight:500">
-            <option value="">Ваша профессия...</option>
-            <option>Бьюти-мастер</option><option>Визажист</option><option>Парикмахер</option>
-            <option>Маникюрист</option><option>Стилист</option><option>Барбер</option>
-            <option>Фотограф</option><option>Видеограф</option><option>Дизайнер</option>
-            <option>Художник</option><option>Флорист</option><option>Другое</option>
-          </select>
-        </div>
-        <div class="auth-field"><input type="tel" id="rPhone" placeholder="Телефон" autocomplete="tel"></div>
-        <div class="auth-field"><input type="password" id="rPass" placeholder="Пароль (мин. 4 символа)" autocomplete="new-password" onkeydown="if(event.key==='Enter')authDoRegister()"></div>
-        <button class="auth-btn" onclick="authDoRegister()">Создать аккаунт</button>
-        <div class="auth-switch">Уже есть аккаунт? <a onclick="authShowPanel('login')" style="cursor:pointer;color:var(--em)">Войти</a></div>
-        <button class="dl-trigger-btn" onclick="openDlPopup()">
-          <span class="dl-trigger-btn-icon">📲</span> Скачать приложение
-        </button>
+        <input class="auth-input" type="text" id="rName" placeholder="Имя и фамилия" autocomplete="name">
+        <select class="auth-select" id="rProf">
+          <option value="">Ваша профессия...</option>
+          <option>Бьюти-мастер</option><option>Визажист</option><option>Парикмахер</option>
+          <option>Маникюрист</option><option>Стилист</option><option>Барбер</option>
+          <option>Фотограф</option><option>Видеограф</option><option>Дизайнер</option>
+          <option>Художник</option><option>Флорист</option><option>Другое</option>
+        </select>
+        <input class="auth-input" type="tel" id="rPhone" placeholder="Телефон" autocomplete="tel">
+        <input class="auth-input" type="password" id="rPass" placeholder="Пароль (мин. 4 символа)" autocomplete="new-password">
+        <button class="auth-submit" id="btnReg" onclick="doAuthRegister()">Создать аккаунт</button>
+        <div class="auth-switch-text">Уже есть аккаунт? <a onclick="showAuthTab('login')">Войти →</a></div>
+        <button class="auth-extra-btn" onclick="openDlPopup()">📲 Скачать приложение</button>
+        <button class="auth-demo-btn" onclick="enterDemoMode()">🎯 Попробовать без регистрации</button>
       </div>
     </div>
   </div>
 
   <!-- Legal footer -->
-  <div class="legal-footer-bar">
-    <div class="legal-footer-links">
-      <button onclick="openLegal('privacy')">Политика конфиденциальности</button>
-      <button onclick="openLegal('agreement')">Пользовательское соглашение</button>
-      <button onclick="openLegal('offer')">Публичная оферта</button>
+  <div class="auth-legal-bar">
+    <div class="auth-legal-links">
+      <button onclick="openLegal('privacy')">Конфиденциальность</button>
+      <button onclick="openLegal('agreement')">Соглашение</button>
+      <button onclick="openLegal('offer')">Оферта</button>
       <button onclick="openLegal('requisites')">Реквизиты</button>
     </div>
-    <div class="legal-footer-copy">© 2025 Капитал Мастера</div>
+    <div class="auth-legal-copy">© 2025 Капитал Мастера</div>
   </div>
 
 </div>
@@ -5854,7 +5857,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
     <button class="more-item" data-page="blog"><span style="font-size:1.2rem">✐</span> Блог</button>
     <button class="more-item" data-page="settings"><span style="font-size:1.2rem">⊕</span> Настройки</button>
     <div style="margin:16px 20px 0;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:12px">
-<button onclick="localStorage.removeItem('km_session');IS_DEMO=false;appEl.classList.remove('visible');appEl.style.display='none';var db=document.getElementById('demoBanner');if(db)db.style.display='none';authScreen.style.display='block';authShowPanel('login');authScreen.scrollTop=0;closeMoreDrawer();" style="font-size:0.82rem;color:var(--red);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;text-align:left">Выйти из аккаунта</button>
+<button onclick="localStorage.removeItem('km_session');IS_DEMO=false;appEl.classList.remove('visible');appEl.style.display='none';var db=document.getElementById('demoBanner');if(db)db.style.display='none';authScreen.style.display='block';showAuthTab('login');authScreen.scrollTop=0;closeMoreDrawer();" style="font-size:0.82rem;color:var(--red);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;text-align:left">Выйти из аккаунта</button>
     </div>
   </div>
 </div>
@@ -6114,6 +6117,18 @@ function launchApp(user){
   });
 }
 
+// Enter key support
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Enter') return;
+  var authVisible = document.getElementById('authScreen');
+  if(!authVisible || authVisible.style.display === 'none') return;
+  if(document.getElementById('formReg') && document.getElementById('formReg').style.display !== 'none'){
+    doAuthRegister();
+  } else {
+    doAuthLogin();
+  }
+});
+
 function checkSession(){
   var s = load('km_session', null);
   if(s && s.id){
@@ -6137,77 +6152,88 @@ function authShowPanel(w) {
   document.getElementById('atReg').className = 'atab' + (!isLogin ? ' active' : '');
 }
 
-function authDoLogin() {
-  var phoneEl = document.getElementById('lPhone');
-  var passEl  = document.getElementById('lPass');
-  var errEl   = document.getElementById('loginErr');
-  var btnEl   = document.querySelector('#aLogin .auth-btn');
-  var phone = phoneEl ? phoneEl.value.trim() : '';
-  var pass  = passEl  ? passEl.value : '';
-  errEl.style.display = 'none';
-  errEl.textContent = '';
-  if(!phone){ errEl.textContent = 'Введите телефон'; errEl.style.display='block'; return; }
-  if(!pass){  errEl.textContent = 'Введите пароль';  errEl.style.display='block'; return; }
-  try {
+function showAuthTab(tab){
+  var isLogin = tab === 'login';
+  document.getElementById('formLogin').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('formReg').style.display  = isLogin ? 'none' : 'block';
+  var t1 = document.getElementById('tabLogin');
+  var t2 = document.getElementById('tabReg');
+  if(t1) t1.className = 'auth-tab-btn' + (isLogin ? ' active' : '');
+  if(t2) t2.className = 'auth-tab-btn' + (!isLogin ? ' active' : '');
+  // Clear errors
+  ['loginErr','regErr'].forEach(function(id){
+    var e = document.getElementById(id);
+    if(e){ e.style.display='none'; e.textContent=''; }
+  });
+}
+
+// Keep old name aliases working
+function authShowPanel(w){ showAuthTab(w === 'reg' ? 'reg' : 'login'); }
+function authDoLogin(){ doAuthLogin(); }
+function authDoRegister(){ doAuthRegister(); }
+
+function doAuthLogin(){
+  var phone = (document.getElementById('lPhone')||{}).value;
+  var pass  = (document.getElementById('lPass')||{}).value;
+  var errEl = document.getElementById('loginErr');
+  var btn   = document.getElementById('btnLogin');
+  phone = phone ? phone.trim() : '';
+  pass  = pass  || '';
+  if(errEl){ errEl.style.display='none'; errEl.textContent=''; }
+  if(!phone){ showAuthError('loginErr','Введите номер телефона'); return; }
+  if(!pass){  showAuthError('loginErr','Введите пароль'); return; }
+  try{
     var users = JSON.parse(localStorage.getItem('km_users')||'[]');
-    var user = users.find(function(u){ return u.phone === phone; });
-    if(!user){ errEl.textContent = 'Номер не зарегистрирован'; errEl.style.display='block'; return; }
-    // Support both hash versions
-    var ph = simpleHash(pass);
-    if(user.ph !== ph){
-      errEl.textContent = 'Неверный пароль';
-      errEl.style.display = 'block';
-      return;
-    }
-    if(btnEl){ btnEl.textContent = 'Входим...'; btnEl.disabled = true; }
-    setTimeout(function(){
-      launchApp({id: user.id, name: user.name, prof: user.prof || ''});
-    }, 50);
-  } catch(e) {
-    errEl.textContent = 'Ошибка входа: ' + e.message;
-    errEl.style.display = 'block';
+    var user = null;
+    for(var i=0;i<users.length;i++){ if(users[i].phone===phone){ user=users[i]; break; } }
+    if(!user){ showAuthError('loginErr','Номер не зарегистрирован'); return; }
+    if(user.ph !== simpleHash(pass)){ showAuthError('loginErr','Неверный пароль'); return; }
+    if(btn){ btn.textContent='Входим...'; btn.disabled=true; }
+    setTimeout(function(){ launchApp({id:user.id, name:user.name, prof:user.prof||''}); }, 50);
+  } catch(e){
+    showAuthError('loginErr','Ошибка: '+e.message);
   }
 }
 
-function authDoRegister() {
-  var nameEl = document.getElementById('rName');
-  var profEl = document.getElementById('rProf');
-  var phoneEl = document.getElementById('rPhone');
-  var passEl = document.getElementById('rPass');
-  var errEl = document.getElementById('regErr');
-  var name = nameEl ? nameEl.value.trim() : '';
-  var prof = profEl ? profEl.value : '';
-  var phone = phoneEl ? phoneEl.value.trim() : '';
-  var pass = passEl ? passEl.value : '';
-  errEl.style.display = 'none';
-  errEl.textContent = '';
-  if (!name) { errEl.textContent = 'Введите имя'; errEl.style.display = 'block'; return; }
-  if (!phone) { errEl.textContent = 'Введите телефон'; errEl.style.display = 'block'; return; }
-  if (pass.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; errEl.style.display = 'block'; return; }
-  if (!phone.match(/[\d]{7,}/)) { errEl.textContent = 'Введите корректный телефон'; errEl.style.display = 'block'; return; }
-  try {
-    var usersRaw = localStorage.getItem('km_users');
-    var users = usersRaw ? JSON.parse(usersRaw) : [];
-    for (var i = 0; i < users.length; i++) {
-      if (users[i].phone === phone) { errEl.textContent = 'Телефон уже зарегистрирован'; errEl.style.display = 'block'; return; }
+function doAuthRegister(){
+  var name  = (document.getElementById('rName')||{}).value;
+  var prof  = (document.getElementById('rProf')||{}).value;
+  var phone = (document.getElementById('rPhone')||{}).value;
+  var pass  = (document.getElementById('rPass')||{}).value;
+  var btn   = document.getElementById('btnReg');
+  name  = name  ? name.trim()  : '';
+  phone = phone ? phone.trim() : '';
+  pass  = pass  || '';
+  if(!name){  showAuthError('regErr','Введите имя'); return; }
+  if(!phone){ showAuthError('regErr','Введите телефон'); return; }
+  if(pass.length < 4){ showAuthError('regErr','Пароль минимум 4 символа'); return; }
+  try{
+    var users = JSON.parse(localStorage.getItem('km_users')||'[]');
+    for(var i=0;i<users.length;i++){
+      if(users[i].phone===phone){ showAuthError('regErr','Телефон уже зарегистрирован'); return; }
     }
-    var id = 'u_' + Date.now();
-    users.push({id: id, name: name, prof: prof, phone: phone, ph: simpleHash(pass), created: Date.now()});
+    var id = 'u_'+Date.now();
+    users.push({id:id, name:name, prof:prof, phone:phone, ph:simpleHash(pass), created:Date.now()});
     localStorage.setItem('km_users', JSON.stringify(users));
-    var btn2 = document.querySelector('#aReg .auth-btn');
-    if(btn2){ btn2.textContent = 'Создаём аккаунт...'; btn2.disabled = true; }
-    setTimeout(function(){
-      launchApp({id: id, name: name, prof: prof || 'Специалист'});
-    }, 50);
-  } catch(e) {
-    errEl.textContent = 'Ошибка регистрации: ' + e.message;
-    errEl.style.display = 'block';
+    if(btn){ btn.textContent='Создаём...'; btn.disabled=true; }
+    setTimeout(function(){ launchApp({id:id, name:name, prof:prof||'Специалист'}); }, 50);
+  } catch(e){
+    showAuthError('regErr','Ошибка: '+e.message);
   }
 }
 
-var doLogin = authDoLogin;
-var doRegister = authDoRegister;
-var showPanel = authShowPanel;
+function showAuthError(errId, msg){
+  var el = document.getElementById(errId);
+  if(el){ el.textContent=msg; el.style.display='block'; }
+  // Reset buttons
+  var b1=document.getElementById('btnLogin');
+  var b2=document.getElementById('btnReg');
+  if(b1){ b1.textContent='Войти'; b1.disabled=false; }
+  if(b2){ b2.textContent='Создать аккаунт'; b2.disabled=false; }
+}
+
+
+// auth aliases consolidated above
 
 document.getElementById('logoutBtn').onclick = function() {
   localStorage.removeItem('km_session');
@@ -6220,7 +6246,7 @@ document.getElementById('logoutBtn').onclick = function() {
   if(banner) banner.style.display = 'none';
   // Show auth screen
   authScreen.style.display = 'block';
-  authShowPanel('login');
+  showAuthTab('login');
   authScreen.scrollTop = 0;
 };
 
@@ -8653,7 +8679,7 @@ function exitDemoToReg(){
   authScreen.style.removeProperty('display');
   var banner = document.getElementById('demoBanner');
   if(banner) banner.style.display='none';
-  authShowPanel('reg');
+  showAuthTab('reg');
   authScreen.scrollTop=0;
 }
 
