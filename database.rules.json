@@ -1,10 +1,16 @@
 {
   "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
     "masters": {
       "$uid": {
         "settings": {
           ".read": true,
-          ".write": true
+          ".write": "auth != null && auth.uid === $uid"
         },
         "appointments": {
           ".read": true,
