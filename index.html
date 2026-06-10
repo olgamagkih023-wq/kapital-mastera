@@ -1516,6 +1516,108 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
   .slot-chip{font-size:0.6rem;padding:4px 2px}
 }
 
+
+/* ═══ ONBOARDING ═══ */
+.onb-overlay{
+  position:fixed;inset:0;z-index:9990;
+  background:rgba(12,13,10,0.92);backdrop-filter:blur(20px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;visibility:hidden;transition:all 0.35s;
+}
+.onb-overlay.open{opacity:1;visibility:visible}
+.onb-sheet{
+  background:var(--cream);width:100%;max-width:560px;
+  border-radius:24px 24px 0 0;
+  transform:translateY(60px);
+  transition:transform 0.4s cubic-bezier(0.34,1.1,0.64,1);
+  padding-bottom:env(safe-area-inset-bottom);
+  max-height:92vh;overflow-y:auto;
+}
+.onb-overlay.open .onb-sheet{transform:translateY(0)}
+.onb-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:14px auto 0}
+
+/* Slides */
+.onb-slides{display:flex;overflow:hidden;width:100%}
+.onb-slide{
+  min-width:100%;padding:28px 28px 0;
+  display:flex;flex-direction:column;
+  transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.onb-emoji{font-size:3rem;margin-bottom:16px;display:block;text-align:center}
+.onb-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--em);color:#fff;
+  font-size:0.8rem;font-weight:700;margin-bottom:14px;
+  flex-shrink:0;
+}
+.onb-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;font-weight:400;color:var(--ink);
+  line-height:1.1;margin-bottom:12px;
+}
+.onb-title em{font-style:italic;color:var(--em)}
+.onb-desc{
+  font-size:0.92rem;color:var(--muted);line-height:1.75;
+  font-weight:300;margin-bottom:20px;
+}
+.onb-tips{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.onb-tip{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;background:var(--cream2);
+  border-left:3px solid var(--em);
+  font-size:0.88rem;color:var(--ink);font-weight:400;
+}
+.onb-tip-icon{font-size:1.1rem;flex-shrink:0}
+.onb-tip b{color:var(--em);font-weight:700}
+
+/* Nav */
+.onb-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 28px 28px;gap:12px;
+}
+.onb-dots{display:flex;gap:6px}
+.onb-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--border);transition:all 0.25s;
+}
+.onb-dot.active{background:var(--em);width:22px;border-radius:4px}
+.onb-prev{
+  padding:12px 20px;background:none;
+  border:1.5px solid var(--border);
+  font-family:'DM Sans',sans-serif;font-size:0.82rem;
+  font-weight:600;color:var(--muted);cursor:pointer;
+  transition:border-color 0.2s;
+}
+.onb-prev:hover{border-color:var(--ink);color:var(--ink)}
+.onb-next{
+  flex:1;padding:14px;background:var(--em);color:#fff;
+  border:none;font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;font-weight:700;
+  letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;transition:background 0.2s;
+  touch-action:manipulation;
+}
+.onb-next:hover{background:var(--ink)}
+.onb-skip{
+  text-align:center;padding:0 28px 16px;
+  font-size:0.78rem;color:var(--muted);cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.onb-skip:hover{color:var(--ink)}
+
+/* Action button inside slide */
+.onb-action{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;background:var(--ink);color:#fff;
+  cursor:pointer;margin-bottom:8px;transition:background 0.2s;
+  touch-action:manipulation;
+}
+.onb-action:hover{background:var(--em)}
+.onb-action-text{font-size:0.9rem;font-weight:600}
+.onb-action-sub{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:2px}
+.onb-action-arr{font-size:1.2rem;flex-shrink:0}
+
 /* ═══ DOWNLOAD POPUP ═══ */
 .dl-popup-overlay{
   position:fixed;inset:0;z-index:10001;
@@ -5196,6 +5298,8 @@ function refreshAll(){
   renderFinances();
   // Start Firebase real-time listener for appointments
   setTimeout(fbListenAppointments, 500);
+  // Show onboarding for new users
+  setTimeout(showOnboarding, 800);
 }
 
 checkSession();
@@ -5312,6 +5416,87 @@ function exitDemoToReg(){
   authShowPanel('reg');
   authScreen.scrollTop=0;
 }
+
+// ════════════════════════════════════════════
+// ONBOARDING
+// ════════════════════════════════════════════
+var ONB_STEP = 0;
+var ONB_TOTAL = 3; // slides 0..3
+
+function showOnboarding(){
+  // Only show once per user
+  var sess = load('km_session', {});
+  var key = 'km_onb_done_' + (sess.id||'u');
+  if(localStorage.getItem(key)) return;
+  ONB_STEP = 0;
+  onbRender();
+  document.getElementById('onbOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOnboarding(){
+  document.getElementById('onbOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  // Mark as done
+  var sess = load('km_session', {});
+  localStorage.setItem('km_onb_done_' + (sess.id||'u'), '1');
+}
+
+function onbRender(){
+  // Move slides
+  var slides = document.getElementById('onbSlides');
+  if(slides) slides.style.transform = 'translateX(-' + (ONB_STEP * 100) + '%)';
+  // Dots
+  for(var i=0;i<=ONB_TOTAL;i++){
+    var d = document.getElementById('od'+i);
+    if(d) d.className = 'onb-dot' + (i===ONB_STEP?' active':'');
+  }
+  // Buttons
+  var prev = document.getElementById('onbPrevBtn');
+  var next = document.getElementById('onbNextBtn');
+  if(prev) prev.style.display = ONB_STEP > 0 ? 'block' : 'none';
+  if(next){
+    if(ONB_STEP === 0) next.textContent = 'Начать →';
+    else if(ONB_STEP === ONB_TOTAL) next.textContent = '🚀 Начать работу';
+    else next.textContent = 'Дальше →';
+  }
+}
+
+function onbNext(){
+  if(ONB_STEP >= ONB_TOTAL){ closeOnboarding(); return; }
+  ONB_STEP++;
+  onbRender();
+}
+function onbPrev(){
+  if(ONB_STEP <= 0) return;
+  ONB_STEP--;
+  onbRender();
+}
+
+function onbGoToFinances(){
+  closeOnboarding();
+  navigateTo('finances');
+  // Focus quick entry
+  setTimeout(function(){
+    var el = document.getElementById('qeAmount');
+    if(el){ el.focus(); el.scrollIntoView({behavior:'smooth',block:'center'}); }
+  }, 400);
+}
+function onbGoToBooking(){
+  closeOnboarding();
+  navigateTo('booking');
+  setTimeout(function(){ switchBookTab && switchBookTab(2); }, 400);
+}
+function onbGoToLink(){
+  closeOnboarding();
+  navigateTo('booking');
+  setTimeout(function(){ switchBookTab && switchBookTab(3); }, 400);
+}
+
+// Close on background click
+document.getElementById('onbOverlay').addEventListener('click', function(e){
+  if(e.target === this) closeOnboarding();
+});
 
 // ════════════════════════════════════════════
 // LEGAL DOCUMENTS
@@ -5747,6 +5932,106 @@ window.addEventListener('appinstalled', function(){
     <div class="legal-handle"></div>
     <div class="legal-content" id="legalContent"></div>
     <button class="legal-close-btn" onclick="closeLegalDirect()">Закрыть</button>
+  </div>
+</div>
+
+
+<!-- ═══ ONBOARDING ═══ -->
+<div class="onb-overlay" id="onbOverlay">
+  <div class="onb-sheet">
+    <div class="onb-handle"></div>
+
+    <div class="onb-slides" id="onbSlides">
+
+      <!-- SLIDE 0: Welcome -->
+      <div class="onb-slide" id="onbS0">
+        <div style="text-align:center;padding:8px 0 4px">
+          <span class="onb-emoji">✦</span>
+          <div class="onb-title">Добро пожаловать<br>в <em>Капитал Мастера</em></div>
+          <div class="onb-desc">Твоя финансовая экосистема готова. Пройди 3 простых шага — и через минуту увидишь реальную картину своих финансов.</div>
+        </div>
+        <div class="onb-tips">
+          <div class="onb-tip"><div class="onb-tip-icon">💰</div><div>Шаг 1 — <b>добавь первый доход</b> и увидишь капитал в деле</div></div>
+          <div class="onb-tip"><div class="onb-tip-icon">📋</div><div>Шаг 2 — <b>настрой услуги</b> для онлайн-записи клиентов</div></div>
+          <div class="onb-tip"><div class="onb-tip-icon">🔗</div><div>Шаг 3 — <b>получи ссылку</b> и отправь клиентам прямо сейчас</div></div>
+        </div>
+      </div>
+
+      <!-- SLIDE 1: Add income -->
+      <div class="onb-slide" id="onbS1">
+        <span class="onb-emoji">💰</span>
+        <div class="onb-num">1</div>
+        <div class="onb-title">Добавь<br>первый <em>доход</em></div>
+        <div class="onb-desc">Введи любую сумму, которую получила за работу сегодня или недавно. Система сразу покажет сколько отложить на налог, подушку и капитал.</div>
+        <div class="onb-tips">
+          <div class="onb-tip"><div class="onb-tip-icon">⚡</div><div><b>Enter</b> — добавить доход, <b>Shift+Enter</b> — расход</div></div>
+          <div class="onb-tip"><div class="onb-tip-icon">🧮</div><div>Система автоматически рассчитает <b>налог УСН 6%</b> или НПД</div></div>
+          <div class="onb-tip"><div class="onb-tip-icon">📊</div><div><b>50/30/20</b> — 50% нужды, 30% желания, 20% капитал</div></div>
+        </div>
+        <div class="onb-action" onclick="onbGoToFinances()">
+          <div>
+            <div class="onb-action-text">Перейти к финансам</div>
+            <div class="onb-action-sub">Добавить первый доход прямо сейчас</div>
+          </div>
+          <div class="onb-action-arr">→</div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2: Set up services -->
+      <div class="onb-slide" id="onbS2">
+        <span class="onb-emoji">📋</span>
+        <div class="onb-num">2</div>
+        <div class="onb-title">Настрой<br><em>услуги</em> и цены</div>
+        <div class="onb-desc">Добавь свои услуги с ценами и длительностью. Они появятся на странице записи — клиент выберет нужное сам.</div>
+        <div class="onb-tips">
+          <div class="onb-tip"><div class="onb-tip-icon">✂️</div><div>Название, длительность в минутах и цена — это всё что нужно</div></div>
+          <div class="onb-tip"><div class="onb-tip-icon">🔄</div><div>Когда клиент запишется — доход <b>зачисляется одной кнопкой</b></div></div>
+          <div class="onb-tip"><div class="onb-tip-icon">📈</div><div>Система сама считает <b>выручку и среднюю цену часа</b></div></div>
+        </div>
+        <div class="onb-action" onclick="onbGoToBooking()">
+          <div>
+            <div class="onb-action-text">Добавить услуги</div>
+            <div class="onb-action-sub">Открыть настройки онлайн-записи</div>
+          </div>
+          <div class="onb-action-arr">→</div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3: Get booking link -->
+      <div class="onb-slide" id="onbS3">
+        <span class="onb-emoji">🔗</span>
+        <div class="onb-num">3</div>
+        <div class="onb-title">Получи ссылку<br>для <em>записи клиентов</em></div>
+        <div class="onb-desc">Включи приём заявок и отправь красивую ссылку клиентам. Они запишутся сами — ты получишь уведомление в Telegram.</div>
+        <div class="onb-tips">
+          <div class="onb-tip"><div class="onb-tip-icon">📲</div><div>Ссылка: <b>kapital-mastera.vercel.app/онлайн-запись</b></div></div>
+          <div class="onb-tip"><div class="onb-tip-icon">🔔</div><div>Новая заявка → <b>уведомление в Telegram</b> мгновенно</div></div>
+          <div class="onb-tip"><div class="onb-tip-icon">💬</div><div>Отправь ссылку в Instagram, WhatsApp или поставь в Bio</div></div>
+        </div>
+        <div class="onb-action" onclick="onbGoToLink()">
+          <div>
+            <div class="onb-action-text">Получить ссылку для записи</div>
+            <div class="onb-action-sub">Открыть раздел «Онлайн-запись»</div>
+          </div>
+          <div class="onb-action-arr">→</div>
+        </div>
+      </div>
+
+    </div><!-- /slides -->
+
+    <!-- Dots + buttons -->
+    <div class="onb-nav">
+      <div class="onb-dots">
+        <div class="onb-dot active" id="od0"></div>
+        <div class="onb-dot" id="od1"></div>
+        <div class="onb-dot" id="od2"></div>
+        <div class="onb-dot" id="od3"></div>
+      </div>
+      <button class="onb-prev" id="onbPrevBtn" onclick="onbPrev()" style="display:none">← Назад</button>
+      <button class="onb-next" id="onbNextBtn" onclick="onbNext()">Начать →</button>
+    </div>
+    <div class="onb-skip" onclick="closeOnboarding()">Пропустить — разберусь сам</div>
+
   </div>
 </div>
 
