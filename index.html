@@ -2655,7 +2655,12 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
             <div class="form-field-app" style="margin-bottom:12px">
               <label>Телефон (WhatsApp / MAX)</label>
               <input id="masterPhone" type="tel" placeholder="+7 (999) 000-00-00" onchange="saveBookingSettings()">
-              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Клиент напишет вам после записи</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Для уведомлений через WhatsApp и MAX</div>
+            </div>
+            <div class="form-field-app" style="margin-bottom:12px">
+              <label>Telegram username</label>
+              <input id="masterTelegram" type="text" placeholder="@username или число (chat ID)" onchange="saveBookingSettings()">
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Для уведомлений через Telegram</div>
             </div>
             <div class="settings-title" style="margin-top:16px">Рабочие часы</div>
             <div style="display:flex;gap:8px;margin-bottom:12px">
@@ -3941,6 +3946,29 @@ function toggleTheme(){
   applyTheme(saved);
 })();
 
+// Telegram notify for master app (Firebase listener)
+var TG_TOKEN_APP   = '8897177806:AAGv09R-rc-umrHHU-TrNUlIy1rIA2L12MY';
+var TG_CHAT_APP    = '1164869349';
+
+function notifyTelegramNewAppt(appt){
+  var lines = [
+    '🔔 *Новая заявка онлайн!*',
+    '',
+    '👤 ' + appt.client,
+    appt.phone ? '📞 ' + appt.phone : '',
+    '💆 ' + (appt.service||'—'),
+    '📅 ' + appt.date + '  🕐 ' + appt.time,
+    appt.price ? '💰 ' + Math.round(appt.price).toLocaleString('ru-RU') + ' ₽' : '',
+    appt.note ? '💬 ' + appt.note : '',
+  ].filter(Boolean).join('\n');
+
+  fetch('https://api.telegram.org/bot' + TG_TOKEN_APP + '/sendMessage', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({chat_id: TG_CHAT_APP, text: lines, parse_mode: 'Markdown'})
+  }).catch(function(){});
+}
+
 // ════════════════════════════════════════════
 // FIREBASE — BOOKING SYNC
 // ════════════════════════════════════════════
@@ -3955,6 +3983,7 @@ function fbSaveBookingSettings(s){
     masterName:   s.masterName || '',
     masterProf:   s.masterProf || '',
     masterPhone:  s.masterPhone || '',
+    masterTelegram: s.masterTelegram || '',
     services:     s.services || [],
     workDays:     s.workDays || [1,2,3,4,5],
     workStart:    s.workStart || '10:00',
@@ -4022,7 +4051,7 @@ function getBookingSettings(){
     isOpen:false, services:[], workDays:[1,2,3,4,5],
     workStart:'10:00', workEnd:'19:00',
     masterName:'', masterProf:'',
-    masterPhone:'', customSlug:''
+    masterPhone:'', masterTelegram:'', customSlug:''
   });
 }
 function saveBookingSettingsData(d){
@@ -4055,6 +4084,8 @@ function renderBookingSettings(){
   var we = document.getElementById('workEnd');
   var slugEl = document.getElementById('customSlug');
   if(mp && s.masterPhone) mp.value = s.masterPhone;
+  var tgEl2 = document.getElementById('masterTelegram');
+  if(tgEl2 && s.masterTelegram) tgEl2.value = s.masterTelegram;
   if(ws) ws.value = s.workStart || '10:00';
   if(we) we.value = s.workEnd || '19:00';
   if(slugEl && s.customSlug) slugEl.value = s.customSlug;
