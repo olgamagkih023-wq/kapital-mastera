@@ -2408,6 +2408,13 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
         </div>
         <div class="settings-card">
           <div class="settings-title" style="display:flex;align-items:center">Данные <button class="help-btn" onclick="openHelp('settings')">?</button></div>
+          <div class="setting-row" style="padding:12px 0;border-bottom:1px solid var(--border)">
+            <div>
+              <div class="setting-label">☁️ Облачная синхронизация</div>
+              <div class="setting-desc" id="fbSyncStatus">Проверяем подключение...</div>
+            </div>
+            <div id="fbSyncDot" style="width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0"></div>
+          </div>
           <div class="setting-row">
             <div>
               <div class="setting-label">Экспорт в CSV</div>
@@ -2986,6 +2993,99 @@ var hsh = simpleHash;
 function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){console.warn('store error',e)}}
 function load(k,d){try{var v=localStorage.getItem(k);return v!==null?JSON.parse(v):d}catch(e){return d}}
 
+// ════════════════════════════════════════════
+// FIREBASE FULL-PROFILE SYNC
+// ════════════════════════════════════════════
+var FB_UID = '';  // set after login
+var FB_SYNC_PENDING = false;
+
+function fbRef(path){
+  if(!FB_UID || typeof db === 'undefined') return null;
+  return db.ref('users/' + FB_UID + '/' + path);
+}
+
+// Write to Firebase (debounced — batch writes)
+var FB_WRITE_TIMERS = {};
+function fbWrite(path, data){
+  var ref = fbRef(path);
+  if(!ref) return;
+  clearTimeout(FB_WRITE_TIMERS[path]);
+  FB_WRITE_TIMERS[path] = setTimeout(function(){
+    ref.set(data).catch(function(e){ console.warn('FB write error ['+path+']:', e.message); });
+  }, 600);  // 600ms debounce — batch rapid changes
+}
+
+// Load full profile from Firebase on login
+function fbLoadProfile(uid, callback){
+  if(typeof db === 'undefined'){ callback(); return; }
+  db.ref('users/' + uid).once('value')
+    .then(function(snap){
+      var data = snap.val();
+      if(!data){ callback(); return; }
+      // Restore to localStorage
+      if(data.tx)        store('km_tx', data.tx);
+      if(data.appts)     store('km_appts', data.appts);
+      if(data.settings)  store('km_settings', data.settings);
+      if(data.hours)     store('km_hours', data.hours);
+      if(data.capital)   store('km_capital', data.capital);
+      if(data.pulse)     store('km_pulse', data.pulse);
+      if(data.blog)      store('km_blog', data.blog);
+      if(data.booking)   store('km_booking_settings', data.booking);
+      console.log('✓ Profile loaded from Firebase');
+      callback();
+    })
+    .catch(function(e){
+      console.warn('FB load error:', e.message);
+      callback();  // proceed with local data
+    });
+}
+
+// Patched save functions — write local + sync to Firebase
+function getTx(){ return load('km_tx',[]); }
+function saveTx(a){
+  store('km_tx', a);
+  fbWrite('tx', a);
+}
+function getAppts(){ return load('km_appts',[]); }
+function saveAppts(a){
+  store('km_appts', a);
+  fbWrite('appts', a);
+}
+function getSettings(){
+  return load('km_settings',{
+    goal:300000, monthly:20000, yield:12, income:100000,
+    categories:['Клиент','Материалы','Аренда','Обучение','Маркетинг','Продукты','Транспорт','Развлечения','Здоровье','Инвестиции','Прочее']
+  });
+}
+function saveSettings(s){
+  store('km_settings', s);
+  fbWrite('settings', s);
+}
+
+// Hour logs
+function getHours(){ return load('km_hours',[]); }
+function saveHours(h){
+  store('km_hours', h);
+  fbWrite('hours', h);
+}
+
+// Capital/investments — intercept store calls for capital keys
+var _origStore = store;
+function store(k, v){
+  try{ localStorage.setItem(k, JSON.stringify(v)); } catch(e){ console.warn('store error',e); }
+  // Sync capital data to Firebase
+  if(FB_UID && typeof db !== 'undefined'){
+    var fbMap = {
+      'km_capital':          'capital',
+      'km_pulse':            'pulse',
+      'km_blog':             'blog',
+      'km_booking_settings': 'booking',
+    };
+    if(fbMap[k]) fbWrite(fbMap[k], v);
+  }
+}
+
+
 
 // ===== AUTH =====
 const authScreen=document.getElementById('authScreen');
@@ -3025,15 +3125,28 @@ function doLogin(){
 function showErr(el,msg){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000)}
 
 function launchApp(user){
-  store('km_session',user);
-  authScreen.style.display='none';
-  appEl.style.display='flex';
-  appEl.classList.add('visible');
-  document.getElementById('sidebarName').textContent=user.name||'Мастер';
-  setTimeout(function(){if(HELP_CONTENT['dashboard']){var t=document.getElementById('pageTitle');if(t)t.innerHTML='Обзор <button class="help-btn" onclick="openHelp(\'dashboard\')" title="Как это работает">?</button>';}},200);
-  document.getElementById('sidebarProf').textContent=user.prof||'Специалист';
-  refreshAll();
+  store('km_session', user);
+  FB_UID = user.id || '';  // ← set Firebase UID
+
+  // Show loading indicator in sidebar while Firebase loads
+  document.getElementById('sidebarName').textContent = user.name || 'Мастер';
+  document.getElementById('sidebarProf').textContent = user.prof || 'Специалист';
+
+  // Load full profile from Firebase, THEN show app
+  fbLoadProfile(FB_UID, function(){
+    authScreen.style.display = 'none';
+    appEl.style.display = 'flex';
+    appEl.classList.add('visible');
+    setTimeout(function(){
+      if(HELP_CONTENT['dashboard']){
+        var t = document.getElementById('pageTitle');
+        if(t) t.innerHTML = 'Обзор <button class="help-btn" onclick="openHelp(\'dashboard\')" title="Как это работает">?</button>';
+      }
+    }, 200);
+    refreshAll();
+  });
 }
+
 function checkSession(){
   var s = load('km_session', null);
   if(s && s.id){
@@ -3119,6 +3232,7 @@ var showPanel = authShowPanel;
 document.getElementById('logoutBtn').onclick = function() {
   localStorage.removeItem('km_session');
   IS_DEMO = false;
+  FB_UID = '';
   appEl.classList.remove('visible');
   appEl.style.display = 'none';
   // Show demo banner hidden
@@ -4168,6 +4282,24 @@ function notifyTelegramNewAppt(appt){
     body: JSON.stringify({chat_id: TG_CHAT_APP, text: lines, parse_mode: 'Markdown'})
   }).catch(function(){});
 }
+
+// Firebase connection status indicator
+function updateFbStatus(ok, msg){
+  var dot = document.getElementById('fbSyncDot');
+  var txt = document.getElementById('fbSyncStatus');
+  if(dot) dot.style.background = ok ? 'var(--em)' : 'var(--red)';
+  if(txt) txt.textContent = msg || (ok ? 'Данные синхронизируются между устройствами' : 'Работаем офлайн — данные сохранены локально');
+}
+
+// Check Firebase connection on load
+if(typeof db !== 'undefined'){
+  db.ref('.info/connected').on('value', function(snap){
+    updateFbStatus(!!snap.val(), snap.val()
+      ? '✓ Синхронизация активна — данные на всех устройствах'
+      : '⚠ Офлайн — данные сохраняются локально');
+  });
+}
+
 
 // ════════════════════════════════════════════
 // FIREBASE — BOOKING SYNC
@@ -5380,6 +5512,7 @@ var IS_DEMO = false;
 
 function enterDemoMode(){
   IS_DEMO = true;
+  FB_UID = '';  // no Firebase sync in demo
   var demoUser = {id:'demo_user', name:'Мастер', prof:'Демо'};
   saveTx([]);
   saveAppts([]);
