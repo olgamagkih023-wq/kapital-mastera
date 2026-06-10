@@ -435,26 +435,41 @@ function submitBooking(){
 }
 
 // ── Telegram notification ────────────────────────────────────
+function escMd(s){
+  // Escape Markdown special chars for Telegram
+  return (s||'').replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
+}
+
 function sendTelegramNotify(a){
   var nl = '\n';
   var p = a.date ? a.date.split('-') : [];
   var dateRu = p.length ? (+p[2])+' '+MONTHS_RU[+p[1]-1] : a.date;
-  var text = [
-    '🔔 *Новая запись онлайн!*', '',
-    '👤 *' + a.client + '*',
-    a.phone ? '📞 ' + a.phone : '',
-    '💆 ' + (a.service||'—'),
-    '📅 ' + dateRu + '  🕐 ' + (a.time||'—'),
-    a.price ? '💰 ' + Math.round(a.price).toLocaleString('ru-RU') + ' ₽' : '',
-    a.note  ? '💬 ' + a.note : '',
-    '', '✅ Подтвердите в приложении «Капитал Мастера»'
-  ].filter(Boolean).join(nl);
+  // Build clean text for Telegram Bot API
+  var lines = [
+    '\u{1F514} *Новая запись онлайн!*',
+    '',
+    '\u{1F464} *' + escMd(a.client) + '*',
+    a.phone ? '\u{1F4DE} ' + a.phone : null,
+    '\u{1F486} ' + escMd(a.service||'—'),
+    '\u{1F4C5} ' + dateRu + '  \u{1F550} ' + (a.time||'—'),
+    a.price ? '\u{1F4B0} ' + Math.round(a.price).toLocaleString('ru-RU') + ' руб.' : null,
+    a.note  ? '\u{1F4AC} ' + escMd(a.note) : null,
+    '',
+    '\u2705 Откройте приложение чтобы подтвердить'
+  ].filter(function(x){ return x !== null; }).join('\n');
 
-  fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({chat_id:TG_CHAT, text:text, parse_mode:'Markdown'})
-  }).catch(function(){});
+  fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      chat_id: TG_CHAT,
+      text: lines,
+      parse_mode: 'Markdown'
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){ console.log('TG notify:', d.ok ? 'OK' : d.description); })
+  .catch(function(e){ console.warn('TG error:', e); });
 }
 
 // ── Success screen ───────────────────────────────────────────
@@ -471,21 +486,59 @@ function showSuccess(a){
   // Messenger buttons for client to write master
   var btns = document.getElementById('msgBtns');
   btns.innerHTML = '';
-  var phone = (CFG.masterPhone||'').replace(/\D/g,'');
-  var tg    = (CFG.masterTelegram||'').replace(/^@/,'');
-  var msgText = 'Здравствуйте! Я записалась через форму.\nИмя: '+a.client+'\nУслуга: '+a.service+'\nДата: '+dateRu+' в '+a.time;
-  var msgEnc = encodeURIComponent(msgText);
+  // Clean phone — digits only, no + no spaces
+  var phone = (CFG.masterPhone||'').replace(/[^\d]/g,'');
+  // Telegram — username (without @) or numeric chat ID
+  var tg = (CFG.masterTelegram||'').trim().replace(/^@/,'');
+
+  // Build message text — use %0A for line breaks (works in all messengers)
+  var msgParts = [
+    'Здравствуйте! Я записалась через форму онлайн-записи.',
+    'Имя: ' + a.client,
+    a.phone ? 'Телефон: ' + a.phone : '',
+    'Услуга: ' + (a.service||''),
+    'Дата: ' + dateRu,
+    'Время: ' + (a.time||''),
+    a.price ? 'Стоимость: ' + Math.round(a.price||0).toLocaleString('ru-RU') + ' руб.' : '',
+    a.note ? 'Пожелание: ' + a.note : ''
+  ].filter(Boolean);
+
+  // For WhatsApp: encode each part separately, join with %0A
+  var waMsg = msgParts.map(function(p){ return encodeURIComponent(p); }).join('%0A');
+  // For Telegram: same approach
+  var tgMsg = waMsg;
 
   if(phone){
-    btns.appendChild(makeBtn('https://wa.me/'+phone+'?text='+msgEnc, '#25D366', waIcon(), ' WhatsApp мастеру'));
-    btns.appendChild(makeBtn('https://max.ru/chat/'+phone+'?text='+msgEnc, '#005BFF', msgIcon(), ' MAX мастеру'));
+    // WhatsApp: https://wa.me/7XXXXXXXXXX?text=...
+    var waPhone = phone.length === 10 ? '7' + phone : phone; // add country code if missing
+    btns.appendChild(makeBtn(
+      'https://wa.me/' + waPhone + '?text=' + waMsg,
+      '#25D366', waIcon(), ' WhatsApp мастеру'
+    ));
   }
   if(tg){
-    var tgUrl = isNaN(tg) ? 'https://t.me/'+tg+'?text='+msgEnc : 'https://t.me/+'+tg;
+    // Telegram username: https://t.me/username?text=...
+    // Telegram phone (+7...): https://t.me/+79261008694
+    var tgUrl;
+    if(/^\d+$/.test(tg)){
+      // Pure digits = phone number → direct link (no text pre-fill possible)
+      tgUrl = 'https://t.me/+' + (tg.length===10 ? '7'+tg : tg);
+    } else {
+      // Username → open chat with pre-filled text
+      tgUrl = 'https://t.me/' + tg + '?text=' + tgMsg;
+    }
     btns.appendChild(makeBtn(tgUrl, '#229ED9', tgIcon(), ' Telegram мастеру'));
   }
+  if(phone){
+    // VK (MAX) — correct URL format
+    // vk.me works for VK accounts linked to phone
+    btns.appendChild(makeBtn(
+      'https://vk.me/+' + (phone.length===10 ? '7'+phone : phone),
+      '#005BFF', msgIcon(), ' ВКонтакте / MAX'
+    ));
+  }
   if(!phone && !tg){
-    btns.innerHTML = '<div style="font-size:0.85rem;color:var(--muted);text-align:center;padding:12px 0">Мастер свяжется с вами для подтверждения.</div>';
+    btns.innerHTML = '<div style="font-size:0.85rem;color:var(--muted);text-align:center;padding:16px 0;line-height:1.6">Мастер получил уведомление и свяжется с вами для подтверждения.</div>';
   }
 
   goStep('done');
