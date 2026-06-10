@@ -4855,63 +4855,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
   </div>
 
   <!-- ── AUTH FORM ── -->
-  <div class="auth-form-section">
-    <div class="auth-form-tag">Начать бесплатно</div>
-    <div class="auth-box">
-      <div class="auth-logo">Капитал <span>Мастера</span></div>
-      <div class="auth-sub">Финансовая экосистема для творческих</div>
-      <div class="auth-tabs">
-        <button class="atab active" id="atLogin" onclick="authShowPanel('login')">Вход</button>
-        <button class="atab" id="atReg" onclick="authShowPanel('reg')">Регистрация</button>
-      </div>
-      <div id="aLogin">
-        <div class="auth-err" id="loginErr"></div>
-        <div class="auth-field"><input type="tel" id="lPhone" placeholder="Телефон" autocomplete="tel" onkeydown="if(event.key==='Enter')authDoLogin()"></div>
-        <div class="auth-field"><input type="password" id="lPass" placeholder="Пароль" autocomplete="current-password" onkeydown="if(event.key==='Enter')authDoLogin()"></div>
-        <button class="auth-btn" onclick="authDoLogin()">Войти</button>
-        <div class="auth-switch">Нет аккаунта? <a onclick="authShowPanel('reg')" style="cursor:pointer;color:var(--em)">Создать</a></div>
-        <button class="dl-trigger-btn" onclick="openDlPopup()">
-          <span class="dl-trigger-btn-icon">📲</span> Скачать приложение
-        </button>
-        <button onclick="enterDemoMode()" style="width:100%;margin-top:12px;padding:14px;background:var(--cream2);border:2px dashed var(--border);font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;color:var(--ink);cursor:pointer;transition:all 0.2s;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.borderColor='var(--em)';this.style.color='var(--em)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink)'">
-          🎯 Попробовать без регистрации
-        </button>
-      </div>
-      <div id="aReg" style="display:none">
-        <div class="auth-err" id="regErr"></div>
-        <div class="auth-field"><input type="text" id="rName" placeholder="Имя и фамилия" autocomplete="name"></div>
-        <div class="auth-field">
-          <select id="rProf" style="width:100%;padding:18px 18px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);outline:none;font-weight:500">
-            <option value="">Ваша профессия...</option>
-            <option>Бьюти-мастер</option><option>Визажист</option><option>Парикмахер</option>
-            <option>Маникюрист</option><option>Стилист</option><option>Барбер</option>
-            <option>Фотограф</option><option>Видеограф</option><option>Дизайнер</option>
-            <option>Художник</option><option>Флорист</option><option>Другое</option>
-          </select>
-        </div>
-        <div class="auth-field"><input type="tel" id="rPhone" placeholder="Телефон" autocomplete="tel"></div>
-        <div class="auth-field"><input type="password" id="rPass" placeholder="Пароль (мин. 4 символа)" autocomplete="new-password" onkeydown="if(event.key==='Enter')authDoRegister()"></div>
-        <button class="auth-btn" onclick="authDoRegister()">Создать аккаунт</button>
-        <div class="auth-switch">Уже есть аккаунт? <a onclick="authShowPanel('login')" style="cursor:pointer;color:var(--em)">Войти</a></div>
-        <button class="dl-trigger-btn" onclick="openDlPopup()">
-          <span class="dl-trigger-btn-icon">📲</span> Скачать приложение
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Legal footer -->
-  <div class="legal-footer-bar">
-    <div class="legal-footer-links">
-      <button onclick="openLegal('privacy')">Политика конфиденциальности</button>
-      <button onclick="openLegal('agreement')">Пользовательское соглашение</button>
-      <button onclick="openLegal('offer')">Публичная оферта</button>
-      <button onclick="openLegal('requisites')">Реквизиты</button>
-    </div>
-    <div class="legal-footer-copy">© 2025 Капитал Мастера</div>
-  </div>
-
-</div>
+  
 
 <!-- ===== APP ===== -->
 <div id="app">
@@ -6216,7 +6160,9 @@ function authDoLogin() {
       return;
     }
     if(btnEl){ btnEl.textContent = 'Входим...'; btnEl.disabled = true; }
-    launchApp({id: user.id, name: user.name, prof: user.prof || ''});
+    setTimeout(function(){
+      launchApp({id: user.id, name: user.name, prof: user.prof || ''});
+    }, 50);
   } catch(e) {
     errEl.textContent = 'Ошибка входа: ' + e.message;
     errEl.style.display = 'block';
@@ -6250,7 +6196,9 @@ function authDoRegister() {
     localStorage.setItem('km_users', JSON.stringify(users));
     var btn2 = document.querySelector('#aReg .auth-btn');
     if(btn2){ btn2.textContent = 'Создаём аккаунт...'; btn2.disabled = true; }
-    launchApp({id: id, name: name, prof: prof || 'Специалист'});
+    setTimeout(function(){
+      launchApp({id: id, name: name, prof: prof || 'Специалист'});
+    }, 50);
   } catch(e) {
     errEl.textContent = 'Ошибка регистрации: ' + e.message;
     errEl.style.display = 'block';
