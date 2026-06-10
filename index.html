@@ -4136,7 +4136,10 @@ function renderBookingLink(){
   if(s.isOpen){
     var sess2 = load('km_session', {});
     var uid2 = sess2.id || 'default';
-    var url = window.location.origin + '/booking.html?master=' + uid2;
+    var fullUrl = window.location.origin + '/booking.html?master=' + uid2;
+    // Short beautiful URL — redirects to booking.html via Vercel
+    var url = window.location.origin + '/%D0%BE%D0%BD%D0%BB%D0%B0%D0%B9%D0%BD-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C?master=' + uid2;
+    var displayUrl = window.location.origin + '/онлайн-запись';
     var display = slug
       ? window.location.origin + '/b/' + slug
       : url;
@@ -4191,9 +4194,10 @@ function copyBookLink(){
   if(!s.isOpen){ toast('Сначала включи приём заявок','error'); return; }
   var sess = load('km_session', {});
   var uid = sess.id || 'default';
-  var url = window.location.origin + '/booking.html?master=' + uid;
+  // Copy beautiful short URL that redirects correctly
+  var url = window.location.origin + '/%D0%BE%D0%BD%D0%BB%D0%B0%D0%B9%D0%BD-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C?master=' + uid;
   if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(function(){ toast('✓ Ссылка скопирована!'); });
+    navigator.clipboard.writeText(url).then(function(){ toast('✓ Ссылка скопирована! Отправь клиентам'); });
   } else {
     var inp = document.createElement('input');
     inp.value = url; document.body.appendChild(inp); inp.select();
