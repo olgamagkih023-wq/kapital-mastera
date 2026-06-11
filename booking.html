@@ -225,6 +225,7 @@ function boot(){
 
   db.ref('masters/' + MASTER_UID + '/settings').once('value')
     .then(function(snap){
+      clearTimeout(loadTimer);
       var data = snap.val();
       if(data){
         CFG = Object.assign(CFG, data);
@@ -457,18 +458,479 @@ function sendTelegramNotify(a){
     '\u2705 Откройте приложение чтобы подтвердить'
   ].filter(function(x){ return x !== null; }).join('\n');
 
-  fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
+  fetch('/api/notify', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      chat_id: TG_CHAT,
-      text: lines,
-      parse_mode: 'Markdown'
-    })
+    body: JSON.stringify({text: text, parse_mode: 'Markdown'})
   })
   .then(function(r){ return r.json(); })
-  .then(function(d){ console.log('TG notify:', d.ok ? 'OK' : d.description); })
-  .catch(function(e){ console.warn('TG error:', e); });
+  .then(function(d){ console.log('TG:', d.ok ? 'sent' : d.error); })
+  .catch(function(e){ console.warn('TG proxy error:', e.message); });
+}!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Онлайн-запись</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCSshaGE_C9oLJJ7p_qRlhzuRR4iz-rKrs",
+  authDomain:"kapital-mastera.firebaseapp.com",
+  databaseURL:"https://kapital-mastera-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"kapital-mastera",
+  storageBucket:"kapital-mastera.firebasestorage.app",
+  messagingSenderId:"85234511419",
+  appId:"1:85234511419:web:fef38bfb35fc11bbd0761e"
+});
+var db = firebase.database();
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--em:#0D6E4A;--em3:#13C47E;--ink:#0C0D0A;--cream:#F9F5EE;--cream2:#F0E9DC;--border:#DDD4C4;--muted:#5A5750;--gold:#B8975A;--red:#C0392B;--white:#fff}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+
+/* Loading screen */
+.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--em);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:0.9rem;color:var(--muted);font-weight:300}
+
+/* Main content */
+.wrap{max-width:500px;margin:0 auto;display:none}
+.wrap.ready{display:block}
+
+/* Header */
+.bk-header{background:var(--ink);padding:28px 24px;text-align:center}
+.bk-logo{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:12px}
+.master-av{width:64px;height:64px;border-radius:50%;background:var(--em);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#fff;font-weight:500}
+.master-name{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:#fff;margin-bottom:4px}
+.master-prof{font-size:0.8rem;color:rgba(255,255,255,0.4);letter-spacing:0.06em}
+.closed-banner{background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);color:var(--red);padding:12px 16px;font-size:0.88rem;font-weight:500;text-align:center;margin:0}
+
+/* Progress */
+.progress{display:flex;gap:4px;padding:14px 24px 0;background:var(--ink)}
+.prog-step{flex:1;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;transition:background 0.3s}
+.prog-step.done{background:var(--em3)}
+
+/* Steps */
+.step{display:none;padding:20px 20px 32px}
+.step.active{display:block}
+.step-tag{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;font-weight:600}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--ink);margin-bottom:18px}
+
+/* Service cards */
+.svc-list{display:flex;flex-direction:column;gap:8px}
+.svc-card{padding:14px 16px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all 0.18s;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.svc-card:active,.svc-card.sel{border-color:var(--em);background:rgba(13,110,74,0.04)}
+.svc-name{font-size:0.95rem;font-weight:600;color:var(--ink);margin-bottom:3px}
+.svc-dur{font-size:0.78rem;color:var(--muted)}
+.svc-price{font-size:1rem;font-weight:700;color:var(--em);white-space:nowrap;margin-left:12px}
+
+/* Calendar */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav-btn{width:36px;height:36px;background:none;border:1.5px solid var(--border);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s;flex-shrink:0;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+.cal-nav-btn:active{border-color:var(--em)}
+.cal-month{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px}
+.cal-wd{font-size:0.6rem;font-weight:700;text-align:center;color:var(--muted);padding:4px 0;text-transform:uppercase}
+.cal-day{height:38px;display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:500;cursor:pointer;border-radius:4px;transition:all 0.15s;-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.cal-day.off{color:var(--border);cursor:default}
+.cal-day.past{color:var(--border);cursor:default;text-decoration:line-through}
+.cal-day.avail:hover{background:rgba(13,110,74,0.1)}
+.cal-day.today{border:2px solid var(--em);color:var(--em);font-weight:700}
+.cal-day.sel{background:var(--em);color:#fff;border-radius:50%}
+
+/* Time slots */
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.time-slot{padding:12px 6px;text-align:center;border:1.5px solid var(--border);cursor:pointer;font-size:0.88rem;font-weight:500;transition:all 0.15s;background:var(--white);-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.time-slot:active,.time-slot.sel{background:var(--em);color:#fff;border-color:var(--em)}
+.time-slot.taken{background:var(--cream2);color:var(--border);cursor:default;text-decoration:line-through}
+.time-note{font-size:0.75rem;color:var(--muted);margin-bottom:14px}
+
+/* Form */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:0.78rem;font-weight:600;color:var(--ink);margin-bottom:5px}
+.field input,.field textarea{width:100%;padding:13px 14px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--ink);outline:none;transition:border-color 0.2s;-webkit-appearance:none;border-radius:0}
+.field input:focus,.field textarea:focus{border-color:var(--em)}
+.field textarea{resize:vertical;min-height:56px}
+
+/* Summary box */
+.sum-box{background:var(--cream2);padding:14px 16px;margin-bottom:16px;border-left:3px solid var(--em)}
+.sum-row{display:flex;justify-content:space-between;font-size:0.88rem;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.sum-row:last-child{border:none;padding-top:8px;font-weight:700;font-size:0.95rem;color:var(--em)}
+
+/* Buttons */
+.btn-next{width:100%;padding:15px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:8px;-webkit-tap-highlight-color:rgba(0,0,0,0.1)}
+.btn-next:active{background:var(--ink)}
+.btn-back{width:100%;padding:13px;background:none;border:2px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;margin-top:8px;transition:border-color 0.2s;-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
+.btn-back:active{border-color:var(--ink)}
+.err-msg{color:var(--red);font-size:0.82rem;padding:10px 14px;background:rgba(192,57,43,0.08);margin-bottom:10px;display:none;border-left:3px solid var(--red)}
+
+/* Success */
+.success{text-align:center;padding:36px 20px 40px}
+.success-icon{font-size:3rem;display:block;margin-bottom:16px}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--ink);margin-bottom:8px}
+.success-det{background:var(--cream2);padding:14px 16px;margin:16px 0;text-align:left;border-left:3px solid var(--em)}
+.success-det-row{display:flex;justify-content:space-between;font-size:0.88rem;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.success-det-row:last-child{border:none}
+.success-note{font-size:0.85rem;color:var(--muted);line-height:1.65;margin-bottom:16px}
+.msg-btns{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.msg-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;color:#fff;text-decoration:none;font-size:0.9rem;font-weight:700;font-family:'DM Sans',sans-serif;-webkit-tap-highlight-color:rgba(0,0,0,0.1);border-radius:0}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loading" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Загружаем расписание...</div>
+</div>
+
+<!-- Main -->
+<div class="wrap" id="mainWrap">
+
+  <div class="bk-header">
+    <div class="bk-logo">Капитал Мастера · Онлайн-запись</div>
+    <div class="master-av" id="masterAv">О</div>
+    <div class="master-name" id="masterName">Мастер</div>
+    <div class="master-prof" id="masterProf">Запись онлайн</div>
+  </div>
+  <div class="closed-banner" id="closedBanner" style="display:none">⏸ Запись временно закрыта. Попробуйте позже.</div>
+
+  <!-- Progress -->
+  <div class="progress" id="progressBar">
+    <div class="prog-step" id="p1"></div>
+    <div class="prog-step" id="p2"></div>
+    <div class="prog-step" id="p3"></div>
+    <div class="prog-step" id="p4"></div>
+  </div>
+
+  <!-- STEP 1: Услуга -->
+  <div class="step" id="s1">
+    <div class="step-tag">Шаг 1 из 4</div>
+    <div class="step-title">Выберите услугу</div>
+    <div class="svc-list" id="svcList"></div>
+  </div>
+
+  <!-- STEP 2: Дата -->
+  <div class="step" id="s2">
+    <div class="step-tag">Шаг 2 из 4</div>
+    <div class="step-title">Выберите дату</div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="prevMonth()">←</button>
+      <div class="cal-month" id="calMonthLbl"></div>
+      <button class="cal-nav-btn" onclick="nextMonth()">→</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <button class="btn-back" onclick="goStep(1)">← Назад</button>
+  </div>
+
+  <!-- STEP 3: Время -->
+  <div class="step" id="s3">
+    <div class="step-tag">Шаг 3 из 4</div>
+    <div class="step-title">Выберите время</div>
+    <div class="time-note" id="selDateLabel"></div>
+    <div class="time-grid" id="timeGrid"></div>
+    <button class="btn-back" onclick="goStep(2)">← Назад</button>
+  </div>
+
+  <!-- STEP 4: Контакты -->
+  <div class="step" id="s4">
+    <div class="step-tag">Шаг 4 из 4</div>
+    <div class="step-title">Ваши данные</div>
+    <div class="sum-box" id="sumBox"></div>
+    <div class="err-msg" id="formErr"></div>
+    <div class="field"><label>Ваше имя *</label><input type="text" id="cName" placeholder="Анна Иванова" autocomplete="name"></div>
+    <div class="field"><label>Телефон *</label><input type="tel" id="cPhone" placeholder="+7 (999) 000-00-00" autocomplete="tel"></div>
+    <div class="field"><label>Пожелания</label><textarea id="cNote" placeholder="Длина ногтей, дизайн, особые пожелания..."></textarea></div>
+    <button class="btn-next" onclick="submitBooking()">Записаться ✓</button>
+    <button class="btn-back" onclick="goStep(3)">← Назад</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="step" id="sDone">
+    <div class="success">
+      <span class="success-icon">✅</span>
+      <div class="success-title">Вы записаны!</div>
+      <div class="success-det" id="successDet"></div>
+      <div class="success-note" id="successNote">Мастер получил уведомление. Вы также можете написать напрямую:</div>
+      <div class="msg-btns" id="msgBtns"></div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── State ────────────────────────────────────────────────────
+var S = { svc:null, date:null, time:null, cy:new Date().getFullYear(), cm:new Date().getMonth() };
+var CFG = { isOpen:false, masterName:'Мастер', masterProf:'', masterPhone:'', masterTelegram:'', services:[], workDays:[1,2,3,4,5], workStart:'10:00', workEnd:'19:00' };
+var MASTER_UID = '';
+// TG credentials stored server-side in Vercel env vars
+var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var MONTHS_RU = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+
+// ── Boot: load settings from Firebase ───────────────────────
+function boot(){
+  var p = new URLSearchParams(window.location.search);
+
+  // Status page mode
+  if(p.get('status')){ showStatus(p.get('status')); return; }
+
+  MASTER_UID = p.get('master') || '';
+
+  if(!MASTER_UID){
+    // Try local settings (same device as master)
+    try{
+      var raw = localStorage.getItem('km_booking_settings');
+      if(raw){ CFG = Object.assign(CFG, JSON.parse(raw)); showApp(); return; }
+    }catch(e){}
+    showClosed('Ссылка для записи недействительна. Запросите актуальную ссылку у мастера.');
+    return;
+  }
+
+  db.ref('masters/' + MASTER_UID + '/settings').once('value')
+    .then(function(snap){
+      clearTimeout(loadTimer);
+      var data = snap.val();
+      if(data){
+        CFG = Object.assign(CFG, data);
+      }
+      showApp();
+    })
+    .catch(function(e){
+      console.warn('Firebase error:', e);
+      showClosed('Не удалось загрузить расписание. Проверьте соединение и обновите страницу.');
+    });
+}
+
+function showApp(){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('mainWrap').classList.add('ready');
+  // Set master info
+  var av = document.getElementById('masterAv');
+  var nm = document.getElementById('masterName');
+  var pf = document.getElementById('masterProf');
+  if(av) av.textContent = (CFG.masterName||'М')[0].toUpperCase();
+  if(nm) nm.textContent = CFG.masterName || 'Мастер';
+  if(pf) pf.textContent = CFG.masterProf || '';
+  if(!CFG.isOpen){
+    showClosed(null); return;
+  }
+  if(!CFG.services || !CFG.services.length){
+    showClosed('Мастер ещё не добавил услуги. Попробуйте позже.'); return;
+  }
+  goStep(1);
+}
+
+function showClosed(msg){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('mainWrap').classList.add('ready');
+  var b = document.getElementById('closedBanner');
+  if(b){ b.textContent = msg || '⏸ Запись временно закрыта. Попробуйте позже.'; b.style.display = 'block'; }
+  document.getElementById('progressBar').style.display = 'none';
+}
+
+// ── Navigation ───────────────────────────────────────────────
+function goStep(n){
+  document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById(n==='done'?'sDone':'s'+n);
+  if(el) el.classList.add('active');
+  for(var i=1;i<=4;i++){
+    var d=document.getElementById('p'+i);
+    if(d) d.className = 'prog-step' + (i<=(n==='done'?4:n)?' done':'');
+  }
+  if(n===1) renderServices();
+  if(n===2) renderCalendar();
+  if(n===3) renderTimes();
+  if(n===4) renderSummary();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Step 1: Services ─────────────────────────────────────────
+function renderServices(){
+  var el = document.getElementById('svcList');
+  el.innerHTML = '';
+  CFG.services.forEach(function(svc, i){
+    var card = document.createElement('div');
+    card.className = 'svc-card' + (S.svc && S.svc.id===svc.id?' sel':'');
+    card.innerHTML =
+      '<div><div class="svc-name">'+svc.name+'</div><div class="svc-dur">⏱ '+svc.dur+' мин</div></div>'+
+      '<div class="svc-price">'+Math.round(svc.price||0).toLocaleString('ru-RU')+' ₽</div>';
+    card.onclick = (function(s){ return function(){
+      S.svc = s;
+      document.querySelectorAll('.svc-card').forEach(function(c){ c.classList.remove('sel'); });
+      this.classList.add('sel');
+      setTimeout(function(){ goStep(2); }, 180);
+    }; })(svc);
+    el.appendChild(card);
+  });
+}
+
+// ── Step 2: Calendar ─────────────────────────────────────────
+function renderCalendar(){
+  document.getElementById('calMonthLbl').textContent = MONTHS[S.cm] + ' ' + S.cy;
+  var first = new Date(S.cy, S.cm, 1);
+  var dow = first.getDay() || 7; // Mon=1
+  var days = new Date(S.cy, S.cm+1, 0).getDate();
+  var today = new Date(); today.setHours(0,0,0,0);
+  var wds = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  var g = document.getElementById('calGrid');
+  g.innerHTML = wds.map(function(d){ return '<div class="cal-wd">'+d+'</div>'; }).join('');
+  // Padding
+  for(var i=1;i<dow;i++) g.innerHTML += '<div></div>';
+  // Days
+  for(var d=1;d<=days;d++){
+    var dt = new Date(S.cy, S.cm, d);
+    var wd = dt.getDay();
+    var isPast = dt < today;
+    var isOff  = CFG.workDays.indexOf(wd) === -1;
+    var dateStr = S.cy+'-'+pad(S.cm+1)+'-'+pad(d);
+    var isToday = dt.getTime() === today.getTime();
+    var isSel   = dateStr === S.date;
+    var cls = 'cal-day';
+    if(isPast || isOff) cls += ' off';
+    else { cls += ' avail'; if(isToday) cls += ' today'; if(isSel) cls += ' sel'; }
+    var div = document.createElement('div');
+    div.className = cls;
+    div.textContent = d;
+    if(!isPast && !isOff){
+      div.onclick = (function(ds){ return function(){
+        S.date = ds;
+        goStep(3);
+      }; })(dateStr);
+    }
+    g.appendChild(div);
+  }
+}
+function prevMonth(){ if(S.cm===0){S.cm=11;S.cy--;}else S.cm--; renderCalendar(); }
+function nextMonth(){ if(S.cm===11){S.cm=0;S.cy++;}else S.cm++; renderCalendar(); }
+function pad(n){ return n<10?'0'+n:n; }
+
+// ── Step 3: Time slots ───────────────────────────────────────
+function renderTimes(){
+  var parts = S.date ? S.date.split('-') : [];
+  document.getElementById('selDateLabel').textContent = parts.length
+    ? (+parts[2]) + ' ' + MONTHS_RU[+parts[1]-1] + ' ' + parts[0] : '';
+  var sh = parseInt(CFG.workStart)||10;
+  var eh = parseInt(CFG.workEnd)||19;
+  var dur = S.svc ? (parseInt(S.svc.dur)||60) : 60;
+  // Slots every 30 min if dur<=30, else every 60 min
+  var step = dur <= 30 ? 30 : 60;
+  var slots = [];
+  for(var h=sh; h<eh; h++){
+    slots.push(pad(h)+':00');
+    if(step===30 && h+0.5<eh) slots.push(pad(h)+':30');
+  }
+  // Get taken slots from Firebase
+  var g = document.getElementById('timeGrid');
+  g.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0">Загрузка...</div>';
+  var uid = MASTER_UID || '';
+  var ref = uid ? db.ref('masters/'+uid+'/appointments') : null;
+  var promise = ref
+    ? ref.orderByChild('date').equalTo(S.date).once('value').then(function(snap){ var t=[]; snap.forEach(function(c){ var a=c.val(); if(a.status!=='cancelled') t.push(a.time); }); return t; })
+    : Promise.resolve([]);
+  promise.then(function(takenTimes){
+    g.innerHTML = '';
+    if(!slots.length){
+      g.innerHTML = '<div style="color:var(--muted);padding:12px 0">Нет доступного времени</div>';
+      return;
+    }
+    slots.forEach(function(t){
+      var taken = takenTimes.indexOf(t) > -1;
+      var sel   = t === S.time;
+      var div = document.createElement('div');
+      div.className = 'time-slot' + (taken?' taken':'') + (sel?' sel':'');
+      div.textContent = taken ? '✕ '+t : t;
+      if(!taken){
+        div.onclick = (function(tm){ return function(){
+          S.time = tm;
+          document.querySelectorAll('.time-slot').forEach(function(x){ x.classList.remove('sel'); });
+          this.classList.add('sel');
+          setTimeout(function(){ goStep(4); }, 180);
+        }; })(t);
+      }
+      g.appendChild(div);
+    });
+  });
+}
+
+// ── Step 4: Summary ──────────────────────────────────────────
+function renderSummary(){
+  var p = S.date ? S.date.split('-') : [];
+  var dateStr = p.length ? (+p[2])+'.'+p[1]+'.'+p[0] : '—';
+  document.getElementById('sumBox').innerHTML =
+    row('Услуга',  S.svc ? S.svc.name : '—') +
+    row('Дата',    dateStr) +
+    row('Время',   S.time || '—') +
+    row('Стоимость', S.svc ? Math.round(S.svc.price||0).toLocaleString('ru-RU')+' ₽' : '—');
+}
+function row(l,v){ return '<div class="sum-row"><span style="color:var(--muted)">'+l+'</span><span style="font-weight:600">'+v+'</span></div>'; }
+
+// ── Submit ───────────────────────────────────────────────────
+function submitBooking(){
+  var name  = (document.getElementById('cName').value||'').trim();
+  var phone = (document.getElementById('cPhone').value||'').trim();
+  var note  = (document.getElementById('cNote').value||'').trim();
+  var err   = document.getElementById('formErr');
+  err.style.display = 'none';
+  if(!name)  { err.textContent='Введите ваше имя'; err.style.display='block'; return; }
+  if(!phone) { err.textContent='Введите номер телефона'; err.style.display='block'; return; }
+
+  var id = 'bk_' + Date.now();
+  var appt = {
+    id:id, client:name, phone:phone,
+    service: S.svc ? S.svc.name : '',
+    date: S.date, time: S.time,
+    price: S.svc ? (S.svc.price||0) : 0,
+    note: note, status:'pending',
+    source:'online', created:Date.now()
+  };
+
+  // Save to Firebase
+  var savePromise = MASTER_UID
+    ? db.ref('masters/'+MASTER_UID+'/appointments/'+id).set(appt)
+    : Promise.resolve();
+
+  savePromise
+    .then(function(){ sendTelegramNotify(appt); })
+    .catch(function(e){ console.warn('Firebase save error:', e); });
+
+  // Show success immediately (don't wait)
+  showSuccess(appt);
+}
+
+// ── Telegram notification ────────────────────────────────────
+function escMd(s){
+  // Escape Markdown special chars for Telegram
+  return (s||'').replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
+}
+
+function sendTelegramNotify(a){
+  var nl = '\n';
+  var p = a.date ? a.date.split('-') : [];
+  var dateRu = p.length ? (+p[2])+' '+MONTHS_RU[+p[1]-1] : a.date;
+  // Build clean text for Telegram Bot API
+  var lines = [
+    '\u{1F514} *Новая запись онлайн!*',
+    '',
+    '\u{1F464} *' + escMd(a.client) + '*',
+    a.phone ? '\u{1F4DE} ' + a.phone : null,
+    '\u{1F486} ' + escMd(a.service||'—'),
+    '\u{1F4C5} ' + dateRu + '  \u{1F550} ' + (a.time||'—'),
+    a.price ? '\u{1F4B0} ' + Math.round(a.price).toLocaleString('ru-RU') + ' руб.' : null,
+    a.note  ? '\u{1F4AC} ' + escMd(a.note) : null,
+    '',
+    '\u2705 Откройте приложение чтобы подтвердить'
+  ].filter(function(x){ return x !== null; }).join('\n');
+
+  fetch('/api/notify', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ text: lines, parse_mode: 'Markdown' })
+  }).catch(function(e){ console.warn('TG proxy:', e.message); });
 }
 
 // ── Success screen ───────────────────────────────────────────
