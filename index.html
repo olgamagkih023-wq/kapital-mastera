@@ -3202,6 +3202,8 @@ function launchApp(user){
 
   document.getElementById('sidebarName').textContent = user.name || 'Мастер';
   document.getElementById('sidebarProf').textContent = user.prof || 'Специалист';
+  var av = document.getElementById('sidebarAv');
+  if(av) av.textContent = (user.name||'М')[0].toUpperCase();
 
   // Show app immediately with local data, then sync Firebase in background
   function showAppNow(){
