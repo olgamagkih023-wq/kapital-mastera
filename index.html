@@ -535,6 +535,66 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 }
 .cap-ring-info p{font-size:0.8rem;color:var(--muted);margin-top:4px}
 
+
+/* ── Dashboard redesign ── */
+.dash-hero{
+  background:linear-gradient(135deg,var(--em) 0%,#1a9463 100%);
+  padding:24px 20px 20px;margin-bottom:16px;cursor:pointer;
+  position:relative;overflow:hidden;
+}
+.dash-hero::before{
+  content:'✦';position:absolute;right:16px;top:16px;
+  font-size:3rem;color:rgba(255,255,255,0.08);line-height:1;
+}
+.dash-hero-label{font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:8px;font-weight:600}
+.dash-hero-val{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:400;color:#fff;line-height:1;margin-bottom:6px}
+.dash-hero-change{font-size:0.78rem;color:rgba(255,255,255,0.55);margin-bottom:10px;min-height:16px}
+.dash-hero-tap{
+  display:inline-block;font-size:0.75rem;font-weight:700;
+  color:var(--em);background:#fff;
+  padding:6px 14px;letter-spacing:0.04em;
+}
+
+/* Quick actions */
+.dash-actions{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:8px;margin-bottom:16px;
+}
+.dash-action-btn{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:14px 8px;border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;
+  letter-spacing:0.02em;transition:all 0.15s;
+  -webkit-tap-highlight-color:rgba(0,0,0,0.08);
+}
+.dash-action-btn:active{transform:scale(0.96)}
+.dash-action-icon{font-size:1.4rem}
+.dash-action-btn.income{background:rgba(13,110,74,0.1);color:var(--em)}
+.dash-action-btn.expense{background:rgba(192,57,43,0.08);color:var(--red)}
+.dash-action-btn.record{background:rgba(184,151,90,0.12);color:var(--gold)}
+.dash-action-btn.link{background:rgba(0,91,255,0.08);color:#005BFF}
+
+/* Bottom grid */
+.dash-bottom-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;
+}
+@media(max-width:600px){.dash-bottom-grid{grid-template-columns:1fr}}
+
+/* Transaction mini list */
+.dash-tx-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 0;border-bottom:1px solid var(--cream2);font-size:0.83rem;
+}
+.dash-tx-row:last-child{border:none}
+.dash-tx-desc{font-weight:500;color:var(--ink);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:8px}
+.dash-tx-date{font-size:0.72rem;color:var(--muted);margin-right:8px;white-space:nowrap}
+.dash-tx-amt{font-weight:700;white-space:nowrap}
+.dash-tx-amt.pos{color:var(--em)}
+.dash-tx-amt.neg{color:var(--red)}
+
+/* KPI cards clickable */
+.kpi-card.clients{background:rgba(0,91,255,0.05);border-color:rgba(0,91,255,0.15)}
+
 /* ===== CALENDAR PAGE ===== */
 .cal-layout{display:grid;grid-template-columns:1fr 300px;gap:20px}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
@@ -2197,61 +2257,77 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <div class="kpi-grid">
-        <div class="kpi-card business">
-          <div class="kpi-label">Бизнес-доход (месяц)</div>
-          <div class="kpi-val" id="kpi-biz-income">0 <small>₽</small></div>
-          <div class="kpi-change up" id="kpi-biz-change">↑ 0%</div>
-        </div>
-        <div class="kpi-card personal">
-          <div class="kpi-label">Личные расходы</div>
+
+      <!-- Hero income card -->
+      <div class="dash-hero" onclick="navigateTo('finances')">
+        <div class="dash-hero-label">Доход за месяц</div>
+        <div class="dash-hero-val" id="kpi-biz-income">0 ₽</div>
+        <div class="dash-hero-change" id="kpi-biz-change"></div>
+        <div class="dash-hero-tap">+ Добавить доход →</div>
+      </div>
+
+      <!-- 3 KPI cards -->
+      <div class="kpi-grid" style="margin-bottom:16px">
+        <div class="kpi-card personal" onclick="navigateTo('finances')" style="cursor:pointer">
+          <div class="kpi-label">Расходы за месяц</div>
           <div class="kpi-val" id="kpi-pers-exp">0 <small>₽</small></div>
           <div class="kpi-change" id="kpi-pers-change">—</div>
         </div>
-        <div class="kpi-card capital">
-          <div class="kpi-label">Накопленный капитал</div>
+        <div class="kpi-card capital" onclick="navigateTo('capital')" style="cursor:pointer">
+          <div class="kpi-label">Капитал</div>
           <div class="kpi-val" id="kpi-capital">0 <small>₽</small></div>
-          <div class="kpi-change up" id="kpi-cap-change">↑ 0%</div>
+          <div class="kpi-change up" id="kpi-cap-change">—</div>
         </div>
-        <div class="kpi-card clients">
-          <div class="kpi-label">Записей в этом месяце</div>
+        <div class="kpi-card clients" onclick="navigateTo('calendar')" style="cursor:pointer">
+          <div class="kpi-label">Записей сегодня</div>
           <div class="kpi-val" id="kpi-appts">0</div>
-          <div class="kpi-change" id="kpi-appts-change">—</div>
+          <div class="kpi-change" id="kpi-appts-label">записей</div>
         </div>
       </div>
 
-      <div class="dash-grid">
-        <div>
-          <div class="dash-card" style="margin-bottom:20px">
-            <div class="dash-card-title">Доходы / Расходы — 6 месяцев</div>
-            <div class="mini-chart" id="dashChart"></div>
-            <div class="bar-labels" id="dashChartLabels"></div>
-            <div style="display:flex;gap:16px;margin-top:12px">
-              <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--muted)">
-                <div style="width:10px;height:10px;background:var(--em)"></div>Бизнес
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--muted)">
-                <div style="width:10px;height:10px;background:var(--gold2)"></div>Личное
-              </div>
-            </div>
-          </div>
-          <div class="dash-card">
-            <div class="dash-card-title">Последние операции</div>
-            <div class="tx-list" id="recentTx"></div>
-          </div>
+      <!-- Quick actions row -->
+      <div class="dash-actions">
+        <button class="dash-action-btn income" onclick="navigateTo('finances')">
+          <span class="dash-action-icon">💰</span>
+          <span>Доход</span>
+        </button>
+        <button class="dash-action-btn expense" onclick="navigateTo('finances')">
+          <span class="dash-action-icon">📤</span>
+          <span>Расход</span>
+        </button>
+        <button class="dash-action-btn record" onclick="navigateTo('calendar')">
+          <span class="dash-action-icon">📅</span>
+          <span>Запись</span>
+        </button>
+        <button class="dash-action-btn link" onclick="navigateTo('booking')">
+          <span class="dash-action-icon">🔗</span>
+          <span>Ссылка</span>
+        </button>
+      </div>
+
+      <!-- Chart + upcoming -->
+      <div class="dash-bottom-grid">
+        <div class="dash-card">
+          <div class="dash-card-title">Динамика дохода</div>
+          <canvas id="incomeChart" height="110"></canvas>
         </div>
-        <div>
-          <div class="dash-card" style="margin-bottom:20px">
-            <div class="dash-card-title" style="display:flex;align-items:center">Распределение 50/30/20 <button class="help-btn" onclick="openHelp('capital')">?</button></div>
-            <div class="split-bars" id="splitBars"></div>
-          </div>
-          <div class="dash-card">
-            <div class="dash-card-title">Ближайшие записи</div>
-            <div id="upcomingAppts"></div>
-          </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Ближайшие записи</div>
+          <div id="dashAppts"></div>
         </div>
       </div>
+
+      <!-- Recent transactions -->
+      <div class="dash-card" style="margin-top:0">
+        <div class="dash-card-title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Последние операции</span>
+          <button onclick="navigateTo('finances')" style="font-size:0.75rem;color:var(--em);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">Все →</button>
+        </div>
+        <div id="dashTxList"></div>
+      </div>
+
     </div>
+
 
     <!-- FINANCES -->
     <div class="page" id="page-finances">
@@ -3696,75 +3772,99 @@ function updateCapitalRing(){
 
 // ===== DASHBOARD =====
 function renderDashboard(){
-  const txs=getTx();
-  const monthTx=txs.filter(t=>thisMonth(t.date));
-  const bizInc=monthTx.filter(t=>t.type==='income'&&t.segment==='business').reduce((a,t)=>a+t.amount,0);
-  const persExp=monthTx.filter(t=>t.type==='expense'&&t.segment==='personal').reduce((a,t)=>a+t.amount,0);
-  const totalIncome=txs.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0);
-  const capital=totalIncome*0.2;
-  const appts=getAppts();
-  const monthAppts=appts.filter(a=>{const d=new Date(a.date);const n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()});
+  var txs     = getTx();
+  var now     = new Date();
+  var ym      = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var ymPrev  = new Date(now.getFullYear(),now.getMonth()-1,1);
+  var ymP     = ymPrev.getFullYear()+'-'+String(ymPrev.getMonth()+1).padStart(2,'0');
 
-  document.getElementById('kpi-biz-income').innerHTML=fmt(bizInc)+' <small>₽</small>';
-  document.getElementById('kpi-pers-exp').innerHTML=fmt(persExp)+' <small>₽</small>';
-  document.getElementById('kpi-capital').innerHTML=fmt(capital)+' <small>₽</small>';
-  document.getElementById('kpi-appts').textContent=monthAppts.length;
+  var mTxs    = txs.filter(function(t){ return (t.date||'').startsWith(ym); });
+  var pTxs    = txs.filter(function(t){ return (t.date||'').startsWith(ymP); });
+  var bizInc  = mTxs.filter(function(t){ return t.type==='income'; }).reduce(function(a,t){ return a+t.amount; },0);
+  var persExp = mTxs.filter(function(t){ return t.type==='expense'; }).reduce(function(a,t){ return a+t.amount; },0);
+  var prevInc = pTxs.filter(function(t){ return t.type==='income'; }).reduce(function(a,t){ return a+t.amount; },0);
 
-  // Recent tx
-  const recent=txs.slice(0,5);
-  const recentEl=document.getElementById('recentTx');
-  if(!recent.length){recentEl.innerHTML='<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">Нет операций</div></div>';return}
-  recentEl.innerHTML=recent.map(t=>`
-    <div class="tx-item">
-      <div class="tx-icon ${t.type}">${t.type==='income'?'↑':'↓'}</div>
-      <div><div class="tx-name">${t.desc}</div><div class="tx-cat">${t.cat} · ${t.segment==='business'?'Бизнес':'Личное'}</div></div>
-      <div class="tx-amount ${t.type}">${t.type==='income'?'+':'−'}${fmt(t.amount)} ₽</div>
-    </div>`).join('');
+  // Hero card
+  var heroVal = document.getElementById('kpi-biz-income');
+  var heroChg = document.getElementById('kpi-biz-change');
+  var heroTap = document.querySelector('.dash-hero-tap');
+  if(heroVal) heroVal.textContent = fmt(bizInc) + ' ₽';
+  if(heroChg){
+    if(!bizInc){ heroChg.textContent = ''; }
+    else if(prevInc){
+      var pct = Math.round((bizInc-prevInc)/prevInc*100);
+      heroChg.textContent = (pct>=0?'▲ +':'▼ ') + pct + '% к прошлому месяцу';
+    } else { heroChg.textContent = 'Первый месяц с данными'; }
+  }
+  if(heroTap) heroTap.textContent = bizInc ? 'Открыть финансы →' : '+ Добавить первый доход →';
 
-  // Chart — last 6 months
-  const months=[];
-  for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({m:d.getMonth(),y:d.getFullYear(),label:d.toLocaleString('ru-RU',{month:'short'})})}
-  const maxVal=Math.max(...months.map(m=>{
-    const inc=txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===m.m&&d.getFullYear()===m.y&&t.type==='income'}).reduce((a,t)=>a+t.amount,0);
-    const exp=txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===m.m&&d.getFullYear()===m.y&&t.type==='expense'}).reduce((a,t)=>a+t.amount,0);
-    return Math.max(inc,exp);
-  }),1);
-  document.getElementById('dashChart').innerHTML=months.map(m=>{
-    const inc=txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===m.m&&d.getFullYear()===m.y&&t.type==='income'}).reduce((a,t)=>a+t.amount,0);
-    const exp=txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===m.m&&d.getFullYear()===m.y&&t.type==='expense'}).reduce((a,t)=>a+t.amount,0);
-    const ih=Math.max((inc/maxVal)*72,2);const eh=Math.max((exp/maxVal)*72,2);
-    return`<div class="bar-group"><div class="bar biz" style="height:${ih}px" title="${fmt(inc)} ₽"></div><div class="bar pers" style="height:${eh}px" title="${fmt(exp)} ₽"></div></div>`;
-  }).join('');
-  document.getElementById('dashChartLabels').innerHTML=months.map(m=>`<span class="bar-label">${m.label}</span>`).join('');
+  // KPI cards
+  var pExp = document.getElementById('kpi-pers-exp');
+  if(pExp) pExp.innerHTML = fmt(persExp) + ' <small>₽</small>';
 
-  // 50/30/20
-  const income=getSettings().income||bizInc||100000;
-  const splits=[
-    {name:'Жизнь (50%)',pct:50,color:var_em(),amount:income*0.5},
-    {name:'Желания (30%)',pct:30,color:var_gold(),amount:income*0.3},
-    {name:'Капитал (20%)',pct:20,color:var_blue(),amount:income*0.2},
-  ];
-  document.getElementById('splitBars').innerHTML=splits.map(s=>`
-    <div class="split-row">
-      <div class="split-top">
-        <span class="split-name">${s.name}</span>
-        <span class="split-pct">${fmt(s.amount)} ₽</span>
-      </div>
-      <div class="split-track"><div class="split-fill" style="width:${s.pct}%;background:${s.color}"></div></div>
-    </div>`).join('');
+  // Capital from storage
+  var cap = load('km_capital',{cushion:0,investments:[]});
+  var totalCap = (cap.cushion||0) + (cap.investments||[]).reduce(function(s,i){ return s+(i.amount||0); },0);
+  var capEl = document.getElementById('kpi-capital');
+  if(capEl) capEl.innerHTML = fmt(totalCap) + ' <small>₽</small>';
+
+  // Today's appointments
+  var today = now.toISOString().split('T')[0];
+  var appts = getAppts().filter(function(a){ return a.status!=='cancelled'; });
+  var todayAppts = appts.filter(function(a){ return a.date===today; });
+  var apptEl = document.getElementById('kpi-appts');
+  var apptLbl = document.getElementById('kpi-appts-label');
+  if(apptEl) apptEl.textContent = todayAppts.length;
+  if(apptLbl) apptLbl.textContent = todayAppts.length===1?'запись':todayAppts.length>1&&todayAppts.length<5?'записи':'записей';
 
   // Upcoming appointments
-  const now=new Date();
-  const upcoming=appts.filter(a=>new Date(a.date+' '+a.time)>=now&&a.status!=='cancelled')
-    .sort((a,b)=>new Date(a.date+' '+a.time)-new Date(b.date+' '+b.time)).slice(0,3);
-  const upEl=document.getElementById('upcomingAppts');
-  if(!upcoming.length){upEl.innerHTML='<div class="empty"><div class="empty-icon">◐</div><div class="empty-text">Нет записей</div></div>';return}
-  upEl.innerHTML=upcoming.map(a=>`
-    <div class="appt-item ${a.status||'confirmed'}">
-      <div class="appt-name">${a.client}</div>
-      <div class="appt-time">${a.date} · ${a.time} · ${a.service}${a.price?' · '+fmt(a.price)+' ₽':''}</div>
-    </div>`).join('');
+  var upEl = document.getElementById('dashAppts');
+  if(upEl){
+    var upcoming = appts.filter(function(a){ return a.date>=today; })
+      .sort(function(a,b){ return a.date.localeCompare(b.date)||a.time.localeCompare(b.time); })
+      .slice(0,4);
+    if(!upcoming.length){
+      upEl.innerHTML='<div class="empty"><div class="empty-icon">◐</div><div class="empty-text">Нет ближайших записей.<br><a onclick="navigateTo(\'calendar\')" style="color:var(--em);cursor:pointer;font-weight:600">+ Добавить →</a></div></div>';
+    } else {
+      upEl.innerHTML='';
+      upcoming.forEach(function(a){
+        var d = a.date===today?'Сегодня':(a.date===new Date(now.getTime()+86400000).toISOString().split('T')[0]?'Завтра':a.date.split('-').reverse().join('.'));
+        var row=document.createElement('div');
+        row.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--cream2);font-size:0.82rem';
+        row.innerHTML='<div style="flex-shrink:0;width:42px;text-align:center;background:var(--em);color:#fff;padding:4px 2px;font-size:0.65rem;font-weight:700;border-radius:4px">'+a.time+'</div>'+
+          '<div style="flex:1;overflow:hidden"><div style="font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+a.client+'</div>'+
+          '<div style="font-size:0.72rem;color:var(--muted)">'+d+(a.price?' · '+fmt(a.price)+' ₽':'')+'</div></div>';
+        upEl.appendChild(row);
+      });
+    }
+  }
+
+  // Recent transactions
+  var txEl = document.getElementById('dashTxList');
+  if(txEl){
+    var recent = txs.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); }).slice(0,6);
+    if(!recent.length){
+      txEl.innerHTML='<div class="empty"><div class="empty-icon">💰</div><div class="empty-text" style="margin-bottom:10px">Нет операций ещё.</div>'+
+        '<button onclick="document.getElementById(\'qeAmount\')&&document.getElementById(\'qeAmount\').focus();navigateTo(\'finances\')" style="padding:9px 18px;background:var(--em);color:#fff;border:none;font-family:DM Sans,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer">+ Добавить доход</button></div>';
+    } else {
+      txEl.innerHTML='';
+      recent.forEach(function(t){
+        var row=document.createElement('div');
+        row.className='dash-tx-row';
+        var isInc = t.type==='income';
+        row.innerHTML='<div class="dash-tx-desc">'+(t.desc||t.cat||'Операция')+'</div>'+
+          '<div class="dash-tx-date">'+(t.date||'').split('-').reverse().join('.')+'</div>'+
+          '<div class="dash-tx-amt '+(isInc?'pos':'neg')+'">'+(isInc?'+':'-')+fmt(t.amount)+' ₽</div>';
+        txEl.appendChild(row);
+      });
+    }
+  }
+
+  // Chart
+  renderIncomeChart();
 }
+
+
 function var_em(){return'#0D6E4A'}
 function var_gold(){return'#D4AF70'}
 function var_blue(){return'#2471A3'}
@@ -6887,9 +6987,49 @@ var DL_STEPS = {
 
 function openDlPopup(){
   var popup = document.getElementById('dlPopup');
-  if(!popup){ console.error('dlPopup not found'); return; }
-  popup.classList.add('open');
+  if(!popup){ return; }
+  popup.style.opacity='0';
+  popup.style.visibility='visible';
+  var box = popup.querySelector('.dl-box');
+  if(box) box.style.transform='translateY(60px)';
   document.body.style.overflow='hidden';
+  requestAnimationFrame(function(){
+    popup.style.opacity='1';
+    if(box) box.style.transform='translateY(0)';
+  });
+  // Auto-detect device for tab
+  var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  dlTab(isIos ? 'ios' : 'android');
+}
+
+function closeDlPopup(e){
+  if(e && e.target !== document.getElementById('dlPopup') && !e.target.classList.contains('btn-close-dl')) return;
+  var popup = document.getElementById('dlPopup');
+  if(!popup) return;
+  var box = popup.querySelector('.dl-box');
+  popup.style.opacity='0';
+  if(box) box.style.transform='translateY(60px)';
+  setTimeout(function(){
+    popup.style.visibility='hidden';
+    document.body.style.overflow='';
+  }, 300);
+}
+
+function dlTab(tab){
+  var ios     = document.getElementById('dlIos');
+  var android = document.getElementById('dlAndroid');
+  var tIos    = document.getElementById('dlTabIos');
+  var tAnd    = document.getElementById('dlTabAndroid');
+  if(!ios) return;
+  if(tab==='ios'){
+    ios.style.display='block'; android.style.display='none';
+    if(tIos){ tIos.style.color='var(--ink)'; tIos.style.borderBottomColor='var(--em)'; }
+    if(tAnd){ tAnd.style.color='var(--muted)'; tAnd.style.borderBottomColor='transparent'; }
+  } else {
+    ios.style.display='none'; android.style.display='block';
+    if(tAnd){ tAnd.style.color='var(--ink)'; tAnd.style.borderBottomColor='var(--em)'; }
+    if(tIos){ tIos.style.color='var(--muted)'; tIos.style.borderBottomColor='transparent'; }
+  }
 }
 function closeDlPopup(e){
   if(e && e.target !== document.getElementById('dlPopup')) return;
@@ -6997,64 +7137,148 @@ window.addEventListener('appinstalled', function(){
 
 
 <!-- ═══ DOWNLOAD POPUP ═══ -->
-<div class="dl-popup-overlay" id="dlPopup" onclick="closeDlPopup(event)">
-  <div class="dl-popup-box">
-    <div class="dl-handle"></div>
-    <div class="dl-popup-inner">
-      <div class="dl-popup-tag">📲 Установка</div>
-      <div class="dl-popup-title">Добавить на экран<br>смартфона</div>
-      <div class="dl-popup-sub">Без App Store и Google Play. Устанавливается прямо из браузера за 30 секунд — работает как обычное приложение.</div>
+<div id="dlPopup" onclick="closeDlPopup(event)" style="
+  position:fixed;inset:0;z-index:99999;
+  background:rgba(12,13,10,0.85);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;visibility:hidden;
+  transition:all 0.3s;
+  -webkit-tap-highlight-color:rgba(0,0,0,0);
+">
+<div class="dl-box" onclick="event.stopPropagation()" style="
+  background:var(--cream);width:100%;max-width:520px;
+  border-radius:20px 20px 0 0;
+  max-height:90vh;overflow-y:auto;
+  transform:translateY(60px);
+  transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1);
+  padding-bottom:env(safe-area-inset-bottom,16px);
+">
+  <!-- Handle -->
+  <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:14px auto 0"></div>
 
-      <!-- Platform cards -->
-      <div class="dl-cards">
-        <a class="dl-card" href="javascript:void(0)" onclick="showDlSteps('ios')">
-          <span class="dl-card-icon">🍎</span>
-          <div class="dl-card-label">iPhone / iPad</div>
-          <div class="dl-card-name">iOS — Safari</div>
-          <div class="dl-card-note">Как установить →</div>
-        </a>
-        <a class="dl-card" href="javascript:void(0)" onclick="showDlSteps('android')">
-          <span class="dl-card-icon">🤖</span>
-          <div class="dl-card-label">Смартфон</div>
-          <div class="dl-card-name">Android — Chrome</div>
-          <div class="dl-card-note">Как установить →</div>
-        </a>
+  <!-- Header -->
+  <div style="padding:20px 24px 0;text-align:center">
+    <div style="font-size:2rem;margin-bottom:8px">📲</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--ink);margin-bottom:6px">Установить приложение</div>
+    <div style="font-size:0.82rem;color:var(--muted);font-weight:300;line-height:1.6">Работает как нативное приложение — без браузера,<br>без адресной строки, быстро и офлайн</div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;margin:18px 24px 0;border-bottom:2px solid var(--border)">
+    <button id="dlTabIos" onclick="dlTab('ios')" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid var(--em);margin-bottom:-2px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+       iPhone / iPad
+    </button>
+    <button id="dlTabAndroid" onclick="dlTab('android')" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+       Android
+    </button>
+  </div>
+
+  <!-- iOS steps -->
+  <div id="dlIos" style="padding:20px 24px">
+    <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:14px">Установка через Safari</div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--white);border:1px solid var(--border)">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--em);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0">1</div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:4px">Открой в браузере Safari</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.55">Если сейчас открыто в другом браузере — скопируй адрес и открой в <strong>Safari</strong>. Только Safari поддерживает установку PWA на iOS.</div>
+        </div>
       </div>
 
-      <!-- Steps accordion -->
-      <div class="dl-steps-wrap" id="dlStepsWrap" style="display:none">
-        <div class="dl-steps-title" onclick="toggleDlSteps()">
-          <span id="dlStepsLabel">Инструкция</span>
-          <span class="dl-steps-arr" id="dlStepsArr">▼</span>
-        </div>
-        <div class="dl-steps-body open" id="dlStepsBody">
-          <!-- Steps injected by JS -->
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--white);border:1px solid var(--border)">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--em);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0">2</div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:4px">Нажми кнопку «Поделиться»</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.55">Внизу экрана найди кнопку с квадратом и стрелкой вверх <strong>⎙</strong> — нажми её.</div>
+          <div style="margin-top:8px;padding:8px 12px;background:var(--cream2);font-size:0.78rem;color:var(--ink);text-align:center;letter-spacing:0.02em">
+            ⎙ &nbsp; Поделиться
+          </div>
         </div>
       </div>
 
-      <button class="dl-close-btn" onclick="closeDlPopupDirect()">Понятно, закрыть</button>
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--white);border:1px solid var(--border)">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--em);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0">3</div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:4px">На экран «Домой»</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.55">Прокрути список вниз → найди пункт <strong>«На экран "Домой"»</strong> → нажми.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--white);border:1px solid var(--border)">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--em);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0">4</div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:4px">Нажми «Добавить»</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.55">В правом верхнем углу нажми <strong>«Добавить»</strong> — иконка появится на рабочем столе.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:14px;padding:12px 14px;background:rgba(13,110,74,0.07);border-left:3px solid var(--em);font-size:0.78rem;color:var(--muted);line-height:1.6">
+      ✅ После установки приложение откроется <strong>на весь экран</strong> без адресной строки, как обычное приложение
     </div>
   </div>
-</div>
 
+  <!-- Android steps -->
+  <div id="dlAndroid" style="padding:20px 24px;display:none">
+    <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:14px">Установка через Chrome</div>
 
-<!-- ═══ COOKIE BANNER ═══ -->
-<div id="cookieBanner">
-  <p>Мы используем файлы cookie и локальное хранилище браузера для хранения ваших финансовых данных исключительно на вашем устройстве. Данные не передаются третьим лицам. <a onclick="openLegal('privacy')">Политика конфиденциальности</a></p>
-  <div class="cookie-btns">
-    <button class="cookie-accept" onclick="acceptCookies()">Принять</button>
-    <button class="cookie-decline" onclick="declineCookies()">Отклонить</button>
+    <div style="display:flex;flex-direction:column;gap:10px">
+
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--white);border:1px solid var(--border)">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--em);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0">1</div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:4px">Открой в Chrome</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.55">Убедись что открыто в браузере <strong>Google Chrome</strong>. Samsung Internet и другие браузеры тоже поддерживают, но Chrome работает лучше.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--white);border:1px solid var(--border)">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--em);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0">2</div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:4px">Нажми меню ⋮</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.55">Три точки в правом верхнем углу браузера.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--white);border:1px solid var(--border)">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--em);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0">3</div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:4px">«Установить приложение» или «Добавить на главный экран»</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.55">Найди этот пункт в меню и нажми. Иногда Chrome сам показывает баннер внизу экрана — просто нажми <strong>«Установить»</strong>.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--white);border:1px solid var(--border)">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--em);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0">4</div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:4px">Подтверди установку</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.55">Нажми <strong>«Установить»</strong> в диалоге — иконка появится на рабочем столе и в панели приложений.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:14px;padding:12px 14px;background:rgba(13,110,74,0.07);border-left:3px solid var(--em);font-size:0.78rem;color:var(--muted);line-height:1.6">
+      ✅ На Android приложение работает <strong>офлайн</strong> — данные сохраняются даже без интернета
+    </div>
   </div>
-</div>
 
-<!-- ═══ LEGAL OVERLAY ═══ -->
-<div class="legal-overlay" id="legalOverlay" onclick="closeLegal(event)">
-  <div class="legal-sheet">
-    <div class="legal-handle"></div>
-    <div class="legal-content" id="legalContent"></div>
-    <button class="legal-close-btn" onclick="closeLegalDirect()">Закрыть</button>
+  <!-- Close button -->
+  <div style="padding:0 24px 24px">
+    <button onclick="closeDlPopup()" style="
+      width:100%;padding:14px;background:var(--ink);color:#fff;
+      border:none;font-family:'DM Sans',sans-serif;
+      font-size:0.88rem;font-weight:700;cursor:pointer;
+      letter-spacing:0.06em;text-transform:uppercase;
+      -webkit-tap-highlight-color:rgba(0,0,0,0.1);
+    ">Понятно ✓</button>
   </div>
-</div>
+
+</div><!-- /dl-box -->
+</div><!-- /dlPopup -->
 
 
 <!-- ═══ ONBOARDING ═══ -->
