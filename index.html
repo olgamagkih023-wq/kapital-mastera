@@ -2033,9 +2033,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
     <button class="nav-item" data-page="clients">
       <span class="nav-icon">👥</span><span>Клиенты</span>
     </button>
-    <button class="nav-item" data-page="clients">
-      <span class="nav-icon">👥</span><span>Клиенты</span>
-    </button>
+
     <button class="nav-item" data-page="booking">
       <span class="nav-icon">🔗</span><span>Онлайн-запись</span><span class="pending-badge" id="pendingCount" style="display:none">0</span>
     </button>
@@ -2921,29 +2919,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
     </div>
 
 
-    <!-- ═══ PAGE: КЛИЕНТЫ ═══ -->
-    <div class="page" id="page-clients">
-      <!-- Search -->
-      <div style="display:flex;gap:8px;margin-bottom:20px">
-        <div style="flex:1;position:relative">
-          <input type="text" id="clientSearch" placeholder="🔍 Поиск по имени или телефону..."
-            style="width:100%;padding:12px 14px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:border-color 0.2s"
-            oninput="renderClientBase(this.value)">
-        </div>
-        <button onclick="renderClientBase()" style="padding:12px 16px;background:var(--em);color:#fff;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Обновить</button>
-      </div>
-      <!-- Stats -->
-      <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi-card business"><div class="kpi-label">Всего клиентов</div><div class="kpi-val" id="cbTotal">0</div></div>
-        <div class="kpi-card capital"><div class="kpi-label">Общий LTV</div><div class="kpi-val" id="cbLtv">0 <small>₽</small></div></div>
-        <div class="kpi-card"><div class="kpi-label">Средний LTV</div><div class="kpi-val" id="cbAvgLtv">0 <small>₽</small></div></div>
-        <div class="kpi-card clients"><div class="kpi-label">Постоянных (3+)</div><div class="kpi-val" id="cbRegular">0</div></div>
-      </div>
-      <!-- Client list -->
-      <div id="clientBaseList"></div>
-    </div>
-  </main>
-
   <!-- MOBILE BOTTOM NAV -->
   <nav id="mobileNav">
     <button class="mob-nav-btn active" data-page="dashboard">
@@ -2984,10 +2959,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
     <button class="more-item" data-page="clients">
       <span style="font-size:1.2rem">👥</span> База клиентов
     </button>
-    <button class="more-item" data-page="clients">
-      <span style="font-size:1.2rem">👥</span> База клиентов
-    </button>
-    <button class="more-item" data-page="booking">
+    <button class="more-it    <button class="more-item" data-page="booking">
       <span style="font-size:1.2rem">🔗</span> Онлайн-запись
       <span class="pending-badge" id="pendingCountMob" style="display:none;margin-left:auto">0</span>
     </button>
