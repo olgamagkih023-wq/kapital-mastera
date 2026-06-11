@@ -4373,6 +4373,26 @@ var HELP_CONTENT = {
     tip:'<strong>Исследования показывают:</strong> люди которые ведут финансовый дневник, накапливают на 23% больше за год. Мысли о деньгах меняют поведение.',
   },
 
+  clients:{
+    tag:'База клиентов',
+    title:'Все клиенты — в одном месте',
+    lead:'Каждый раз когда ты добавляешь запись в календарь — клиент автоматически попадает в базу. История визитов, LTV и повторная запись — всё здесь.',
+    sections:[
+      {title:'Что показывает база',benefits:[
+        {icon:'👤',text:'Имя, телефон, дата последнего визита'},
+        {icon:'💰',text:'LTV — сколько клиент принёс денег за всё время'},
+        {icon:'📊',text:'Число визитов и статус: 🆕 Новый / ⭐ Постоянный / 💎 VIP'},
+        {icon:'🔍',text:'Поиск по имени или телефону в реальном времени'},
+      ]},
+      {title:'Как работать',steps:[
+        {n:1,text:'Добавляй записи в <strong>Календарь</strong> — клиенты появятся автоматически'},
+        {n:2,text:'Нажми <strong>«📅 Записать снова»</strong> — форма заполнится данными клиента'},
+        {n:3,text:'Кнопка <strong>WA</strong> откроет WhatsApp с номером клиента'},
+      ]},
+    ],
+    tip:'<strong>LTV</strong> (Lifetime Value) — главный показатель ценности клиента. Клиент с LTV 50 000 ₽ важнее десяти разовых.',
+  },
+
   booking:{
     tag:'Онлайн-запись',
     title:'Онлайн-запись — клиент записывается сам',
@@ -5017,6 +5037,41 @@ function toggleDay(btn){
 // MOBILE NAVIGATION
 // ════════════════════════════════════════════
 function isMobile(){return window.innerWidth<=860}
+
+
+// ── Floating page help button ──────────────────────────────────────────────
+var PAGE_HELP_MAP = {
+  'dashboard': 'dashboard',
+  'finances':  'finances',
+  'capital':   'capital',
+  'calendar':  'calendar',
+  'clients':   'clients',
+  'booking':   'booking',
+  'hour':      'hour',
+  'owner':     'owner',
+  'pulse':     'pulse',
+  'blog':      'blog',
+  'settings':  'settings',
+};
+
+function updatePageHelpFab(page){
+  var fab = document.getElementById('pageHelpFab');
+  if(!fab) return;
+  var key = PAGE_HELP_MAP[page];
+  if(key && HELP_CONTENT[key]){
+    fab.classList.add('visible');
+    fab.dataset.helpKey = key;
+  } else {
+    fab.classList.remove('visible');
+    fab.dataset.helpKey = '';
+  }
+}
+
+function openPageHelp(){
+  var fab = document.getElementById('pageHelpFab');
+  var key = fab ? fab.dataset.helpKey : '';
+  if(key) openHelp(key);
+}
 
 function navigateTo(pg){
   // Hide all pages
@@ -5664,6 +5719,7 @@ document.querySelectorAll('.nav-item[data-page]').forEach(btn=>{
     if(pg==='blog') renderBlogPage();
     if(pg==='booking') renderBookingPage();
     if(pg==='clients') renderClientBase();
+    updatePageHelpFab(pg);
     if(pg==='clients') renderClientBase();
   };
 });
@@ -7133,6 +7189,10 @@ window.addEventListener('appinstalled', function(){
     <button class="bot-send" id="botSend" onclick="sendBotMsg()">↑</button>
   </div>
 </div>
+
+
+<!-- Floating help button -->
+<button class="page-help-fab" id="pageHelpFab" onclick="openPageHelp()" title="Что это за раздел?">?</button>
 
 </body>
 </html>
