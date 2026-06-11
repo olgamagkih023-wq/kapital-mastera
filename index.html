@@ -6075,12 +6075,10 @@ function botThink(userMsg){
 
   var messages = BOT_HISTORY.slice(-8).map(function(m){ return {role:m.role, content:m.content}; });
 
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
       system: getBotSystemPrompt(),
       messages: messages
     })
