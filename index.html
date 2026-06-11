@@ -1800,6 +1800,120 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
   .bot-window{bottom:154px;right:12px;width:calc(100vw - 24px)}
 }
 
+
+/* ── Client Card Modal ── */
+.client-card-overlay{
+  position:fixed;inset:0;z-index:8000;
+  background:rgba(12,13,10,0.85);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  opacity:0;visibility:hidden;transition:all 0.25s;
+}
+.client-card-overlay.open{opacity:1;visibility:visible}
+.client-card-modal{
+  background:var(--cream);width:100%;max-width:480px;
+  max-height:90vh;overflow-y:auto;
+  border-radius:2px;
+  transform:translateY(20px) scale(0.97);
+  transition:transform 0.3s cubic-bezier(0.34,1.1,0.64,1);
+  position:relative;
+}
+.client-card-overlay.open .client-card-modal{transform:translateY(0) scale(1)}
+
+/* Card header */
+.cc-header{
+  background:var(--ink);padding:28px 24px 24px;
+  position:relative;
+}
+.cc-close{
+  position:absolute;top:16px;right:16px;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,0.1);border:none;
+  color:rgba(255,255,255,0.5);font-size:1.1rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.cc-close:hover{background:rgba(255,255,255,0.2);color:#fff}
+.cc-av{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--em),var(--em3));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#fff;
+  font-weight:500;margin-bottom:12px;
+}
+.cc-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:#fff;margin-bottom:4px}
+.cc-phone{font-size:0.82rem;color:rgba(255,255,255,0.45);margin-bottom:8px}
+.cc-badge{
+  display:inline-block;font-size:0.68rem;font-weight:700;
+  padding:3px 12px;border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.6);letter-spacing:0.06em;
+}
+
+/* Stats row */
+.cc-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-bottom:1px solid var(--border);
+}
+.cc-stat{
+  padding:16px 12px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.cc-stat:last-child{border-right:none}
+.cc-stat-val{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--em);line-height:1}
+.cc-stat-lbl{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* Body */
+.cc-body{padding:20px 24px}
+.cc-section{margin-bottom:20px}
+.cc-section-title{
+  font-size:0.65rem;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.cc-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Visit history */
+.cc-visit-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid var(--cream2);font-size:0.83rem;
+}
+.cc-visit-row:last-child{border:none}
+.cc-visit-date{font-weight:600;color:var(--ink);min-width:80px}
+.cc-visit-svc{color:var(--muted);flex:1;margin:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-visit-price{font-weight:700;color:var(--em);white-space:nowrap}
+
+/* Notes */
+.cc-notes-input{
+  width:100%;padding:12px;border:1.5px solid var(--border);
+  background:var(--white);font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;color:var(--ink);outline:none;resize:vertical;
+  min-height:70px;transition:border-color 0.2s;border-radius:0;
+}
+.cc-notes-input:focus{border-color:var(--em)}
+
+/* Actions */
+.cc-actions{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;
+}
+.cc-btn{
+  padding:11px 14px;border:none;font-family:'DM Sans',sans-serif;
+  font-size:0.8rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  touch-action:manipulation;letter-spacing:0.02em;
+}
+.cc-btn-primary{background:var(--em);color:#fff}
+.cc-btn-wa{background:#25D366;color:#fff}
+.cc-btn-tg{background:#229ED9;color:#fff}
+.cc-btn-outline{background:none;border:1.5px solid var(--border);color:var(--muted)}
+
+/* Print styles */
+@media print{
+  body > *:not(#clientCardOverlay){display:none!important}
+  .client-card-overlay{position:static;padding:0;background:none;opacity:1;visibility:visible}
+  .client-card-modal{max-height:none;box-shadow:none;transform:none}
+  .cc-close,.cc-actions,.cc-notes-input{display:none!important}
+  .cc-header{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
+
 /* ═══ DOWNLOAD POPUP ═══ */
 .dl-popup-overlay{
   position:fixed;inset:0;z-index:10001;
@@ -6747,6 +6861,119 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ════════════════════════════════════════════
+// CLIENT CARD
+// ════════════════════════════════════════════
+var CURRENT_CLIENT = null;
+
+function openClientCard(client){
+  CURRENT_CLIENT = client;
+  var overlay = document.getElementById('clientCardOverlay');
+  if(!overlay) return;
+
+  var visits  = client.visits || [];
+  var ltv     = client.totalLtv || 0;
+  var avgChk  = visits.length ? Math.round(ltv / visits.length) : 0;
+  var badge   = visits.length>=5?'💎 VIP':visits.length>=3?'⭐ Постоянный':'🆕 Новый';
+
+  // Header
+  document.getElementById('ccAv').textContent    = client.name[0].toUpperCase();
+  document.getElementById('ccName').textContent   = client.name;
+  document.getElementById('ccPhone').textContent  = client.phone ? '📞 ' + client.phone : 'Телефон не указан';
+  document.getElementById('ccBadge').textContent  = badge;
+
+  // Stats
+  document.getElementById('ccVisits').textContent = visits.length;
+  document.getElementById('ccLtv').textContent    = Math.round(ltv).toLocaleString('ru-RU');
+  document.getElementById('ccAvgCheck').textContent = avgChk.toLocaleString('ru-RU');
+
+  // Visit history (last 10, newest first)
+  var histEl = document.getElementById('ccVisitList');
+  if(histEl){
+    var sorted = visits.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); }).slice(0,10);
+    if(!sorted.length){
+      histEl.innerHTML='<div style="font-size:0.82rem;color:var(--muted)">Нет записей</div>';
+    } else {
+      histEl.innerHTML='';
+      sorted.forEach(function(v){
+        var p=(v.date||'').split('-');
+        var ds=p.length===3?(+p[2])+'.'+p[1]+'.'+p[0]:(v.date||'—');
+        var row=document.createElement('div');
+        row.className='cc-visit-row';
+        row.innerHTML=
+          '<span class="cc-visit-date">'+ds+'</span>'+
+          '<span class="cc-visit-svc">'+(v.service||'—')+'</span>'+
+          '<span class="cc-visit-price">'+(v.price?Math.round(v.price).toLocaleString('ru-RU')+' ₽':'—')+'</span>';
+        histEl.appendChild(row);
+      });
+    }
+  }
+
+  // Top services
+  var svcCount = {};
+  visits.forEach(function(v){ if(v.service){ svcCount[v.service]=(svcCount[v.service]||0)+1; } });
+  var topSvcs = Object.entries(svcCount).sort(function(a,b){ return b[1]-a[1]; }).slice(0,3);
+  var topEl = document.getElementById('ccTopSvc');
+  var topSec = document.getElementById('ccTopSvcSection');
+  if(topEl && topSvcs.length){
+    topEl.innerHTML = topSvcs.map(function(s){
+      return '<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:var(--cream2);border:1px solid var(--border);margin:0 6px 6px 0;font-size:0.78rem">'+
+        '<span style="font-weight:700;color:var(--em)">'+s[1]+'×</span> '+s[0]+'</div>';
+    }).join('');
+    if(topSec) topSec.style.display='block';
+  } else {
+    if(topSec) topSec.style.display='none';
+  }
+
+  // Notes from localStorage
+  var notesKey = 'km_client_note_' + client.name.toLowerCase().replace(/\s+/g,'_');
+  var notesEl = document.getElementById('ccNotes');
+  if(notesEl) notesEl.value = localStorage.getItem(notesKey) || '';
+
+  // Rebook button
+  var rbBtn = document.getElementById('ccRebookBtn');
+  if(rbBtn) rbBtn.onclick = function(){ closeClientCardBtn(); rebookClient(client); };
+
+  // Messenger buttons
+  var mBtns = document.getElementById('ccMessengerBtns');
+  if(mBtns && client.phone){
+    var phone = client.phone.replace(/\D/g,'');
+    var wa = phone.length===10?'7'+phone:phone;
+    var msg = encodeURIComponent('Здравствуйте, '+client.name+'! Хотим пригласить вас на следующий визит 🌿');
+    mBtns.innerHTML='';
+    var waBtn=document.createElement('button');
+    waBtn.className='cc-btn cc-btn-wa';
+    waBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp';
+    waBtn.onclick=function(){ window.open('https://wa.me/'+wa+'?text='+msg,'_blank'); };
+    mBtns.appendChild(waBtn);
+  } else if(mBtns){
+    mBtns.innerHTML='';
+  }
+
+  // Show modal
+  overlay.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function saveClientNote(val){
+  if(!CURRENT_CLIENT) return;
+  var key = 'km_client_note_' + CURRENT_CLIENT.name.toLowerCase().replace(/\s+/g,'_');
+  localStorage.setItem(key, val);
+}
+
+function closeClientCard(e){
+  if(e && e.target !== document.getElementById('clientCardOverlay')) return;
+  closeClientCardBtn();
+}
+function closeClientCardBtn(){
+  var overlay = document.getElementById('clientCardOverlay');
+  if(overlay) overlay.classList.remove('open');
+  document.body.style.overflow='';
+}
+function printClientCard(){
+  window.print();
+}
+
+// ════════════════════════════════════════════
 // FEATURE: QUICK AMOUNT SUGGESTIONS
 // ════════════════════════════════════════════
 function showAmountSuggestions(){
@@ -6870,9 +7097,16 @@ function renderClientBase(search){
       '<div style="display:flex;gap:8px;flex-wrap:wrap"></div>';
     var actions = div.querySelector('div:last-child');
     // Rebook button
+    // 📋 Client card button
+    var cardBtn = document.createElement('button');
+    cardBtn.style.cssText = 'padding:8px 14px;background:var(--ink);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;touch-action:manipulation';
+    cardBtn.textContent = '📋 Карта клиента';
+    cardBtn.onclick = (function(client){ return function(){ openClientCard(client); }; })(c);
+    actions.appendChild(cardBtn);
+    // 📅 Rebook button
     var rb = document.createElement('button');
     rb.style.cssText = 'padding:8px 14px;background:var(--em);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;touch-action:manipulation';
-    rb.textContent = '📅 Записать снова';
+    rb.textContent = '📅 Снова';
     rb.onclick = (function(client){ return function(){ rebookClient(client); }; })(c);
     actions.appendChild(rb);
     // WhatsApp button
@@ -7417,6 +7651,74 @@ window.addEventListener('appinstalled', function(){
 
 <!-- Floating help button -->
 <button class="page-help-fab" id="pageHelpFab" onclick="openPageHelp()" title="Что это за раздел?">?</button>
+
+
+<!-- ═══ CLIENT CARD MODAL ═══ -->
+<div class="client-card-overlay" id="clientCardOverlay" onclick="closeClientCard(event)">
+  <div class="client-card-modal" id="clientCardModal">
+
+    <!-- Header -->
+    <div class="cc-header">
+      <button class="cc-close" onclick="closeClientCardBtn()">×</button>
+      <div class="cc-av" id="ccAv">А</div>
+      <div class="cc-name" id="ccName">Клиент</div>
+      <div class="cc-phone" id="ccPhone"></div>
+      <div class="cc-badge" id="ccBadge">🆕 Новый</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="cc-stats">
+      <div class="cc-stat">
+        <div class="cc-stat-val" id="ccVisits">0</div>
+        <div class="cc-stat-lbl">Визитов</div>
+      </div>
+      <div class="cc-stat">
+        <div class="cc-stat-val" id="ccLtv">0</div>
+        <div class="cc-stat-lbl">LTV ₽</div>
+      </div>
+      <div class="cc-stat">
+        <div class="cc-stat-val" id="ccAvgCheck">0</div>
+        <div class="cc-stat-lbl">Ср. чек ₽</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="cc-body">
+
+      <!-- Visit history -->
+      <div class="cc-section">
+        <div class="cc-section-title">История визитов</div>
+        <div id="ccVisitList"></div>
+      </div>
+
+      <!-- Preferred services -->
+      <div class="cc-section" id="ccTopSvcSection">
+        <div class="cc-section-title">Любимые услуги</div>
+        <div id="ccTopSvc"></div>
+      </div>
+
+      <!-- Notes -->
+      <div class="cc-section">
+        <div class="cc-section-title">Заметки о клиенте</div>
+        <textarea class="cc-notes-input" id="ccNotes"
+          placeholder="Особенности, предпочтения, аллергии, важные детали..."
+          onchange="saveClientNote(this.value)"></textarea>
+      </div>
+
+      <!-- Actions -->
+      <div class="cc-actions">
+        <button class="cc-btn cc-btn-primary" id="ccRebookBtn">
+          📅 Записать снова
+        </button>
+        <button class="cc-btn cc-btn-outline" onclick="printClientCard()">
+          🖨 Распечатать карту
+        </button>
+      </div>
+      <div class="cc-actions" id="ccMessengerBtns"></div>
+
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
