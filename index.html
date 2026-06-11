@@ -1618,6 +1618,128 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 .onb-action-sub{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:2px}
 .onb-action-arr{font-size:1.2rem;flex-shrink:0}
 
+
+/* ═══ КАПИТАЛ АССИСТЕНТ ═══ */
+.bot-fab{
+  position:fixed;bottom:80px;right:20px;z-index:5000;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--em),#1A9463);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(13,110,74,0.45);
+  transition:all 0.25s;
+  font-size:1.4rem;
+}
+.bot-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(13,110,74,0.55)}
+.bot-fab .bot-badge{
+  position:absolute;top:-3px;right:-3px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--red);color:#fff;font-size:0.6rem;
+  font-weight:700;display:none;align-items:center;justify-content:center;
+  border:2px solid var(--cream);
+}
+.bot-window{
+  position:fixed;bottom:144px;right:20px;z-index:5001;
+  width:360px;max-width:calc(100vw - 32px);
+  background:var(--cream);
+  border:1px solid var(--border);
+  box-shadow:0 12px 48px rgba(0,0,0,0.16);
+  display:flex;flex-direction:column;
+  border-radius:16px;overflow:hidden;
+  transform:scale(0.92) translateY(20px);
+  opacity:0;visibility:hidden;
+  transition:all 0.25s cubic-bezier(0.34,1.1,0.64,1);
+  max-height:520px;
+}
+.bot-window.open{
+  transform:scale(1) translateY(0);
+  opacity:1;visibility:visible;
+}
+.bot-header{
+  background:var(--ink);padding:14px 16px;
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.bot-av{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--em),var(--em3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.bot-header-info{flex:1}
+.bot-header-name{font-size:0.85rem;font-weight:700;color:#fff}
+.bot-header-status{font-size:0.7rem;color:var(--em3);display:flex;align-items:center;gap:4px}
+.bot-header-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--em3);display:inline-block}
+.bot-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:1.2rem;padding:2px;line-height:1;transition:color 0.2s}
+.bot-close:hover{color:#fff}
+.bot-msgs{
+  flex:1;overflow-y:auto;padding:14px 14px 8px;
+  display:flex;flex-direction:column;gap:10px;
+  min-height:200px;
+}
+.bot-msg{display:flex;gap:8px;align-items:flex-end;animation:msgIn 0.2s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.bot-msg.user{flex-direction:row-reverse}
+.bot-msg-av{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:0.7rem;
+}
+.bot-msg.bot .bot-msg-av{background:linear-gradient(135deg,var(--em),var(--em3));color:#fff;font-size:0.8rem}
+.bot-msg.user .bot-msg-av{background:var(--ink);color:rgba(255,255,255,0.6)}
+.bot-bubble{
+  max-width:80%;padding:9px 12px;
+  font-size:0.83rem;line-height:1.55;
+  border-radius:12px;
+}
+.bot-msg.bot .bot-bubble{
+  background:#fff;color:var(--ink);
+  border:0.5px solid var(--border);
+  border-bottom-left-radius:4px;
+}
+.bot-msg.user .bot-bubble{
+  background:var(--em);color:#fff;
+  border-bottom-right-radius:4px;
+}
+.bot-bubble strong{font-weight:700}
+.bot-bubble em{color:var(--em)}
+.bot-typing{display:none;align-items:center;gap:4px;padding:8px 14px}
+.bot-typing.show{display:flex}
+.bot-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:dotBounce 1.2s infinite}
+.bot-dot:nth-child(2){animation-delay:0.2s}
+.bot-dot:nth-child(3){animation-delay:0.4s}
+@keyframes dotBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.bot-chips{padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:5px}
+.bot-chip{
+  font-size:0.73rem;padding:5px 11px;
+  background:var(--cream2);border:1px solid var(--border);
+  cursor:pointer;border-radius:20px;
+  color:var(--ink);transition:all 0.15s;white-space:nowrap;
+}
+.bot-chip:hover{border-color:var(--em);color:var(--em)}
+.bot-input-row{
+  display:flex;gap:8px;padding:10px 14px 14px;
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.bot-input{
+  flex:1;padding:10px 13px;
+  border:1.5px solid var(--border);
+  background:#fff;border-radius:20px;
+  font-family:'DM Sans',sans-serif;font-size:0.85rem;
+  color:var(--ink);outline:none;transition:border-color 0.2s;
+}
+.bot-input:focus{border-color:var(--em)}
+.bot-send{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--em);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1rem;transition:background 0.2s;flex-shrink:0;
+}
+.bot-send:hover{background:var(--ink)}
+.bot-send:disabled{background:var(--border);cursor:default}
+@media(max-width:860px){
+  .bot-fab{bottom:90px}
+  .bot-window{bottom:154px;right:12px;width:calc(100vw - 24px)}
+}
+
 /* ═══ DOWNLOAD POPUP ═══ */
 .dl-popup-overlay{
   position:fixed;inset:0;z-index:10001;
@@ -5799,6 +5921,214 @@ function exitDemoToReg(){
 }
 
 // ════════════════════════════════════════════
+// КАПИТАЛ АССИСТЕНТ — AI Chatbot
+// ════════════════════════════════════════════
+var BOT_OPEN = false;
+var BOT_HISTORY = [];  // conversation history
+var BOT_LOADING = false;
+
+// System prompt — teach the bot everything about the app
+function getBotSystemPrompt(){
+  var sess = load('km_session', {});
+  var txs  = getTx();
+  var appts = getAppts();
+  var sets  = getSettings();
+
+  // Gather user's real financial data
+  var now = new Date();
+  var thisMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  var monthTxs  = txs.filter(function(t){ return (t.date||'').startsWith(thisMonth); });
+  var income    = monthTxs.filter(function(t){ return t.type==='income';  }).reduce(function(s,t){ return s+t.amount; },0);
+  var expense   = monthTxs.filter(function(t){ return t.type==='expense'; }).reduce(function(s,t){ return s+t.amount; },0);
+  var totalTxs  = txs.length;
+  var upcomingAppts = appts.filter(function(a){ return a.date >= thisMonth && a.status!=='cancelled'; });
+
+  return 'Ты — Капитал Ассистент, персональный финансовый помощник в приложении «Капитал Мастера».' +
+  '\n\nПриложение создано специально для творческих специалистов: бьюти-мастеров, фотографов, дизайнеров, художников, флористов.' +
+  '\n\n## ЧТО УМЕЕТ ПРИЛОЖЕНИЕ:' +
+  '\n- **Финансы**: быстрый ввод доходов (Enter) и расходов (Shift+Enter), категории, сегменты (бизнес/личное)' +
+  '\n- **Правило 50/30/20**: автоматическое распределение каждого рубля — 50% нужды, 30% желания, 20% капитал' +
+  '\n- **Налоговая подсказка**: при вводе дохода сразу показывает сколько отложить на УСН 6%, НПД 4%, НПД 6%, УСН 15%' +
+  '\n- **Календарь клиентов**: записи с именем, телефоном, услугой, ценой, заметками. Кнопка «💰 Зачислить в доход»' +
+  '\n- **Онлайн-запись**: клиенты сами записываются по ссылке kapital-mastera.vercel.app/онлайн-запись?master=ID' +
+  '\n- **База клиентов**: история визитов, LTV, поиск, кнопка «Записать снова»' +
+  '\n- **Капитал**: подушка безопасности, инвестиционный портфель, прогноз на 10 лет со сложным %' +
+  '\n- **Цена часа**: трекер ₽/час по дням, динамика роста' +
+  '\n- **Зарплата владельца**: разделение выручки бизнеса и личной зарплаты' +
+  '\n- **Финансовый пульс**: 3 вопроса раз в неделю для рефлексии' +
+  '\n- **Блог сообщества**: опыт других мастеров' +
+  '\n- **Firebase синхронизация**: данные доступны на всех устройствах' +
+  '\n- **Telegram уведомления**: новые заявки приходят в бот мгновенно' +
+  '\n\n## НАЛОГООБЛОЖЕНИЕ (Россия 2025):' +
+  '\n- НПД (самозанятый) с физлицами: 4% — лимит 2.4 млн ₽/год' +
+  '\n- НПД с юрлицами: 6%' +
+  '\n- ИП УСН «доходы»: 6% + страховые взносы ~49 500 ₽/год' +
+  '\n- ИП УСН «доходы минус расходы»: 15% от прибыли' +
+  '\n- Платить УСН: авансы до 28 апр, 28 июл, 28 окт; итог до 28 апр' +
+  '\n\n## ФИНАНСОВЫЕ ПРАВИЛА (50/30/20):' +
+  '\n- 50% — обязательные нужды (аренда, еда, налоги, материалы)' +
+  '\n- 30% — желания и качество жизни' +
+  '\n- 20% — капитал, подушка, инвестиции' +
+  '\n- Правило: СНАЧАЛА откладывай 20%, потом живи на остальное' +
+  '\n\n## ДАННЫЕ ПОЛЬЗОВАТЕЛЯ:' +
+  '\n- Имя: ' + (sess.name||'не указано') +
+  '\n- Профессия: ' + (sess.prof||'не указана') +
+  '\n- Доход этот месяц: ' + Math.round(income).toLocaleString('ru-RU') + ' ₽' +
+  '\n- Расходы этот месяц: ' + Math.round(expense).toLocaleString('ru-RU') + ' ₽' +
+  '\n- Всего операций: ' + totalTxs +
+  '\n- Предстоящих записей: ' + upcomingAppts.length +
+  '\n\n## КАК ОТВЕЧАТЬ:' +
+  '\n- Отвечай кратко и по делу — 2-4 предложения' +
+  '\n- Используй реальные данные пользователя' +
+  '\n- Давай конкретные советы с цифрами' +
+  '\n- Пиши на русском, дружелюбно, как коуч' +
+  '\n- Если вопрос не по теме финансов/бизнеса — мягко возвращай к теме' +
+  '\n- Markdown: **жирный** для важного, списки с -';
+}
+
+var BOT_QUICK_CHIPS = [
+  'Как добавить доход?',
+  'Сколько мне платить налогов?',
+  'Как настроить онлайн-запись?',
+  'Как работает 50/30/20?',
+  'Как поднять цену на услуги?',
+];
+
+function toggleBot(){
+  BOT_OPEN = !BOT_OPEN;
+  var win = document.getElementById('botWindow');
+  if(win) win.classList.toggle('open', BOT_OPEN);
+  if(BOT_OPEN && BOT_HISTORY.length === 0) botGreet();
+  if(BOT_OPEN){
+    var inp = document.getElementById('botInput');
+    if(inp) setTimeout(function(){ inp.focus(); }, 300);
+  }
+  // Hide badge
+  var badge = document.getElementById('botBadge');
+  if(badge) badge.style.display = 'none';
+}
+
+function botGreet(){
+  var sess = load('km_session', {});
+  var name = sess.name ? sess.name.split(' ')[0] : null;
+  var greeting = name
+    ? 'Привет, ' + name + '! Я Капитал Ассистент ✦\n\nЗнаю всё о твоих финансах и помогу разобраться с любым вопросом — от налогов до цены часа.'
+    : 'Привет! Я Капитал Ассистент ✦\n\nПомогу разобраться с финансами, настроить приложение или ответить на вопрос о налогах.';
+  addBotMsg('bot', greeting);
+  showBotChips(BOT_QUICK_CHIPS);
+}
+
+function addBotMsg(role, text){
+  var msgs = document.getElementById('botMsgs');
+  if(!msgs) return;
+  var div = document.createElement('div');
+  div.className = 'bot-msg ' + role;
+  var av = document.createElement('div');
+  av.className = 'bot-msg-av';
+  av.textContent = role === 'bot' ? '✦' : '👤';
+  var bubble = document.createElement('div');
+  bubble.className = 'bot-bubble';
+  // Simple markdown: **bold**, \n → <br>
+  bubble.innerHTML = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+  div.appendChild(av);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  // Clear chips after user message
+  if(role === 'user') showBotChips([]);
+  BOT_HISTORY.push({role: role === 'bot' ? 'assistant' : 'user', content: text});
+}
+
+function showBotChips(chips){
+  var el = document.getElementById('botChips');
+  if(!el) return;
+  el.innerHTML = '';
+  chips.forEach(function(chip){
+    var btn = document.createElement('button');
+    btn.className = 'bot-chip';
+    btn.textContent = chip;
+    btn.onclick = function(){ sendBotMsg(chip); };
+    el.appendChild(btn);
+  });
+}
+
+function sendBotMsg(text){
+  if(BOT_LOADING) return;
+  var inp = document.getElementById('botInput');
+  var msg = text || (inp ? inp.value.trim() : '');
+  if(!msg) return;
+  if(inp) inp.value = '';
+  addBotMsg('user', msg);
+  showBotChips([]);
+  botThink(msg);
+}
+
+function botThink(userMsg){
+  BOT_LOADING = true;
+  var send = document.getElementById('botSend');
+  var typing = document.getElementById('botTyping');
+  if(send){ send.disabled = true; }
+  if(typing) typing.classList.add('show');
+
+  var messages = BOT_HISTORY.slice(-8).map(function(m){ return {role:m.role, content:m.content}; });
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: getBotSystemPrompt(),
+      messages: messages
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    BOT_LOADING = false;
+    if(send) send.disabled = false;
+    if(typing) typing.classList.remove('show');
+    var reply = '';
+    if(data.content && data.content[0] && data.content[0].text){
+      reply = data.content[0].text;
+    } else if(data.error){
+      reply = 'Ошибка: ' + (data.error.message || 'попробуй позже');
+    } else {
+      reply = 'Что-то пошло не так. Попробуй ещё раз.';
+    }
+    addBotMsg('bot', reply);
+    // Suggest follow-ups based on context
+    var followUps = getFollowUps(userMsg);
+    if(followUps.length) showBotChips(followUps);
+  })
+  .catch(function(e){
+    BOT_LOADING = false;
+    if(send) send.disabled = false;
+    if(typing) typing.classList.remove('show');
+    addBotMsg('bot', 'Нет связи с сервером. Проверь интернет и попробуй снова.');
+  });
+}
+
+function getFollowUps(msg){
+  var m = msg.toLowerCase();
+  if(m.includes('налог') || m.includes('усн') || m.includes('ндп') || m.includes('самозанятый')){
+    return ['Как платить УСН?','Что выгоднее: НПД или УСН?','Как рассчитать авансовый платёж?'];
+  }
+  if(m.includes('запись') || m.includes('клиент') || m.includes('онлайн')){
+    return ['Как поделиться ссылкой?','Как подтвердить заявку?','Как настроить услуги?'];
+  }
+  if(m.includes('цена') || m.includes('прайс') || m.includes('поднять')){
+    return ['Как рассчитать цену часа?','Как отслеживать рост цены?'];
+  }
+  if(m.includes('доход') || m.includes('добавить') || m.includes('ввести')){
+    return ['Как разделить бизнес и личное?','Что такое 50/30/20?'];
+  }
+  return [];
+}
+
+// ════════════════════════════════════════════
 // ONBOARDING
 // ════════════════════════════════════════════
 var ONB_STEP = 0;
@@ -6628,6 +6958,40 @@ window.addEventListener('appinstalled', function(){
     </div>
     <div class="onb-skip" onclick="closeOnboarding()">Пропустить — разберусь сам</div>
 
+  </div>
+</div>
+
+
+<!-- ═══ КАПИТАЛ АССИСТЕНТ ═══ -->
+<button class="bot-fab" id="botFab" onclick="toggleBot()" title="Капитал Ассистент">
+  ✦
+  <div class="bot-badge" id="botBadge"></div>
+</button>
+
+<div class="bot-window" id="botWindow">
+  <div class="bot-header">
+    <div class="bot-av">✦</div>
+    <div class="bot-header-info">
+      <div class="bot-header-name">Капитал Ассистент</div>
+      <div class="bot-header-status">онлайн</div>
+    </div>
+    <button class="bot-close" onclick="toggleBot()">×</button>
+  </div>
+
+  <div class="bot-msgs" id="botMsgs"></div>
+
+  <div class="bot-typing" id="botTyping">
+    <div class="bot-dot"></div>
+    <div class="bot-dot"></div>
+    <div class="bot-dot"></div>
+  </div>
+
+  <div class="bot-chips" id="botChips"></div>
+
+  <div class="bot-input-row">
+    <input class="bot-input" id="botInput" placeholder="Спроси что угодно..." maxlength="500"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendBotMsg()}">
+    <button class="bot-send" id="botSend" onclick="sendBotMsg()">↑</button>
   </div>
 </div>
 
