@@ -2959,6 +2959,11 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
             Клиент открывает ссылку → выбирает услугу, дату и время → оставляет контакты → заявка появляется у вас в «Заявках».
           </div>
 
+          <!-- Explanation -->
+          <div style="background:var(--cream2);border-left:3px solid var(--gold);padding:12px 14px;margin-bottom:16px;font-size:0.82rem;color:var(--muted);line-height:1.6">
+            <strong style="color:var(--ink)">Как работает:</strong> включи приём → скопируй ссылку → отправь клиентам в WhatsApp или Instagram. Ссылка содержит твой уникальный ID — без него страница не откроется.
+          </div>
+
           <!-- Toggle -->
           <div class="setting-row" style="margin-bottom:20px">
             <div>
@@ -4687,48 +4692,50 @@ function onSlugInput(el){
 }
 
 // ── TAB 3: Link ──────────────────────────────────────────────
+function getMasterBookUrl(){
+  // Always use /booking.html?master=ID — guaranteed to work
+  var sess = load('km_session', {});
+  var uid = sess.id || 'default';
+  return window.location.origin + '/booking.html?master=' + uid;
+}
+
+function getDisplayBookUrl(){
+  // Show short URL for display, but copy full working URL
+  return window.location.origin + '/онлайн-запись';
+}
+
 function renderBookingLink(){
   var s = getBookingSettings();
   var tog = document.getElementById('bookingToggle');
   var statusText = document.getElementById('bookStatusText');
   var linkDiv = document.getElementById('bookLinkUrl');
   var linkResult = document.getElementById('bookLinkResult');
-  var slugEl = document.getElementById('customSlug');
-  var slugPreview = document.getElementById('slugPreview');
-  var slug = (slugEl ? slugEl.value.trim() : '') || s.customSlug || '';
 
   // Toggle state
   if(tog){ if(s.isOpen) tog.classList.add('on'); else tog.classList.remove('on'); }
 
   if(s.isOpen){
-    var sess2 = load('km_session', {});
-    var uid2 = sess2.id || 'default';
-    var fullUrl = window.location.origin + '/booking.html?master=' + uid2;
-    // Short beautiful URL — redirects to booking.html via Vercel
-    var url = window.location.origin + '/%D0%BE%D0%BD%D0%BB%D0%B0%D0%B9%D0%BD-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C?master=' + uid2;
-    var displayUrl = window.location.origin + '/онлайн-запись';
-    var display = slug
-      ? window.location.origin + '/b/' + slug
-      : url;
+    var workingUrl = getMasterBookUrl();
+    var displayUrl = getDisplayBookUrl();
+
     if(statusText) statusText.textContent = '✅ Клиенты могут записаться по ссылке';
+
     if(linkDiv){
-      linkDiv.textContent = display;
-      linkDiv.style.color = 'var(--em)';
-      linkDiv.style.fontWeight = '600';
+      // Show beautiful short URL but note the working URL
+      linkDiv.innerHTML =
+        '<div style="font-size:1rem;font-weight:700;color:var(--em);margin-bottom:6px;word-break:break-all">'+ displayUrl +'</div>'+
+        '<div style="font-size:0.72rem;color:var(--muted);line-height:1.5">Кнопка скопирует рабочую ссылку с твоим ID автоматически</div>';
     }
     if(linkResult){
       linkResult.style.borderLeftColor = 'var(--em)';
       linkResult.style.background = 'rgba(13,110,74,0.06)';
     }
-    // Update KPI status
     var bs = document.getElementById('bookStatus');
     if(bs) bs.textContent = '✅ Открыта';
   } else {
     if(statusText) statusText.textContent = 'Выключено — клиенты не могут записаться';
     if(linkDiv){
-      linkDiv.textContent = 'Включи приём заявок чтобы получить ссылку';
-      linkDiv.style.color = 'var(--muted)';
-      linkDiv.style.fontWeight = '400';
+      linkDiv.innerHTML = '<div style="color:var(--muted);font-size:0.9rem">Включи тумблер — появится ссылка для клиентов</div>';
     }
     if(linkResult){
       linkResult.style.borderLeftColor = 'var(--border)';
@@ -4736,11 +4743,6 @@ function renderBookingLink(){
     }
     var bs2 = document.getElementById('bookStatus');
     if(bs2) bs2.textContent = '⏸ Выкл';
-  }
-
-  if(slugPreview && slug){
-    slugPreview.innerHTML = 'Красивая ссылка: <strong style="color:var(--em)">' +
-      window.location.origin + '/b/' + slug + '</strong>';
   }
 }
 
@@ -4759,12 +4761,12 @@ function toggleBooking(){
 function copyBookLink(){
   var s = getBookingSettings();
   if(!s.isOpen){ toast('Сначала включи приём заявок','error'); return; }
-  var sess = load('km_session', {});
-  var uid = sess.id || 'default';
-  // Copy beautiful short URL that redirects correctly
-  var url = window.location.origin + '/%D0%BE%D0%BD%D0%BB%D0%B0%D0%B9%D0%BD-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C?master=' + uid;
+  // Always copy the WORKING URL with master ID — never without it
+  var url = getMasterBookUrl();
   if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(function(){ toast('✓ Ссылка скопирована! Отправь клиентам'); });
+    navigator.clipboard.writeText(url).then(function(){
+      toast('✓ Ссылка скопирована — отправь клиентам!');
+    });
   } else {
     var inp = document.createElement('input');
     inp.value = url; document.body.appendChild(inp); inp.select();
