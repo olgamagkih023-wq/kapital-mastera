@@ -4799,6 +4799,7 @@ function fbSaveBookingSettings(s){
     masterProf:   s.masterProf || '',
     masterPhone:  s.masterPhone || '',
     masterTelegram: s.masterTelegram || '',
+    masterMax: s.masterMax || '',
     services:     s.services || [],
     workDays:     s.workDays || [1,2,3,4,5],
     workStart:    s.workStart || '10:00',
@@ -4858,6 +4859,54 @@ function fbUpdateApptStatus(apptId, status){
 }
 
 // ════════════════════════════════════════════
+// UNIFIED MESSENGER NOTIFICATIONS
+// ════════════════════════════════════════════
+function testMessenger(type){
+  var s = getBookingSettings();
+  var msg = encodeURIComponent('Привет! Тест подключения Капитал Мастера. Всё работает!');
+  if(type==='wa'){
+    var phone = (s.masterPhone||'').replace(/[^0-9]/g,'');
+    if(!phone){ toast('Укажи номер WhatsApp','error'); return; }
+    var wa = phone.length===10?'7'+phone:phone;
+    window.open('https://wa.me/'+wa+'?text='+msg,'_blank');
+    toast('Открываем WhatsApp...');
+  }
+  if(type==='tg'){
+    var tg = (s.masterTelegram||'').replace(/^@/,'');
+    if(!tg){ toast('Укажи Telegram @username','error'); return; }
+    var url = /^[0-9]+$/.test(tg)?'https://t.me/+'+tg:'https://t.me/'+tg+'?text='+msg;
+    window.open(url,'_blank');
+    toast('Открываем Telegram...');
+  }
+  if(type==='max'){
+    var max = (s.masterMax||'').replace(/[^0-9]/g,'');
+    if(!max){ toast('Укажи номер MAX/VK','error'); return; }
+    var mx = max.length===10?'7'+max:max;
+    window.open('https://vk.me/+'+mx,'_blank');
+    toast('Открываем MAX...');
+  }
+}
+
+function notifyClientConfirm(appt){
+  var clientPhone = (appt.phone||'').replace(/[^0-9]/g,'');
+  if(!clientPhone) return;
+  var p = (appt.date||'').split('-');
+  var dateRu = p.length===3?(+p[2])+'.'+p[1]+'.'+p[0]:(appt.date||'');
+  var nl = '\n';
+  var msg = encodeURIComponent(
+    'Здравствуйте, '+(appt.client||'')+
+    '! Ваша запись подтверждена.'+nl+
+    'Услуга: '+(appt.service||'')+nl+
+    'Дата: '+dateRu+'  Время: '+(appt.time||'')+
+    (appt.price?nl+'Стоимость: '+Math.round(appt.price).toLocaleString('ru-RU')+' ₽':'')+
+    nl+'Ждём вас!'
+  );
+  var wa = clientPhone.length===10?'7'+clientPhone:clientPhone;
+  window.open('https://wa.me/'+wa+'?text='+msg,'_blank');
+}
+
+
+// ════════════════════════════════════════════
 // BOOKING SYSTEM — NEW CLEAN VERSION
 // ════════════════════════════════════════════
 
@@ -4866,7 +4915,7 @@ function getBookingSettings(){
     isOpen:false, services:[], workDays:[1,2,3,4,5],
     workStart:'10:00', workEnd:'19:00',
     masterName:'', masterProf:'',
-    masterPhone:'', masterTelegram:'', customSlug:''
+    masterPhone:'', masterTelegram:'', masterMax:'', customSlug:''
   });
 }
 function saveBookingSettingsData(d){
@@ -4901,6 +4950,8 @@ function renderBookingSettings(){
   if(mp && s.masterPhone) mp.value = s.masterPhone;
   var tgEl2 = document.getElementById('masterTelegram');
   if(tgEl2 && s.masterTelegram) tgEl2.value = s.masterTelegram;
+  var maxEl2 = document.getElementById('masterMax');
+  if(maxEl2 && s.masterMax) maxEl2.value = s.masterMax;
   if(ws) ws.value = s.workStart || '10:00';
   if(we) we.value = s.workEnd || '19:00';
   if(slugEl && s.customSlug) slugEl.value = s.customSlug;
@@ -5117,7 +5168,12 @@ function renderIncomingList(){
       var confBtn = document.createElement('button');
       confBtn.style.cssText = 'flex:1;padding:8px;background:var(--em);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif';
       confBtn.textContent = '✓ Подтвердить';
-      confBtn.onclick = (function(id){ return function(){ confirmAppt(id); }; })(a.id);
+      confBtn.onclick = (function(appt){ return function(){
+        confirmAppt(appt.id);
+        if(appt.phone && confirm('Отправить подтверждение клиенту '+appt.client+' в WhatsApp?')){
+          notifyClientConfirm(appt);
+        }
+      }; })(a);
       var canBtn = document.createElement('button');
       canBtn.style.cssText = 'flex:1;padding:8px;background:none;border:1.5px solid var(--border);color:var(--muted);font-size:0.78rem;cursor:pointer;font-family:DM Sans,sans-serif';
       canBtn.textContent = '✕ Отменить';
