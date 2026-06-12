@@ -191,33 +191,39 @@ function launchApp(user){
   store('km_session', user);
   FB_UID = user.id || '';
 
-  document.getElementById('sidebarName').textContent = user.name || 'Мастер';
-  document.getElementById('sidebarProf').textContent = user.prof || 'Специалист';
+  // Update sidebar immediately
+  var sn = document.getElementById('sidebarName');
+  var sp = document.getElementById('sidebarProf');
+  var av = document.getElementById('sidebarAv');
+  if(sn) sn.textContent = user.name || 'Мастер';
+  if(sp) sp.textContent = user.prof || 'Специалист';
+  if(av) av.textContent = (user.name||'М')[0].toUpperCase();
 
-  // Show app immediately with local data, then sync Firebase in background
-  function showAppNow(){
-    authScreen.style.display = 'none';
-    appEl.style.display = 'flex';
-    appEl.classList.add('visible');
+  // Show app INSTANTLY — no waiting for Firebase
+  var auth = document.getElementById('authScreen');
+  var app  = document.getElementById('app');
+  if(auth) auth.style.display = 'none';
+  if(app){ app.style.display = 'flex'; app.classList.add('visible'); }
+
+  refreshAll();
+
+  // Firebase sync in background (no delay to user)
+  if(FB_UID && typeof fbLoadProfile === 'function'){
     setTimeout(function(){
-      if(HELP_CONTENT && HELP_CONTENT['dashboard']){
-        var t = document.getElementById('pageTitle');
-        if(t) t.innerHTML = 'Обзор <button class="help-btn" onclick="openHelp(\'dashboard\')" title="Как это работает">?</button>';
-      }
-    }, 200);
-    refreshAll();
+      fbLoadProfile(FB_UID, function(){
+        // Silently refresh data if Firebase has newer version
+        renderFinances && renderFinances();
+        renderDashboard && renderDashboard();
+      });
+    }, 500);
   }
 
-  // Try Firebase with 3s timeout — show app regardless
-  var shown = false;
-  var timer = setTimeout(function(){
-    if(!shown){ shown = true; showAppNow(); }
-  }, 3000);
-
-  fbLoadProfile(FB_UID, function(){
-    clearTimeout(timer);
-    if(!shown){ shown = true; showAppNow(); }
-  });
+  setTimeout(function(){
+    if(HELP_CONTENT && HELP_CONTENT['dashboard']){
+      var t = document.getElementById('pageTitle');
+      if(t) t.innerHTML = 'Обзор <button class="help-btn" onclick="openHelp(\'dashboard\')" title="Как это работает">?</button>';
+    }
+  }, 300);
 }
 
 
@@ -304,6 +310,14 @@ function showAuthErr(errId, msg){
 
 // Enter key support
 document.addEventListener('keydown', function(e){
+  // Escape closes popups
+  if(e.key === 'Escape'){
+    var dl = document.getElementById('dlPopup');
+    if(dl && dl.classList.contains('open')){ dl.classList.remove('open'); document.body.style.overflow=''; }
+    var onb = document.getElementById('onbOverlay');
+    if(onb && onb.classList.contains('open')){ onb.classList.remove('open'); document.body.style.overflow=''; }
+    return;
+  }
   if(e.key !== 'Enter') return;
   var auth = document.getElementById('authScreen');
   if(!auth || auth.style.display === 'none') return;
@@ -3442,8 +3456,14 @@ function dlTab(tab){
   if(tAnd){ tAnd.style.color = tab==='android' ? 'var(--ink)' : 'var(--muted)'; tAnd.style.borderBottomColor = tab==='android' ? 'var(--em)' : 'transparent'; }
 }
 function closeDlPopup(e){
-  if(e && e.target !== document.getElementById('dlPopup')) return;
-  closeDlPopupDirect();
+  // Close if clicked on overlay backdrop (not the box itself)
+  if(e && e.target){
+    var box = document.querySelector('.dl-popup-box');
+    if(box && box.contains(e.target)) return; // click inside box — ignore
+  }
+  var el = document.getElementById('dlPopup');
+  if(el) el.classList.remove('open');
+  document.body.style.overflow = '';
 }
 function closeDlPopupDirect(){
   document.getElementById('dlPopup').classList.remove('open');
