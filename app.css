@@ -1809,3 +1809,37 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 .sb-user-row{display:flex;align-items:center;gap:9px;width:100%}
 .sb-av{width:28px;height:28px;border-radius:50%;background:var(--em);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:.9rem;color:#fff;font-weight:600}
 .sidebar-user{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+
+/* ── Demo Banner ── */
+.demo-banner{
+  position:sticky;top:0;z-index:3000;
+  background:linear-gradient(90deg,var(--ink) 0%,#1a1f1a 100%);
+  border-bottom:2px solid var(--em3);
+  flex-shrink:0;
+}
+.demo-banner-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;gap:12px;flex-wrap:wrap;
+}
+.demo-badge{
+  display:inline-block;font-size:0.72rem;font-weight:700;
+  padding:3px 10px;background:var(--em);color:#fff;
+  border-radius:12px;margin-right:8px;
+  letter-spacing:0.04em;
+}
+.demo-msg{font-size:0.8rem;color:rgba(255,255,255,0.55);font-weight:300}
+.demo-reg-btn{
+  flex-shrink:0;
+  padding:8px 18px;background:var(--em3);
+  color:var(--ink);border:none;
+  font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;
+  cursor:pointer;border-radius:20px;
+  white-space:nowrap;letter-spacing:0.03em;
+  transition:all 0.2s;
+  -webkit-tap-highlight-color:rgba(0,0,0,0.1);
+}
+.demo-reg-btn:hover{background:#fff;transform:scale(1.03)}
+@media(max-width:480px){
+  .demo-msg{font-size:0.72rem}
+  .demo-banner-inner{padding:8px 14px}
+}

@@ -138,9 +138,7 @@
         <button class="dl-trigger-btn" onclick="openDlPopup()">
           <span class="dl-trigger-btn-icon">📲</span> Скачать приложение
         </button>
-        <button onclick="enterDemoMode()" style="width:100%;margin-top:12px;padding:14px;background:var(--cream2);border:2px dashed var(--border);font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;color:var(--ink);cursor:pointer;transition:all 0.2s;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.borderColor='var(--em)';this.style.color='var(--em)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink)'">
-          🎯 Попробовать без регистрации
-        </button>
+        <button onclick="enterDemoMode()" class="auth-demo-btn" style="width:100%;margin-top:10px;padding:13px;background:none;border:2px dashed var(--border);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:rgba(0,0,0,0.05);border-radius:0;display:block">🎯 Попробовать без регистрации</button>
       </div>
       <div id="aReg" style="display:none">
         <div class="auth-err" id="regErr"></div>
@@ -181,8 +179,17 @@
 <!-- ===== APP ===== -->
 <div id="app">
   <!-- Demo banner (shown only in demo mode) -->
-  <div class="demo-banner" id="demoBanner" style="display:none;grid-column:1/-1;order:-1;position:sticky;top:0;z-index:99">
-    <div class="demo-banner-text">🎯 <span>Демо-режим</span> — данные не сохраняются. Зарегистрируйся чтобы сохранить всё.</div>
+  <div class="demo-banner" id="demoBanner" style="display:none">
+  <div class="demo-banner-inner">
+    <div class="demo-banner-text">
+      <span class="demo-badge">🎯 Демо</span>
+      <span class="demo-msg">Данные не сохраняются · Попробуй все функции бесплатно</span>
+    </div>
+    <button class="demo-reg-btn" onclick="exitDemo()">
+      Создать аккаунт →
+    </button>
+  </div>
+</div>
     <button class="demo-reg-btn" onclick="exitDemoToReg()">Зарегистрироваться</button>
   </div>
   <!-- SIDEBAR -->
@@ -3087,7 +3094,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 <!-- ===== APP ===== -->
 <div id="app">
   <!-- Demo banner (shown only in demo mode) -->
-  <div class="demo-banner" id="demoBanner" style="display:none;grid-column:1/-1;order:-1;position:sticky;top:0;z-index:99">
+  <div class="demo-banner" id="demoBanner" class="demo-banner" style="display:none;grid-column:1/-1;order:-1;position:sticky;top:0;z-index:99">
     <div class="demo-banner-text">🎯 <span>Демо-режим</span> — данные не сохраняются. Зарегистрируйся чтобы сохранить всё.</div>
     <button class="demo-reg-btn" onclick="exitDemoToReg()">Зарегистрироваться</button>
   </div>
