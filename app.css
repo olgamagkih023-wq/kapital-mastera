@@ -1804,3 +1804,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 .cookie-accept{padding:10px 20px;background:var(--em);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.06em}
 .cookie-decline{padding:10px 16px;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-size:0.78rem;cursor:pointer;font-family:'DM Sans',sans-serif}
 
+
+/* Sidebar user row with logout icon */
+.sb-user-row{display:flex;align-items:center;gap:9px;width:100%}
+.sb-av{width:28px;height:28px;border-radius:50%;background:var(--em);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:.9rem;color:#fff;font-weight:600}
+.sidebar-user{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}

@@ -1848,6 +1848,33 @@ function toggleDay(btn){
 // ════════════════════════════════════════════
 function isMobile(){return window.innerWidth<=860}
 
+
+// ── Floating page help button ──────────────────────────────────────────────
+var PAGE_HELP_MAP = {
+  'dashboard':'dashboard','finances':'finances','capital':'capital',
+  'calendar':'calendar','clients':'clients','booking':'booking',
+  'hour':'hour','owner':'owner','pulse':'pulse','blog':'blog','settings':'settings'
+};
+
+function updatePageHelpFab(page){
+  var fab = document.getElementById('pageHelpFab');
+  if(!fab) return;
+  var key = PAGE_HELP_MAP[page];
+  if(key && HELP_CONTENT && HELP_CONTENT[key]){
+    fab.style.display = 'flex';
+    fab.dataset.helpKey = key;
+  } else {
+    fab.style.display = 'none';
+  }
+}
+
+function openPageHelp(){
+  var fab = document.getElementById('pageHelpFab');
+  if(!fab) return;
+  var key = fab.dataset.helpKey;
+  if(key && typeof openHelp === 'function') openHelp(key);
+}
+
 function navigateTo(pg){
   // Hide all pages
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -2494,6 +2521,7 @@ document.querySelectorAll('.nav-item[data-page]').forEach(btn=>{
     if(pg==='blog') renderBlogPage();
     if(pg==='booking') renderBookingPage();
     if(pg==='clients') renderClientBase();
+    updatePageHelpFab(pg);
     if(pg==='clients') renderClientBase();
   };
 });
@@ -3293,9 +3321,31 @@ var DL_STEPS = {
 
 function openDlPopup(){
   var popup = document.getElementById('dlPopup');
-  if(!popup){ console.error('dlPopup not found'); return; }
-  popup.classList.add('open');
-  document.body.style.overflow='hidden';
+  if(!popup){ return; }
+  popup.style.opacity = '0';
+  popup.style.visibility = 'visible';
+  var box = popup.querySelector('.dl-popup-box');
+  if(box) box.style.transform = 'translateY(60px)';
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(function(){
+    popup.style.opacity = '1';
+    if(box) box.style.transform = 'translateY(0)';
+  });
+  // Auto-detect iOS vs Android
+  var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  dlTab(isIos ? 'ios' : 'android');
+}
+
+function dlTab(tab){
+  var ios     = document.getElementById('dlIos');
+  var android = document.getElementById('dlAndroid');
+  var tIos    = document.getElementById('dlTabIos');
+  var tAnd    = document.getElementById('dlTabAndroid');
+  if(!ios || !android) return;
+  ios.style.display     = tab === 'ios' ? 'block' : 'none';
+  android.style.display = tab === 'android' ? 'block' : 'none';
+  if(tIos){ tIos.style.color = tab==='ios' ? 'var(--ink)' : 'var(--muted)'; tIos.style.borderBottomColor = tab==='ios' ? 'var(--em)' : 'transparent'; }
+  if(tAnd){ tAnd.style.color = tab==='android' ? 'var(--ink)' : 'var(--muted)'; tAnd.style.borderBottomColor = tab==='android' ? 'var(--em)' : 'transparent'; }
 }
 function closeDlPopup(e){
   if(e && e.target !== document.getElementById('dlPopup')) return;
