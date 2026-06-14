@@ -2000,6 +2000,3 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
   .demo-msg{font-size:0.72rem}
   .demo-banner-inner{padding:8px 14px}
 }
-
-/* dl-popup open state */
-.dl-popup-overlay.open{opacity:1 !important;visibility:visible !important}
