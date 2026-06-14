@@ -236,7 +236,7 @@
       <span class="nav-icon">⊕</span><span>Настройки</span>
     </button>
     <div class="sidebar-bottom">
-<button class="logout-btn" id="logoutBtn" title="Выйти из аккаунта" style="width:28px;height:28px;border-radius:50%;margin-left:auto;flex-shrink:0;background:none;border:1px solid rgba(255,255,255,0.12);cursor:pointer;color:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;transition:all 0.2s" onmouseover="this.style.background='rgba(192,57,43,0.2)';this.style.color='var(--red)'" onmouseout="this.style.background='none';this.style.color='rgba(255,255,255,0.4)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+<button class="logout-btn" id="logoutBtn">Выйти →</button>
     </div>
   </aside>
 
@@ -3142,7 +3142,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
       <span class="nav-icon">⊕</span><span>Настройки</span>
     </button>
     <div class="sidebar-bottom">
-<button class="logout-btn" id="logoutBtn" title="Выйти из аккаунта" style="width:28px;height:28px;border-radius:50%;margin-left:auto;flex-shrink:0;background:none;border:1px solid rgba(255,255,255,0.12);cursor:pointer;color:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;transition:all 0.2s" onmouseover="this.style.background='rgba(192,57,43,0.2)';this.style.color='var(--red)'" onmouseout="this.style.background='none';this.style.color='rgba(255,255,255,0.4)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+<button class="logout-btn" id="logoutBtn">Выйти →</button>
     </div>
   </aside>
 
@@ -4311,19 +4311,5 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
 <!-- Application JS -->
 <script src="app.js"></script>
-
-<!-- Floating page help button -->
-<button id="pageHelpFab" onclick="openPageHelp()"
-  title="Что это за раздел?"
-  style="
-    position:fixed;bottom:80px;left:16px;z-index:4000;
-    width:40px;height:40px;border-radius:50%;
-    background:var(--cream2);border:1.5px solid var(--border);
-    cursor:pointer;color:var(--muted);font-size:1rem;font-weight:700;
-    display:none;align-items:center;justify-content:center;
-    box-shadow:0 2px 12px rgba(0,0,0,0.10);
-    transition:all 0.2s;font-family:'Cormorant Garamond',serif;
-  ">?</button>
-
 </body>
 </html>
