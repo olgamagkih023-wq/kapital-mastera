@@ -220,98 +220,6 @@ function launchApp(user){
   });
 }
 
-
-// ════════════════════════════════════════════
-// AUTH FUNCTIONS — clean unified
-// ════════════════════════════════════════════
-
-function showAuthTab(tab){
-  var isLogin = tab === 'login';
-  var fl = document.getElementById('formLogin');
-  var fr = document.getElementById('formReg');
-  var tl = document.getElementById('tabLogin');
-  var tr = document.getElementById('tabReg');
-  if(fl) fl.style.display = isLogin ? 'block' : 'none';
-  if(fr) fr.style.display = isLogin ? 'none'  : 'block';
-  if(tl) tl.className = 'auth-tab-btn' + (isLogin ? ' active' : '');
-  if(tr) tr.className = 'auth-tab-btn' + (!isLogin ? ' active' : '');
-  ['loginErr','regErr'].forEach(function(id){
-    var e = document.getElementById(id);
-    if(e){ e.style.display='none'; e.textContent=''; }
-  });
-}
-
-// Keep old names as aliases
-function authShowPanel(w){ showAuthTab(w === 'reg' ? 'reg' : 'login'); }
-
-function doAuthLogin(){
-  var phone = (document.getElementById('lPhone')||{}).value;
-  var pass  = (document.getElementById('lPass')||{}).value;
-  var errEl = document.getElementById('loginErr');
-  var btn   = document.getElementById('btnLogin');
-  phone = phone ? phone.trim() : '';
-  pass  = pass  ? pass : '';
-  if(errEl){ errEl.style.display='none'; errEl.textContent=''; }
-  if(!phone){ showAuthErr('loginErr','Введите номер телефона'); return; }
-  if(!pass){  showAuthErr('loginErr','Введите пароль'); return; }
-  try{
-    var users = JSON.parse(localStorage.getItem('km_users')||'[]');
-    var user = users.find(function(u){ return u.phone === phone; });
-    if(!user){ showAuthErr('loginErr','Номер не зарегистрирован'); return; }
-    if(user.ph !== simpleHash(pass)){ showAuthErr('loginErr','Неверный пароль'); return; }
-    if(btn){ btn.textContent='Входим...'; btn.disabled=true; }
-    setTimeout(function(){ launchApp({id:user.id, name:user.name, prof:user.prof||''}); }, 50);
-  } catch(e){
-    showAuthErr('loginErr','Ошибка: '+e.message);
-  }
-}
-
-function doAuthRegister(){
-  var name  = (document.getElementById('rName')||{}).value;
-  var prof  = (document.getElementById('rProf')||{}).value;
-  var phone = (document.getElementById('rPhone')||{}).value;
-  var pass  = (document.getElementById('rPass')||{}).value;
-  var btn   = document.getElementById('btnReg');
-  name  = name  ? name.trim()  : '';
-  phone = phone ? phone.trim() : '';
-  pass  = pass  ? pass : '';
-  if(!name){  showAuthErr('regErr','Введите имя'); return; }
-  if(!phone){ showAuthErr('regErr','Введите телефон'); return; }
-  if(pass.length < 4){ showAuthErr('regErr','Пароль минимум 4 символа'); return; }
-  try{
-    var users = JSON.parse(localStorage.getItem('km_users')||'[]');
-    if(users.find(function(u){ return u.phone===phone; })){
-      showAuthErr('regErr','Телефон уже зарегистрирован'); return;
-    }
-    var id = 'u_'+Date.now();
-    users.push({id:id, name:name, prof:prof, phone:phone, ph:simpleHash(pass), created:Date.now()});
-    localStorage.setItem('km_users', JSON.stringify(users));
-    if(btn){ btn.textContent='Создаём...'; btn.disabled=true; }
-    setTimeout(function(){ launchApp({id:id, name:name, prof:prof||'Специалист'}); }, 50);
-  } catch(e){
-    showAuthErr('regErr','Ошибка: '+e.message);
-  }
-}
-
-function showAuthErr(errId, msg){
-  var el = document.getElementById(errId);
-  if(el){ el.textContent=msg; el.style.display='block'; }
-  var b1=document.getElementById('btnLogin');
-  var b2=document.getElementById('btnReg');
-  if(b1){ b1.textContent='Войти'; b1.disabled=false; }
-  if(b2){ b2.textContent='Создать аккаунт'; b2.disabled=false; }
-}
-
-// Enter key support
-document.addEventListener('keydown', function(e){
-  if(e.key !== 'Enter') return;
-  var auth = document.getElementById('authScreen');
-  if(!auth || auth.style.display === 'none') return;
-  var fr = document.getElementById('formReg');
-  if(fr && fr.style.display !== 'none') doAuthRegister();
-  else doAuthLogin();
-});
-
 function checkSession(){
   var s = load('km_session', null);
   if(s && s.id){
@@ -327,11 +235,77 @@ function checkSession(){
 }
 
 // ===== AUTH FUNCTIONS (global, called from HTML onclick) =====
+function authShowPanel(w) {
+  var isLogin = (w === 'login');
+  document.getElementById('aLogin').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('aReg').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('atLogin').className = 'atab' + (isLogin ? ' active' : '');
+  document.getElementById('atReg').className = 'atab' + (!isLogin ? ' active' : '');
+}
 
+function authDoLogin() {
+  var phoneEl = document.getElementById('lPhone');
+  var passEl  = document.getElementById('lPass');
+  var errEl   = document.getElementById('loginErr');
+  var btnEl   = document.querySelector('#aLogin .auth-btn');
+  var phone = phoneEl ? phoneEl.value.trim() : '';
+  var pass  = passEl  ? passEl.value : '';
+  errEl.style.display = 'none';
+  errEl.textContent = '';
+  if(!phone){ errEl.textContent = 'Введите телефон'; errEl.style.display='block'; return; }
+  if(!pass){  errEl.textContent = 'Введите пароль';  errEl.style.display='block'; return; }
+  try {
+    var users = JSON.parse(localStorage.getItem('km_users')||'[]');
+    var user = users.find(function(u){ return u.phone === phone; });
+    if(!user){ errEl.textContent = 'Номер не зарегистрирован'; errEl.style.display='block'; return; }
+    // Support both hash versions
+    var ph = simpleHash(pass);
+    if(user.ph !== ph){
+      errEl.textContent = 'Неверный пароль';
+      errEl.style.display = 'block';
+      return;
+    }
+    if(btnEl){ btnEl.textContent = 'Входим...'; btnEl.disabled = true; }
+    launchApp({id: user.id, name: user.name, prof: user.prof || ''});
+  } catch(e) {
+    errEl.textContent = 'Ошибка входа: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
 
-
-
-
+function authDoRegister() {
+  var nameEl = document.getElementById('rName');
+  var profEl = document.getElementById('rProf');
+  var phoneEl = document.getElementById('rPhone');
+  var passEl = document.getElementById('rPass');
+  var errEl = document.getElementById('regErr');
+  var name = nameEl ? nameEl.value.trim() : '';
+  var prof = profEl ? profEl.value : '';
+  var phone = phoneEl ? phoneEl.value.trim() : '';
+  var pass = passEl ? passEl.value : '';
+  errEl.style.display = 'none';
+  errEl.textContent = '';
+  if (!name) { errEl.textContent = 'Введите имя'; errEl.style.display = 'block'; return; }
+  if (!phone) { errEl.textContent = 'Введите телефон'; errEl.style.display = 'block'; return; }
+  if (pass.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; errEl.style.display = 'block'; return; }
+  if (!phone.match(/[\d]{7,}/)) { errEl.textContent = 'Введите корректный телефон'; errEl.style.display = 'block'; return; }
+  try {
+    var usersRaw = localStorage.getItem('km_users');
+    var users = usersRaw ? JSON.parse(usersRaw) : [];
+    for (var i = 0; i < users.length; i++) {
+      if (users[i].phone === phone) { errEl.textContent = 'Телефон уже зарегистрирован'; errEl.style.display = 'block'; return; }
+    }
+    var id = 'u_' + Date.now();
+    users.push({id: id, name: name, prof: prof, phone: phone, ph: simpleHash(pass), created: Date.now()});
+    localStorage.setItem('km_users', JSON.stringify(users));
+    var btn2 = document.querySelector('#aReg .auth-btn');
+    if(btn2){ btn2.textContent = 'Создаём аккаунт...'; btn2.disabled = true; }
+    launchApp({id: id, name: name, prof: prof || 'Специалист'});
+  } catch(e) {
+    errEl.textContent = 'Ошибка регистрации: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
 
 var doLogin = authDoLogin;
 var doRegister = authDoRegister;
@@ -1049,89 +1023,27 @@ document.getElementById('resetData').onclick=function(){
 
 // ===== SEED DEMO DATA =====
 function seedDemo(){
-  var t = today();
-  var yr = t.slice(0,4);
-  var mo = t.slice(5,7);
-  // Helper: date N days from today
-  function d(offset){
-    var dt = new Date(); dt.setDate(dt.getDate()+offset);
-    return dt.toISOString().split('T')[0];
+  if(getTx().length>0)return;
+  const now=new Date();
+  const txs=[];
+  const categories=['Клиент','Материалы','Аренда','Обучение','Маркетинг','Продукты','Транспорт'];
+  for(let i=0;i<30;i++){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const isIncome=Math.random()>0.45;
+    txs.push({id:uid(),date:d.toISOString(),amount:isIncome?Math.round(3000+Math.random()*12000):Math.round(500+Math.random()*5000),desc:isIncome?['Стрижка Анна','Маникюр Елена','Окрашивание Мария','Стилинг Ольга','Укладка Наташа'][Math.floor(Math.random()*5)]:['Шампунь','Краска L\'Oreal','Аренда места','Курс обучения','Реклама Instagram'][Math.floor(Math.random()*5)],cat:isIncome?'Клиент':categories[Math.floor(Math.random()*categories.length)],type:isIncome?'income':'expense',segment:Math.random()>0.3?'business':'personal'});
   }
-  // Current month YYYY-MM
-  var ym = yr+'-'+mo;
-  // Previous months
-  var now = new Date();
-  function prevMonth(n){
-    var dt = new Date(now.getFullYear(), now.getMonth()-n, 1);
-    return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
-  }
-
-  // ── TRANSACTIONS ─────────────────────────────────────────────
-  var txs = [
-    // This month — income
-    {id:'d1',date:ym+'-05',desc:'Маникюр — Анна К.',cat:'Клиент',type:'income',segment:'business',amount:3500},
-    {id:'d2',date:ym+'-06',desc:'Педикюр + гель — Мария С.',cat:'Клиент',type:'income',segment:'business',amount:4200},
-    {id:'d3',date:ym+'-08',desc:'Маникюр + дизайн — Ольга В.',cat:'Клиент',type:'income',segment:'business',amount:4800},
-    {id:'d4',date:ym+'-10',desc:'Наращивание — Юлия П.',cat:'Клиент',type:'income',segment:'business',amount:6500},
-    {id:'d5',date:ym+'-12',desc:'Коррекция бровей',cat:'Клиент',type:'income',segment:'business',amount:2200},
-    {id:'d6',date:ym+'-14',desc:'Маникюр — Светлана Р.',cat:'Клиент',type:'income',segment:'business',amount:3500},
-    {id:'d7',date:ym+'-15',desc:'Консультация онлайн',cat:'Клиент',type:'income',segment:'business',amount:1500},
-    // This month — expenses
-    {id:'d8',date:ym+'-02',desc:'Гель-лак OPI набор',cat:'Материалы',type:'expense',segment:'business',amount:4200},
-    {id:'d9',date:ym+'-01',desc:'Аренда кабинета',cat:'Аренда',type:'expense',segment:'business',amount:8000},
-    {id:'d10',date:ym+'-03',desc:'Продукты на неделю',cat:'Продукты',type:'expense',segment:'personal',amount:3200},
-    {id:'d11',date:ym+'-07',desc:'Маркетинг Instagram',cat:'Маркетинг',type:'expense',segment:'business',amount:2000},
-    {id:'d12',date:ym+'-09',desc:'Кофе и транспорт',cat:'Транспорт',type:'expense',segment:'personal',amount:1800},
-    // Previous months
-    {id:'d13',date:prevMonth(1)+'-20',desc:'Маникюр — клиенты (14 шт)',cat:'Клиент',type:'income',segment:'business',amount:52000},
-    {id:'d14',date:prevMonth(1)+'-25',desc:'Материалы и расходники',cat:'Материалы',type:'expense',segment:'business',amount:5600},
-    {id:'d15',date:prevMonth(1)+'-01',desc:'Аренда кабинета',cat:'Аренда',type:'expense',segment:'business',amount:8000},
-    {id:'d16',date:prevMonth(2)+'-20',desc:'Маникюр — клиенты',cat:'Клиент',type:'income',segment:'business',amount:47500},
-    {id:'d17',date:prevMonth(2)+'-05',desc:'Обучение — курс по нейл-арту',cat:'Обучение',type:'expense',segment:'business',amount:9000},
-    {id:'d18',date:prevMonth(3)+'-18',desc:'Маникюр — клиенты',cat:'Клиент',type:'income',segment:'business',amount:44000},
-    {id:'d19',date:prevMonth(3)+'-01',desc:'Аренда',cat:'Аренда',type:'expense',segment:'business',amount:8000},
-    {id:'d20',date:prevMonth(4)+'-22',desc:'Доход за месяц',cat:'Клиент',type:'income',segment:'business',amount:41000},
-    {id:'d21',date:prevMonth(5)+'-20',desc:'Доход за месяц',cat:'Клиент',type:'income',segment:'business',amount:38000},
-  ];
   saveTx(txs);
 
-  // ── APPOINTMENTS ─────────────────────────────────────────────
-  var appts = [
-    {id:'a1',client:'Анна Козлова',phone:'+7 916 123-45-67',service:'Маникюр с покрытием',date:d(1),time:'10:00',price:3500,status:'confirmed',source:'manual'},
-    {id:'a2',client:'Мария Смирнова',phone:'+7 903 234-56-78',service:'Педикюр + гель',date:d(1),time:'12:30',price:4200,status:'confirmed',source:'online'},
-    {id:'a3',client:'Юлия Петрова',phone:'+7 925 345-67-89',service:'Наращивание ногтей',date:d(2),time:'11:00',price:6500,status:'pending',source:'online'},
-    {id:'a4',client:'Светлана Романова',phone:'+7 917 456-78-90',service:'Маникюр + дизайн',date:d(3),time:'14:00',price:4800,status:'confirmed',source:'manual'},
-    {id:'a5',client:'Ольга Васильева',phone:'+7 916 567-89-01',service:'Коррекция',date:d(5),time:'10:00',price:2800,status:'confirmed',source:'manual'},
-    {id:'a6',client:'Анна Козлова',phone:'+7 916 123-45-67',service:'Маникюр с покрытием',date:ym+'-10',time:'10:00',price:3500,status:'confirmed',source:'manual',paid:true},
-    {id:'a7',client:'Мария Смирнова',phone:'+7 903 234-56-78',service:'Педикюр',date:ym+'-06',time:'12:00',price:3200,status:'confirmed',source:'online',paid:true},
-    {id:'a8',client:'Юлия Петрова',phone:'+7 925 345-67-89',service:'Наращивание',date:ym+'-12',time:'11:00',price:6500,status:'confirmed',source:'online'},
-  ];
+  // Demo appointments
+  const appts=[];
+  const names=['Анна К.','Мария П.','Елена В.','Наташа С.','Ольга М.','Светлана Д.'];
+  const services=['Стрижка','Маникюр','Укладка','Окрашивание','Педикюр','Брови'];
+  for(let i=0;i<8;i++){
+    const d=new Date(now);d.setDate(d.getDate()+(i-2));
+    const dateStr=`${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+    appts.push({id:uid(),client:names[Math.floor(Math.random()*names.length)],service:services[Math.floor(Math.random()*services.length)],date:dateStr,time:`${10+Math.floor(Math.random()*8)}:00`,price:Math.round(1500+Math.random()*3500),note:'',status:i<3?'confirmed':'pending',created:Date.now()});
+  }
   saveAppts(appts);
-
-  // ── SETTINGS ─────────────────────────────────────────────────
-  var settings = getSettings();
-  settings.income  = 60000;
-  settings.goal    = 300000;
-  settings.monthly = 12000;
-  settings.yield   = 12;
-  saveSettings(settings);
-
-  // ── BOOKING SETTINGS ─────────────────────────────────────────
-  var bs = getBookingSettings();
-  bs.isOpen      = true;
-  bs.masterName  = 'Мастер';
-  bs.masterProf  = 'Nail-мастер';
-  bs.workDays    = [1,2,3,4,5];
-  bs.workStart   = '10:00';
-  bs.workEnd     = '19:00';
-  bs.services    = [
-    {id:'s1',name:'Маникюр с покрытием',dur:90, price:3500},
-    {id:'s2',name:'Педикюр',            dur:60, price:3200},
-    {id:'s3',name:'Наращивание ногтей', dur:150,price:6500},
-    {id:'s4',name:'Коррекция',          dur:60, price:2800},
-    {id:'s5',name:'Дизайн ногтей',      dur:30, price:1200},
-  ];
-  saveBookingSettingsData(bs);
 }
 
 // Set today's date as default for appointments
@@ -2617,8 +2529,8 @@ document.querySelectorAll('.nav-item[data-page]').forEach(btn=>{
 // ===== INIT =====
 function refreshAll(){
   // Reset auth buttons
-  var b1 = document.querySelector('#aLogin .auth-btn-primary');
-  var b2 = document.querySelector('#aReg .auth-btn-primary');
+  var b1 = document.querySelector('#aLogin .auth-btn');
+  var b2 = document.querySelector('#aReg .auth-btn');
   if(b1){ b1.textContent = 'Войти'; b1.disabled = false; }
   if(b2){ b2.textContent = 'Создать аккаунт'; b2.disabled = false; }
   window.dispatchEvent(new Event("km_ready"));
