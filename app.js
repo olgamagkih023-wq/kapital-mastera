@@ -152,7 +152,7 @@ function store(k, v){
 
 // ===== AUTH =====
 const authScreen=document.getElementById('authScreen');
-var appEl=document.getElementById('app');
+const appEl=document.getElementById('app');
 
 function getUsers(){return load('km_users',[])}
 function saveUsers(u){store('km_users',u)}
@@ -2716,34 +2716,28 @@ var IS_DEMO = false;
 
 function enterDemoMode(){
   IS_DEMO = true;
-  FB_UID = '';
-
-  var demoUser = {id:'demo_user', name:'Мастер', prof:'Демо-режим'};
-  store('km_session', demoUser);
+  FB_UID = '';  // no Firebase sync in demo
+  var demoUser = {id:'demo_user', name:'Мастер', prof:'Демо'};
   saveTx([]);
   saveAppts([]);
+  store('km_session', demoUser);
   seedDemo();
-
-  // Hide auth, show app — safely get elements
-  var auth = document.getElementById('authScreen');
-  var app  = document.getElementById('app');
-  if(auth) auth.style.display = 'none';
-  if(app){ app.style.display = 'flex'; app.classList.add('visible'); }
-
-  // Sidebar
+  // Hide auth screen
+  authScreen.style.display = 'none';
+  // Show app
+  appEl.style.display = 'flex';
+  appEl.classList.add('visible');
+  // Update sidebar
   var sn = document.getElementById('sidebarName');
   var sp = document.getElementById('sidebarProf');
-  var av = document.getElementById('sidebarAv');
-  if(sn) sn.textContent = 'Демо-режим';
-  if(sp) sp.textContent = 'Данные не сохраняются';
-  if(av) av.textContent = 'D';
-
-  // Demo banner
+  if(sn) sn.textContent = 'Мастер';
+  if(sp) sp.textContent = 'Демо-режим';
+  // Show demo banner
   var banner = document.getElementById('demoBanner');
   if(banner) banner.style.display = 'flex';
-
+  // Navigate to dashboard and render
   navigateTo('dashboard');
-  setTimeout(refreshAll, 100);
+  refreshAll();
 }
 
 function exitDemoToReg(){
