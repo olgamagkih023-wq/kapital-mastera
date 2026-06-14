@@ -1831,7 +1831,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   
 </head>
@@ -2905,7 +2904,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
     <button class="more-item" data-page="blog"><span style="font-size:1.2rem">✐</span> Блог</button>
     <button class="more-item" data-page="settings"><span style="font-size:1.2rem">⊕</span> Настройки</button>
     <div style="margin:16px 20px 0;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:12px">
-<button onclick="if(!IS_DEMO&&typeof auth!=='undefined')auth.signOut();localStorage.removeItem('km_session');IS_DEMO=false;FB_UID='';appEl.classList.remove('visible');appEl.style.display='none';var bn=document.getElementById('demoBanner');if(bn)bn.style.display='none';authScreen.style.display='block';authShowPanel('login');authScreen.scrollTop=0;closeMoreDrawer();" style="font-size:0.82rem;color:var(--red);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;text-align:left">Выйти из аккаунта</button>
+<button onclick="localStorage.removeItem('km_session');IS_DEMO=false;appEl.classList.remove('visible');appEl.style.display='none';var db=document.getElementById('demoBanner');if(db)db.style.display='none';authScreen.style.display='block';authShowPanel('login');authScreen.scrollTop=0;closeMoreDrawer();" style="font-size:0.82rem;color:var(--red);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;text-align:left">Выйти из аккаунта</button>
     </div>
   </div>
 </div>
@@ -3489,28 +3488,20 @@ function authShowPanel(w){showAuthTab(w==='reg'?'reg':'login');}
 
 function authShowPanel(w){showAuthTab(w==='reg'?'reg':'login');}
 
-// телефон -> технический email для Firebase Auth: 79991234567@kapital.local
-function phoneToEmail(phone){
-  return (phone||'').replace(/\D/g,'') + '@kapital.local';
-}
-
 function doAuthLogin(){
   var phone=((document.getElementById('lPhone')||{}).value||'').trim();
   var pass=(document.getElementById('lPass')||{}).value||'';
   var btn=document.getElementById('btnLogin');
   if(!phone){showAuthErr('loginErr','Введите телефон');return;}
   if(!pass){showAuthErr('loginErr','Введите пароль');return;}
-  if(btn){btn.textContent='Входим...';btn.disabled=true;}
-  auth.signInWithEmailAndPassword(phoneToEmail(phone), pass)
-    .catch(function(e){
-      var msg = 'Ошибка входа';
-      if(e.code==='auth/user-not-found') msg='Номер не зарегистрирован';
-      else if(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential') msg='Неверный телефон или пароль';
-      else if(e.code==='auth/too-many-requests') msg='Слишком много попыток, подождите';
-      else if(e.code==='auth/invalid-email') msg='Неверный формат телефона';
-      showAuthErr('loginErr', msg);
-    });
-  // при успехе вход подхватит onAuthStateChanged -> launchApp
+  try{
+    var users=JSON.parse(localStorage.getItem('km_users')||'[]');
+    var user=users.find(function(u){return u.phone===phone;});
+    if(!user){showAuthErr('loginErr','Номер не зарегистрирован');return;}
+    if(user.ph!==simpleHash(pass)){showAuthErr('loginErr','Неверный пароль');return;}
+    if(btn){btn.textContent='Входим...';btn.disabled=true;}
+    setTimeout(function(){launchApp({id:user.id,name:user.name,prof:user.prof||''});},50);
+  }catch(e){showAuthErr('loginErr','Ошибка: '+e.message);}
 }
 
 function doAuthRegister(){
@@ -3521,22 +3512,16 @@ function doAuthRegister(){
   var btn=document.getElementById('btnReg');
   if(!name){showAuthErr('regErr','Введите имя');return;}
   if(!phone){showAuthErr('regErr','Введите телефон');return;}
-  if(pass.length<6){showAuthErr('regErr','Пароль минимум 6 символов');return;}
-  if(btn){btn.textContent='Создаём...';btn.disabled=true;}
-  auth.createUserWithEmailAndPassword(phoneToEmail(phone), pass)
-    .then(function(cred){
-      return db.ref('users/'+cred.user.uid+'/profile').set({
-        name:name, prof:prof||'Специалист', phone:phone, created:Date.now()
-      });
-    })
-    .catch(function(e){
-      var msg='Ошибка регистрации';
-      if(e.code==='auth/email-already-in-use') msg='Этот телефон уже зарегистрирован';
-      else if(e.code==='auth/weak-password') msg='Слишком простой пароль';
-      else if(e.code==='auth/invalid-email') msg='Неверный формат телефона';
-      showAuthErr('regErr', msg);
-    });
-  // при успехе вход подхватит onAuthStateChanged -> launchApp
+  if(pass.length<4){showAuthErr('regErr','Пароль минимум 4 символа');return;}
+  try{
+    var users=JSON.parse(localStorage.getItem('km_users')||'[]');
+    if(users.find(function(u){return u.phone===phone;})){showAuthErr('regErr','Телефон занят');return;}
+    var id='u_'+Date.now();
+    users.push({id:id,name:name,prof:prof,phone:phone,ph:simpleHash(pass),created:Date.now()});
+    localStorage.setItem('km_users',JSON.stringify(users));
+    if(btn){btn.textContent='Создаём...';btn.disabled=true;}
+    setTimeout(function(){launchApp({id:id,name:name,prof:prof||'Специалист'});},50);
+  }catch(e){showAuthErr('regErr','Ошибка: '+e.message);}
 }
 
 function showAuthErr(errId,msg){
@@ -3571,26 +3556,17 @@ function launchApp(user){
 }
 
 function checkSession(){
-  // Firebase сам помнит сессию между запусками.
-  // Реагируем на вход/выход в одной точке.
-  auth.onAuthStateChanged(function(user){
-    if(IS_DEMO) return; // в демо Firebase Auth не используется
-    if(user){
-      FB_UID = user.uid;
-      db.ref('users/'+user.uid+'/profile').once('value').then(function(snap){
-        var p = snap.val() || {};
-        launchApp({id:user.uid, name:p.name||'Мастер', prof:p.prof||'Специалист'});
-      }).catch(function(){
-        launchApp({id:user.uid, name:'Мастер', prof:'Специалист'});
-      });
-    }else{
-      FB_UID = '';
-      var authScr=document.getElementById('authScreen');
-      var app=document.getElementById('app');
-      if(authScr) authScr.style.display='block';
-      if(app){ app.style.display='none'; app.classList.remove('visible'); }
+  var s = load('km_session', null);
+  if(s && s.id){
+    var users = getUsers();
+    var validUser = users.find(function(u){ return u.id === s.id; });
+    if(validUser){
+      launchApp({id:validUser.id, name:validUser.name, prof:validUser.prof});
+      return;
     }
-  });
+  }
+  // No session — show auth screen
+  // (no auto-login even if one user exists — user must log in manually)
 }
 
 function enterDemoMode(){
@@ -4460,7 +4436,6 @@ var firebaseConfig = {
     };
     firebase.initializeApp(firebaseConfig);
     var db = firebase.database();
-    var auth = firebase.auth();
 
 // Firebase already initialized above
 
@@ -4634,7 +4609,6 @@ var doRegister = authDoRegister;
 var showPanel = authShowPanel;
 
 document.getElementById('logoutBtn').onclick = function() {
-  if(!IS_DEMO && typeof auth !== 'undefined') auth.signOut();
   localStorage.removeItem('km_session');
   IS_DEMO = false;
   FB_UID = '';
