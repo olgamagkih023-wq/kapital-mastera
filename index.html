@@ -13,6 +13,8 @@
   --gold:#B8975A;--gold2:#D4AF70;
   --red:#C0392B;--blue:#2471A3;--purple:#7D3C98;
   --muted:#6B6860;--border:#DDD4C4;--white:#fff;
+  --en-paper:#FBF8F1;--en-beige:#EFE7D7;--en-em:#1C5A41;--en-em-deep:#123E2D;
+  --en-bordo:#7A2230;--en-bordo-soft:#9A3343;--en-ink:#2A2620;--en-ink-dim:#6E665A;--en-line:#D8CDB8;
   --sidebar:220px;
 }
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);overflow:hidden;cursor:auto}
@@ -20,239 +22,164 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 /* ===== AUTH SCREEN ===== */
 #authScreen{
   position:fixed;inset:0;z-index:9999;
-  background:var(--cream);
+  background:var(--en-paper);
   overflow-y:auto;-webkit-overflow-scrolling:touch;
-  display:block;
+  display:grid;grid-template-columns:1.12fr 0.88fr;
 }
 
-/* ── Mini landing ── */
-.auth-landing{
-  background:var(--ink);
-  padding:60px 24px 48px;
-  text-align:center;
-  position:relative;overflow:hidden;
-}
-.auth-landing::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 30% 60%,rgba(13,110,74,0.2) 0%,transparent 55%),
-             radial-gradient(ellipse at 80% 20%,rgba(19,196,126,0.08) 0%,transparent 50%);
-  pointer-events:none;
+/* ── English-style landing (left column) ── */
+.al-landing{
+  padding:56px 56px 56px 72px;
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--en-line);
+  text-align:left;background:var(--en-paper);position:relative;overflow:visible;
 }
 .al-logo{
+  display:flex;align-items:center;gap:13px;
   font-family:'Cormorant Garamond',serif;
-  font-size:1.4rem;font-weight:600;color:rgba(255,255,255,0.5);
-  letter-spacing:0.04em;margin-bottom:36px;position:relative;
+  font-size:1.55rem;font-weight:500;color:var(--en-em);
+  letter-spacing:0.03em;margin-bottom:0;
 }
-.al-logo span{color:var(--em3)}
+.al-logo::before{
+  content:'\25C8';width:36px;height:36px;flex-shrink:0;
+  border:1.5px solid var(--en-em);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;color:var(--en-em);
+}
+.al-logo span{color:var(--en-em)}
+.al-center{margin-top:auto;margin-bottom:auto;padding:40px 0}
+.al-eyebrow{
+  display:flex;align-items:center;gap:14px;
+  font-size:0.74rem;letter-spacing:0.24em;text-transform:uppercase;
+  color:var(--en-ink-dim);font-weight:500;margin-bottom:30px;
+}
+.al-eyebrow::before{content:'';width:42px;height:1px;background:var(--en-bordo)}
 .al-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(2.4rem,8vw,4rem);font-weight:300;
-  color:#fff;line-height:1;letter-spacing:-0.02em;
-  margin-bottom:16px;position:relative;
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(2.7rem,5vw,4.6rem);line-height:1.02;
+  letter-spacing:-0.01em;color:var(--en-ink);margin-bottom:0;
 }
-.al-title em{font-style:italic;color:var(--em3)}
+.al-title em{font-style:italic;font-weight:400;color:var(--en-em)}
+.al-title .cap{display:inline-block;position:relative;font-weight:500;color:var(--en-ink)}
+.al-title .cap::after{
+  content:'';position:absolute;left:0;right:0;bottom:0.08em;height:2px;
+  background:var(--en-bordo);transform:scaleX(0);transform-origin:left;
+  animation:alDraw 1s 0.5s cubic-bezier(.2,.7,.2,1) forwards;
+}
+@keyframes alDraw{to{transform:scaleX(1)}}
 .al-sub{
-  font-size:1rem;color:rgba(255,255,255,0.45);font-weight:300;
-  line-height:1.7;max-width:480px;margin:0 auto 40px;position:relative;
+  font-size:1.05rem;color:var(--en-ink-dim);font-weight:300;
+  line-height:1.7;max-width:33ch;margin:30px 0 0;
 }
+.al-rule{display:flex;align-items:center;gap:16px;margin-top:auto;padding-top:38px}
+.al-rule .l{flex:1;height:1px;background:var(--en-line)}
+.al-rule .d{width:5px;height:5px;background:var(--en-bordo);transform:rotate(45deg)}
+.al-stats{display:flex;gap:46px;margin:24px 0 0;border:none}
+.al-stat{flex:0 0 auto;max-width:none;padding:0;border:none}
+.al-stat-v{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:var(--en-em);line-height:1}
+.al-stat-l{font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--en-ink-dim);margin-top:3px}
+#authScreen .al-author{
+  display:flex;align-items:center;gap:13px;
+  padding:22px 0 0;margin-top:22px;
+  border-top:1px solid var(--en-line);background:none;
+}
+#authScreen .al-av{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:var(--en-em);display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--en-paper);font-weight:500;
+}
+#authScreen .al-name{font-size:0.9rem;font-weight:500;color:var(--en-ink)}
+#authScreen .al-role{font-size:0.78rem;color:var(--en-ink-dim);margin-top:2px}
 
-/* Stats row */
-.al-stats{
-  display:flex;justify-content:center;gap:0;
-  border-top:1px solid rgba(255,255,255,0.07);
-  border-bottom:1px solid rgba(255,255,255,0.07);
-  margin-bottom:40px;position:relative;
-}
-.al-stat{
-  flex:1;max-width:140px;padding:20px 12px;
-  border-right:1px solid rgba(255,255,255,0.07);
-}
-.al-stat:last-child{border-right:none}
-.al-stat-v{
-  font-family:'Cormorant Garamond',serif;
-  font-size:2rem;font-weight:400;color:#fff;line-height:1;
-}
-.al-stat-l{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:4px}
-
-/* Pain+check grid */
-.al-grid{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:10px;max-width:600px;margin:0 auto 36px;
-  position:relative;
-}
-.al-pain{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.07);
-  padding:16px 14px;text-align:left;
-}
-.al-pain-icon{font-size:1.2rem;display:block;margin-bottom:8px}
-.al-pain-t{font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.75);margin-bottom:4px;line-height:1.3}
-.al-pain-d{font-size:0.75rem;color:rgba(255,255,255,0.3);line-height:1.5;font-weight:300}
-
-.al-sol{
-  background:rgba(13,110,74,0.1);
-  border:1px solid rgba(19,196,126,0.15);
-  padding:16px 14px;text-align:left;
-}
-.al-sol-icon{font-size:1.2rem;display:block;margin-bottom:8px}
-.al-sol-t{font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.75);margin-bottom:4px;line-height:1.3}
-.al-sol-d{font-size:0.75rem;color:rgba(255,255,255,0.35);line-height:1.5;font-weight:300}
-
-/* Features strip */
-.al-features{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
-  max-width:560px;margin:0 auto 36px;position:relative;
-}
-.al-feat{
-  display:flex;align-items:center;gap:6px;
-  font-size:0.78rem;color:rgba(255,255,255,0.5);
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.07);
-  padding:8px 14px;font-weight:400;
-}
-.al-feat-dot{color:var(--em3);font-size:0.7rem}
-
-/* Scroll hint */
-.al-scroll-hint{
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  cursor:pointer;position:relative;
-  color:rgba(255,255,255,0.25);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;
-  transition:color 0.2s;
-}
-.al-scroll-hint:hover{color:rgba(255,255,255,0.5)}
-.al-scroll-line{
-  width:1px;height:36px;
-  background:linear-gradient(to bottom,rgba(255,255,255,0.2),transparent);
-  animation:scrollPulse 2s ease-in-out infinite;
-}
-@keyframes scrollPulse{0%,100%{opacity:0.3}50%{opacity:0.8}}
-
-/* Author strip */
-.al-author{
-  display:flex;align-items:center;justify-content:center;gap:14px;
-  padding:20px 24px;
-  background:rgba(255,255,255,0.03);
-  border-top:1px solid rgba(255,255,255,0.06);
-  margin-bottom:0;
-}
-.al-author-av{
-  width:40px;height:40px;border-radius:50%;flex-shrink:0;
-  background:var(--em);display:flex;align-items:center;justify-content:center;
-  font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#fff;font-weight:600;
-}
-.al-author-text{font-size:0.8rem;color:rgba(255,255,255,0.35);line-height:1.5}
-.al-author-text strong{color:rgba(255,255,255,0.65);display:block;font-size:0.85rem}
-
-/* ── Auth form section ── */
+/* ── Auth form section (right column) ── */
 .auth-form-section{
-  background:var(--cream);
-  padding:48px 24px 80px;
-  display:flex;flex-direction:column;align-items:center;
+  background:var(--en-beige);
+  padding:56px 60px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
 }
-.auth-form-tag{
-  font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;
-  color:var(--gold);font-weight:600;margin-bottom:20px;
-  display:flex;align-items:center;gap:10px;
-}
-.auth-form-tag::before,.auth-form-tag::after{
-  content:'';flex:1;max-width:40px;height:1px;background:var(--gold);opacity:0.4;
-}
-
+.auth-form-tag{display:none}
 .auth-box{
-  background:var(--white);width:100%;max-width:460px;
-  padding:48px 44px;
-  box-shadow:0 8px 40px rgba(0,0,0,0.08);
-  border:1px solid var(--border);
+  background:var(--en-paper);width:100%;max-width:360px;
+  padding:42px 38px;
+  box-shadow:0 14px 40px rgba(42,38,32,0.07);
+  border:1px solid var(--en-line);
   touch-action:auto;
 }
-
-/* promo replaced by al-* landing */
-.promo-badge{
-  display:inline-block;font-size:0.68rem;letter-spacing:0.18em;
-  text-transform:uppercase;color:var(--em3);font-weight:600;
-  border:1px solid rgba(19,196,126,0.3);padding:5px 12px;
-  margin-bottom:24px;
-}
-.promo-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:2.2rem;font-weight:300;color:#fff;
-  line-height:1.1;margin-bottom:20px;
-}
-.promo-title em{font-style:italic;color:var(--em3)}
-.promo-lead{
-  font-size:0.9rem;color:rgba(255,255,255,0.4);
-  font-weight:300;line-height:1.7;margin-bottom:28px;
-  border-left:3px solid var(--em);padding-left:14px;
-}
-.promo-pains{display:flex;flex-direction:column;gap:14px;margin-bottom:28px}
-.promo-pain{
-  display:flex;align-items:flex-start;gap:12px;
-  padding:14px 16px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.07);
-}
-.promo-pain-icon{font-size:1.3rem;flex-shrink:0;line-height:1;margin-top:1px}
-.promo-pain-t{font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.8);margin-bottom:3px}
-.promo-pain-d{font-size:0.78rem;color:rgba(255,255,255,0.35);line-height:1.55;font-weight:300}
-.promo-checks{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
-.promo-check{
-  display:flex;align-items:center;gap:10px;
-  font-size:0.82rem;color:rgba(255,255,255,0.6);font-weight:400;
-}
-.promo-check-icon{color:var(--em3);font-size:0.95rem;flex-shrink:0;font-weight:700}
-.promo-author{
-  display:flex;align-items:center;gap:12px;
-  padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);
-  font-size:0.8rem;color:rgba(255,255,255,0.3);line-height:1.5;
-}
-.promo-author-av{
-  width:36px;height:36px;border-radius:50%;flex-shrink:0;
-  background:var(--em);display:flex;align-items:center;justify-content:center;
-  font-family:'Cormorant Garamond',serif;font-size:1rem;color:#fff;font-weight:600;
-}
-.promo-author strong{color:rgba(255,255,255,0.7);display:block;font-size:0.85rem}
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 .auth-logo{
   font-family:'Cormorant Garamond',serif;
-  font-size:2rem;font-weight:600;color:var(--ink);
-  margin-bottom:6px;
+  font-size:1.7rem;font-weight:400;color:var(--en-ink);
+  margin-bottom:4px;
 }
-.auth-logo span{color:var(--em)}
-.auth-sub{font-size:0.9rem;color:var(--muted);margin-bottom:36px;font-weight:300}
-.auth-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px}
-.atab{
-  font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;
-  font-weight:700;color:#8A8278;background:none;border:none;
-  padding:0 0 14px;margin-right:28px;cursor:pointer;
-  border-bottom:3px solid transparent;transition:all 0.2s;
+.auth-logo span{color:var(--en-em)}
+.auth-sub{font-size:0.82rem;color:var(--en-ink-dim);margin-bottom:30px;font-weight:400}
+.auth-tabs-row{display:flex;gap:28px;border-bottom:1px solid var(--en-line);margin-bottom:28px}
+#authScreen .atab{
+  font-size:0.9rem;letter-spacing:0.02em;text-transform:none;
+  font-weight:400;color:var(--en-ink-dim);background:none;border:none;
+  padding:0 0 13px;margin-right:0;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all 0.2s;position:relative;
 }
-.atab.active{color:var(--ink);border-bottom-color:var(--em);font-weight:700}
-.auth-field{margin-bottom:14px}
-.auth-field input{
-  width:100%;padding:18px 18px;
-  border:2px solid var(--border);background:var(--white);
-  font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);
-  outline:none;transition:border-color 0.2s;font-weight:500;
-  -webkit-appearance:none;border-radius:0;touch-action:auto;
+#authScreen .atab.active{color:var(--en-em);border-bottom-color:var(--en-em);font-weight:500}
+.auth-field{
+  width:100%;margin-bottom:16px;padding:13px 14px;
+  border:1px solid var(--en-line);background:var(--en-paper);
+  font-family:'Inter','DM Sans',sans-serif;font-size:0.95rem;color:var(--en-ink);
+  outline:none;transition:border-color 0.2s;font-weight:400;
+  -webkit-appearance:none;border-radius:2px;touch-action:auto;
   -webkit-tap-highlight-color:transparent;
 }
-.auth-field input:focus{border-color:var(--em);border-width:2px}
-.auth-field input::placeholder{color:#B0A898}
+.auth-field:focus{border-color:var(--en-em)}
+.auth-field::placeholder{color:#B6AC98}
+select.auth-field{cursor:pointer}
 .auth-btn{
-  width:100%;padding:20px;background:var(--em);color:#fff;
-  border:none;font-family:'DM Sans',sans-serif;
-  font-size:1rem;letter-spacing:0.08em;text-transform:uppercase;
-  font-weight:700;cursor:pointer;transition:background 0.2s;margin-top:12px;
-  box-shadow:0 4px 16px rgba(13,110,74,0.4);
-  -webkit-appearance:none;border-radius:0;
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:rgba(0,0,0,0.1);
-  min-height:56px;
+  width:100%;padding:15px;background:var(--en-em);color:var(--en-paper);
+  border:none;font-family:'Inter','DM Sans',sans-serif;
+  font-size:0.95rem;letter-spacing:0.02em;text-transform:none;
+  font-weight:500;cursor:pointer;transition:background 0.3s;margin-top:8px;
+  -webkit-appearance:none;border-radius:2px;
+  touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,0.1);
+  min-height:50px;
 }
-.auth-btn:hover{background:var(--ink)}
-.auth-err{font-size:0.82rem;color:var(--red);margin-bottom:10px;display:none;padding:10px 14px;background:rgba(192,57,43,0.08)}
-.auth-switch{font-size:0.85rem;color:var(--muted);text-align:center;margin-top:20px}
-.auth-switch a{color:var(--em);cursor:pointer}
+.auth-btn:hover{background:var(--en-em-deep)}
+.auth-err{font-size:0.82rem;color:var(--en-bordo);margin-bottom:10px;display:none;padding:10px 14px;background:rgba(122,34,48,0.07);border-radius:2px}
+.auth-switch{font-size:0.85rem;color:var(--en-ink-dim);text-align:center;margin-top:22px}
+.auth-switch a{color:var(--en-bordo);cursor:pointer;font-weight:500;text-decoration:none}
+.auth-extra-btn{
+  width:100%;background:none;border:none;color:var(--en-ink-dim);
+  font-family:'Inter','DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;
+  margin-top:24px;padding-top:22px;border-top:1px solid var(--en-line);transition:color 0.2s;
+}
+.auth-extra-btn:hover{color:var(--en-em)}
+.auth-demo-btn{
+  width:100%;background:none;border:none;color:var(--en-ink-dim);
+  font-family:'Inter','DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;
+  margin-top:12px;transition:color 0.2s;
+}
+.auth-demo-btn:hover{color:var(--en-em)}
+
+/* Legal footer — spans both columns */
+.legal-footer-bar{
+  grid-column:1 / -1;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 72px;border-top:1px solid var(--en-line);
+  background:var(--en-paper);flex-wrap:wrap;gap:12px;
+}
+.legal-footer-links{display:flex;gap:22px;flex-wrap:wrap}
+.legal-footer-links button{
+  background:none;border:none;color:var(--en-ink-dim);
+  font-family:'Inter','DM Sans',sans-serif;font-size:0.8rem;cursor:pointer;transition:color 0.2s;
+}
+.legal-footer-links button:hover{color:var(--en-em)}
+.legal-footer-copy{font-size:0.78rem;color:var(--en-ink-dim)}
+
+@media(max-width:900px){
+  #authScreen{grid-template-columns:1fr;display:block}
+  .al-landing{padding:40px 26px 32px;border-right:none;border-bottom:1px solid var(--en-line)}
+  .al-sub{max-width:none}
+  .al-stats{gap:30px;flex-wrap:wrap}
+  .auth-form-section{padding:44px 26px}
+  .legal-footer-bar{padding:20px 26px;justify-content:center;text-align:center}
+}
 
 /* ===== APP LAYOUT ===== */
 #app{display:none;height:100vh;flex-direction:row}
@@ -1831,23 +1758,28 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   
 </head>
 <body>
 
 <!-- ===== AUTH ===== -->
-<div <div id="authScreen">
+<div id="authScreen">
 
-  <!-- Landing -->
+  <!-- English-style landing (left) -->
   <div class="al-landing">
     <div class="al-logo">Капитал <span>Мастера</span></div>
-    <h1 class="al-title">Твоё искусство —<br><em>твой капитал</em></h1>
-    <p class="al-sub">Финансовая экосистема для бьюти-мастеров, фотографов, дизайнеров и всех, кто превращает талант в профессию.</p>
+    <div class="al-center">
+      <div class="al-eyebrow">Финансы для мастеров красоты</div>
+      <h1 class="al-title">Твоё <em>искусство</em><br>становится <span class="cap">капиталом</span></h1>
+      <p class="al-sub">Учёт дохода, накопления и онлайн-запись клиентов — в одном спокойном пространстве, созданном для тех, кто живёт своим ремеслом.</p>
+    </div>
+    <div class="al-rule"><span class="l"></span><span class="d"></span><span class="l"></span></div>
     <div class="al-stats">
       <div class="al-stat"><div class="al-stat-v">56+</div><div class="al-stat-l">Профессий</div></div>
-      <div class="al-stat"><div class="al-stat-v">0 ₽</div><div class="al-stat-l">Старт</div></div>
-      <div class="al-stat"><div class="al-stat-v">AES</div><div class="al-stat-l">Шифрование</div></div>
+      <div class="al-stat"><div class="al-stat-v">0 ₽</div><div class="al-stat-l">За старт</div></div>
+      <div class="al-stat"><div class="al-stat-v">20 лет</div><div class="al-stat-l">в индустрии</div></div>
     </div>
     <div class="al-author">
       <div class="al-av">О</div>
@@ -1855,9 +1787,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
     </div>
   </div>
 
-  <!-- Auth card -->
+  <!-- Auth card (right) -->
   <div class="auth-form-section">
-    <div class="auth-form-tag">Начать бесплатно</div>
     <div class="auth-box">
       <div class="auth-logo">Капитал <span>Мастера</span></div>
       <div class="auth-sub">Финансовая экосистема для творческих</div>
@@ -1891,7 +1822,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
           <option>Художник</option><option>Флорист</option><option>Другое</option>
         </select>
         <input class="auth-field" type="tel"      id="rPhone" placeholder="Телефон" autocomplete="tel">
-        <input class="auth-field" type="password" id="rPass"  placeholder="Пароль (мин. 4 символа)" autocomplete="new-password">
+        <input class="auth-field" type="password" id="rPass"  placeholder="Пароль (мин. 6 символов)" autocomplete="new-password">
         <button class="auth-btn"  id="btnReg"   onclick="doAuthRegister()">Создать аккаунт</button>
         <div class="auth-switch">Уже есть аккаунт? <a onclick="showAuthTab('login')">Войти →</a></div>
         <button class="auth-extra-btn" onclick="openDlPopup()">📲 Скачать приложение</button>
@@ -1912,7 +1843,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
   </div>
 
 </div>
-
 <!-- ===== APP ===== -->
 <div id="app">
   <!-- Demo banner (shown only in demo mode) -->
@@ -2904,7 +2834,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
     <button class="more-item" data-page="blog"><span style="font-size:1.2rem">✐</span> Блог</button>
     <button class="more-item" data-page="settings"><span style="font-size:1.2rem">⊕</span> Настройки</button>
     <div style="margin:16px 20px 0;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:12px">
-<button onclick="localStorage.removeItem('km_session');IS_DEMO=false;appEl.classList.remove('visible');appEl.style.display='none';var db=document.getElementById('demoBanner');if(db)db.style.display='none';authScreen.style.display='block';authShowPanel('login');authScreen.scrollTop=0;closeMoreDrawer();" style="font-size:0.82rem;color:var(--red);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;text-align:left">Выйти из аккаунта</button>
+<button onclick="if(!IS_DEMO&&typeof auth!=='undefined')auth.signOut();localStorage.removeItem('km_session');IS_DEMO=false;FB_UID='';appEl.classList.remove('visible');appEl.style.display='none';var bn=document.getElementById('demoBanner');if(bn)bn.style.display='none';authScreen.style.display='block';authShowPanel('login');authScreen.scrollTop=0;closeMoreDrawer();" style="font-size:0.82rem;color:var(--red);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;text-align:left">Выйти из аккаунта</button>
     </div>
   </div>
 </div>
@@ -3488,20 +3418,28 @@ function authShowPanel(w){showAuthTab(w==='reg'?'reg':'login');}
 
 function authShowPanel(w){showAuthTab(w==='reg'?'reg':'login');}
 
+// телефон -> технический email для Firebase Auth: 79991234567@kapital.local
+function phoneToEmail(phone){
+  return (phone||'').replace(/\D/g,'') + '@kapital.local';
+}
+
 function doAuthLogin(){
   var phone=((document.getElementById('lPhone')||{}).value||'').trim();
   var pass=(document.getElementById('lPass')||{}).value||'';
   var btn=document.getElementById('btnLogin');
   if(!phone){showAuthErr('loginErr','Введите телефон');return;}
   if(!pass){showAuthErr('loginErr','Введите пароль');return;}
-  try{
-    var users=JSON.parse(localStorage.getItem('km_users')||'[]');
-    var user=users.find(function(u){return u.phone===phone;});
-    if(!user){showAuthErr('loginErr','Номер не зарегистрирован');return;}
-    if(user.ph!==simpleHash(pass)){showAuthErr('loginErr','Неверный пароль');return;}
-    if(btn){btn.textContent='Входим...';btn.disabled=true;}
-    setTimeout(function(){launchApp({id:user.id,name:user.name,prof:user.prof||''});},50);
-  }catch(e){showAuthErr('loginErr','Ошибка: '+e.message);}
+  if(btn){btn.textContent='Входим...';btn.disabled=true;}
+  auth.signInWithEmailAndPassword(phoneToEmail(phone), pass)
+    .catch(function(e){
+      var msg = 'Ошибка входа';
+      if(e.code==='auth/user-not-found') msg='Номер не зарегистрирован';
+      else if(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential') msg='Неверный телефон или пароль';
+      else if(e.code==='auth/too-many-requests') msg='Слишком много попыток, подождите';
+      else if(e.code==='auth/invalid-email') msg='Неверный формат телефона';
+      showAuthErr('loginErr', msg);
+    });
+  // при успехе вход подхватит onAuthStateChanged -> launchApp
 }
 
 function doAuthRegister(){
@@ -3512,16 +3450,22 @@ function doAuthRegister(){
   var btn=document.getElementById('btnReg');
   if(!name){showAuthErr('regErr','Введите имя');return;}
   if(!phone){showAuthErr('regErr','Введите телефон');return;}
-  if(pass.length<4){showAuthErr('regErr','Пароль минимум 4 символа');return;}
-  try{
-    var users=JSON.parse(localStorage.getItem('km_users')||'[]');
-    if(users.find(function(u){return u.phone===phone;})){showAuthErr('regErr','Телефон занят');return;}
-    var id='u_'+Date.now();
-    users.push({id:id,name:name,prof:prof,phone:phone,ph:simpleHash(pass),created:Date.now()});
-    localStorage.setItem('km_users',JSON.stringify(users));
-    if(btn){btn.textContent='Создаём...';btn.disabled=true;}
-    setTimeout(function(){launchApp({id:id,name:name,prof:prof||'Специалист'});},50);
-  }catch(e){showAuthErr('regErr','Ошибка: '+e.message);}
+  if(pass.length<6){showAuthErr('regErr','Пароль минимум 6 символов');return;}
+  if(btn){btn.textContent='Создаём...';btn.disabled=true;}
+  auth.createUserWithEmailAndPassword(phoneToEmail(phone), pass)
+    .then(function(cred){
+      return db.ref('users/'+cred.user.uid+'/profile').set({
+        name:name, prof:prof||'Специалист', phone:phone, created:Date.now()
+      });
+    })
+    .catch(function(e){
+      var msg='Ошибка регистрации';
+      if(e.code==='auth/email-already-in-use') msg='Этот телефон уже зарегистрирован';
+      else if(e.code==='auth/weak-password') msg='Слишком простой пароль';
+      else if(e.code==='auth/invalid-email') msg='Неверный формат телефона';
+      showAuthErr('regErr', msg);
+    });
+  // при успехе вход подхватит onAuthStateChanged -> launchApp
 }
 
 function showAuthErr(errId,msg){
@@ -3556,17 +3500,26 @@ function launchApp(user){
 }
 
 function checkSession(){
-  var s = load('km_session', null);
-  if(s && s.id){
-    var users = getUsers();
-    var validUser = users.find(function(u){ return u.id === s.id; });
-    if(validUser){
-      launchApp({id:validUser.id, name:validUser.name, prof:validUser.prof});
-      return;
+  // Firebase сам помнит сессию между запусками.
+  // Реагируем на вход/выход в одной точке.
+  auth.onAuthStateChanged(function(user){
+    if(IS_DEMO) return; // в демо Firebase Auth не используется
+    if(user){
+      FB_UID = user.uid;
+      db.ref('users/'+user.uid+'/profile').once('value').then(function(snap){
+        var p = snap.val() || {};
+        launchApp({id:user.uid, name:p.name||'Мастер', prof:p.prof||'Специалист'});
+      }).catch(function(){
+        launchApp({id:user.uid, name:'Мастер', prof:'Специалист'});
+      });
+    }else{
+      FB_UID = '';
+      var authScr=document.getElementById('authScreen');
+      var app=document.getElementById('app');
+      if(authScr) authScr.style.display='block';
+      if(app){ app.style.display='none'; app.classList.remove('visible'); }
     }
-  }
-  // No session — show auth screen
-  // (no auto-login even if one user exists — user must log in manually)
+  });
 }
 
 function enterDemoMode(){
@@ -4436,6 +4389,7 @@ var firebaseConfig = {
     };
     firebase.initializeApp(firebaseConfig);
     var db = firebase.database();
+    var auth = firebase.auth();
 
 // Firebase already initialized above
 
@@ -4609,6 +4563,7 @@ var doRegister = authDoRegister;
 var showPanel = authShowPanel;
 
 document.getElementById('logoutBtn').onclick = function() {
+  if(!IS_DEMO && typeof auth !== 'undefined') auth.signOut();
   localStorage.removeItem('km_session');
   IS_DEMO = false;
   FB_UID = '';
