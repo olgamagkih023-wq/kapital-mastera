@@ -1081,8 +1081,11 @@ select.auth-field{cursor:pointer}
 .demo-banner{
   background:linear-gradient(90deg,#0D6E4A,#1A9463);
   padding:10px 20px;display:flex;align-items:center;justify-content:space-between;
-  gap:12px;flex-shrink:0;
+  gap:12px;
+  position:fixed;top:0;left:0;right:0;z-index:10000;
 }
+body.demo-active #app{padding-top:46px}
+@media(max-width:760px){body.demo-active #app{padding-top:58px}}
 .demo-banner-text{font-size:0.82rem;color:rgba(255,255,255,0.9);font-weight:500}
 .demo-banner-text span{color:#fff;font-weight:700}
 .demo-reg-btn{
@@ -1861,7 +1864,7 @@ select.auth-field{cursor:pointer}
 <!-- ===== APP ===== -->
 <div id="app">
   <!-- Demo banner (shown only in demo mode) -->
-  <div class="demo-banner" id="demoBanner" class="demo-banner" style="display:none;grid-column:1/-1;order:-1;position:sticky;top:0;z-index:99">
+  <div id="demoBanner" class="demo-banner" style="display:none">
     <div class="demo-banner-text">🎯 <span>Демо-режим</span> — данные не сохраняются. Зарегистрируйся чтобы сохранить всё.</div>
     <button class="demo-reg-btn" onclick="exitDemoToReg()">Зарегистрироваться</button>
   </div>
@@ -2849,7 +2852,7 @@ select.auth-field{cursor:pointer}
     <button class="more-item" data-page="blog"><span style="font-size:1.2rem">✐</span> Блог</button>
     <button class="more-item" data-page="settings"><span style="font-size:1.2rem">⊕</span> Настройки</button>
     <div style="margin:16px 20px 0;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:12px">
-<button onclick="if(!IS_DEMO&&auth){auth.signOut();}localStorage.removeItem('km_session');IS_DEMO=false;FB_UID='';appEl.classList.remove('visible');appEl.style.display='none';var bn=document.getElementById('demoBanner');if(bn)bn.style.display='none';authScreen.style.display='block';authShowPanel('login');authScreen.scrollTop=0;closeMoreDrawer();" style="font-size:0.82rem;color:var(--red);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;text-align:left">Выйти из аккаунта</button>
+<button onclick="if(!IS_DEMO&&auth){auth.signOut();}localStorage.removeItem('km_session');IS_DEMO=false;FB_UID='';document.body.classList.remove('demo-active');appEl.classList.remove('visible');appEl.style.display='none';var bn=document.getElementById('demoBanner');if(bn)bn.style.display='none';authScreen.style.display='block';authShowPanel('login');authScreen.scrollTop=0;closeMoreDrawer();" style="font-size:0.82rem;color:var(--red);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;text-align:left">Выйти из аккаунта</button>
     </div>
   </div>
 </div>
@@ -3434,7 +3437,6 @@ function showAuthTab(tab){
 }
 function authShowPanel(w){showAuthTab(w==='reg'?'reg':'login');}
 
-function authShowPanel(w){showAuthTab(w==='reg'?'reg':'login');}
 
 // телефон -> технический email для Firebase Auth: 79991234567@kapital.local
 function phoneToEmail(phone){
@@ -3568,6 +3570,7 @@ function enterDemoMode(){
   if(av) av.textContent = 'D';
   var banner = document.getElementById('demoBanner');
   if(banner) banner.style.display = 'flex';
+  document.body.classList.add('demo-active');
   if(typeof navigateTo === 'function') navigateTo('dashboard');
   setTimeout(function(){ if(typeof refreshAll === 'function') refreshAll(); }, 100);
 }
@@ -4581,11 +4584,8 @@ document.addEventListener('keydown',function(e){
 
 // ===== AUTH FUNCTIONS (global, called from HTML onclick) =====
 function authShowPanel(w) {
-  var isLogin = (w === 'login');
-  document.getElementById('aLogin').style.display = isLogin ? 'block' : 'none';
-  document.getElementById('aReg').style.display = isLogin ? 'none' : 'block';
-  document.getElementById('atLogin').className = 'atab' + (isLogin ? ' active' : '');
-  document.getElementById('atReg').className = 'atab' + (!isLogin ? ' active' : '');
+  // делегируем к актуальной логике вкладок (новая вёрстка)
+  showAuthTab(w === 'reg' ? 'reg' : 'login');
 }
 
 
@@ -6531,6 +6531,7 @@ var IS_DEMO = false;
 function exitDemoToReg(){
   // Clear demo session, show auth in reg mode
   IS_DEMO = false;
+  document.body.classList.remove('demo-active');
   localStorage.removeItem('km_session');
   store('km_users', getUsers().filter(function(u){ return u.id !== 'demo_user'; }));
   appEl.classList.remove('visible');
