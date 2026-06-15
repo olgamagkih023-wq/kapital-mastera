@@ -1639,6 +1639,53 @@ body.demo-active #app{padding-top:46px}
 .cookie-accept{padding:10px 20px;background:var(--em);color:#fff;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.06em}
 .cookie-decline{padding:10px 16px;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-size:0.78rem;cursor:pointer;font-family:'DM Sans',sans-serif}
 
+
+/* ═══ BOT ASSISTANT ═══ */
+#botFab:hover{transform:scale(1.08)}
+.bot-window{
+  position:fixed;bottom:146px;right:16px;z-index:4001;
+  width:360px;max-width:calc(100vw - 32px);height:520px;max-height:calc(100vh - 180px);
+  background:#FBF8F1;border:1px solid #D8CDB8;border-radius:14px;
+  box-shadow:0 20px 60px rgba(42,38,32,0.25);
+  display:flex;flex-direction:column;overflow:hidden;
+  opacity:0;visibility:hidden;transform:translateY(20px) scale(.97);
+  transition:all .28s cubic-bezier(.2,.7,.2,1);transform-origin:bottom right;
+}
+.bot-window.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.bot-header{display:flex;align-items:center;gap:11px;padding:14px 16px;background:#1C5A41;color:#FBF8F1;flex-shrink:0}
+.bot-header-av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+.bot-header-info{flex:1}
+.bot-header-name{font-size:0.95rem;font-weight:600;font-family:'Cormorant Garamond',serif}
+.bot-header-status{font-size:0.72rem;opacity:0.7;margin-top:1px}
+.bot-close{background:none;border:none;color:rgba(255,255,255,0.7);font-size:1rem;cursor:pointer;padding:4px}
+.bot-close:hover{color:#fff}
+.bot-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.bot-msg{display:flex;gap:9px;align-items:flex-start;max-width:88%}
+.bot-msg.user{align-self:flex-end;flex-direction:row-reverse}
+.bot-msg-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.85rem;background:#EFE7D7}
+.bot-msg.bot .bot-msg-av{background:#1C5A41;color:#fff}
+.bot-bubble{padding:10px 13px;border-radius:12px;font-size:0.88rem;line-height:1.5;color:#2A2620;background:#fff;border:1px solid #E3D7C0}
+.bot-msg.user .bot-bubble{background:#1C5A41;color:#FBF8F1;border-color:#1C5A41}
+.bot-bubble strong{font-weight:600}
+.bot-typing{display:none;gap:4px;padding:0 16px 8px 53px}
+.bot-typing.show{display:flex}
+.bot-typing span{width:7px;height:7px;border-radius:50%;background:#B6AC98;animation:botBlink 1.2s infinite}
+.bot-typing span:nth-child(2){animation-delay:.2s}
+.bot-typing span:nth-child(3){animation-delay:.4s}
+@keyframes botBlink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.bot-chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 10px}
+.bot-chip{background:#EFE7D7;border:1px solid #D8CDB8;color:#2A2620;font-size:0.78rem;padding:7px 12px;border-radius:16px;cursor:pointer;font-family:'Inter','DM Sans',sans-serif;transition:all .2s}
+.bot-chip:hover{background:#1C5A41;color:#fff;border-color:#1C5A41}
+.bot-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid #E3D7C0;flex-shrink:0;background:#FBF8F1}
+.bot-input{flex:1;border:1px solid #D8CDB8;border-radius:20px;padding:10px 15px;font-family:'Inter','DM Sans',sans-serif;font-size:0.9rem;color:#2A2620;outline:none;background:#fff}
+.bot-input:focus{border-color:#1C5A41}
+.bot-send{width:40px;height:40px;border-radius:50%;background:#1C5A41;border:none;color:#fff;font-size:1.2rem;cursor:pointer;flex-shrink:0;transition:background .2s}
+.bot-send:hover{background:#123E2D}
+.bot-send:disabled{opacity:0.5;cursor:default}
+@media(max-width:760px){
+  .bot-window{bottom:140px;right:10px;left:10px;width:auto;max-width:none;height:70vh}
+  #botFab{bottom:74px;right:14px;width:50px;height:50px}
+}
 </style>
 
   <!-- ═══ PWA ═══ -->
@@ -1861,7 +1908,7 @@ body.demo-active #app{padding-top:46px}
       <div class="dash-grid">
         <div>
           <div class="dash-card" style="margin-bottom:20px">
-            <div class="dash-card-title">Доходы / Расходы — 6 месяцев</div>
+            <div class="dash-card-title" style="display:flex;align-items:center">Доходы / Расходы — 6 месяцев <button class="help-btn" onclick="openHelp('dashboard')">?</button></div>
             <div class="mini-chart" id="dashChart"></div>
             <div class="bar-labels" id="dashChartLabels"></div>
             <div style="display:flex;gap:16px;margin-top:12px">
@@ -2665,6 +2712,7 @@ body.demo-active #app{padding-top:46px}
           style="flex:1;padding:12px 16px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--ink);outline:none"
           oninput="renderClientBase(this.value)">
         <div id="clientsCount" style="font-size:0.82rem;color:var(--muted);white-space:nowrap;font-weight:600"></div>
+        <button class="help-btn" onclick="openHelp('clients')">?</button>
       </div>
 
       <!-- Stats -->
@@ -3133,6 +3181,27 @@ body.demo-active #app{padding-top:46px}
     box-shadow:0 2px 12px rgba(0,0,0,0.10);
     transition:all 0.2s;font-family:'Cormorant Garamond',serif;
   ">?</button>
+
+<!-- BOT ASSISTANT -->
+<button id="botFab" onclick="toggleBot()" title="Капитал Ассистент" style="position:fixed;bottom:80px;right:16px;z-index:4000;width:54px;height:54px;border-radius:50%;background:#1C5A41;border:none;cursor:pointer;color:#fff;font-size:1.5rem;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(28,90,65,0.4);transition:transform 0.2s;">✦<span id="botBadge" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:#7A2230;display:none"></span></button>
+
+<div id="botWindow" class="bot-window">
+  <div class="bot-header">
+    <div class="bot-header-av">✦</div>
+    <div class="bot-header-info">
+      <div class="bot-header-name">Капитал Ассистент</div>
+      <div class="bot-header-status">Всегда на связи</div>
+    </div>
+    <button class="bot-close" onclick="toggleBot()">✕</button>
+  </div>
+  <div class="bot-msgs" id="botMsgs"></div>
+  <div class="bot-typing" id="botTyping"><span></span><span></span><span></span></div>
+  <div class="bot-chips" id="botChips"></div>
+  <div class="bot-input-row">
+    <input type="text" id="botInput" class="bot-input" placeholder="Напиши вопрос..." onkeydown="if(event.key==='Enter')sendBotMsg()">
+    <button id="botSend" class="bot-send" onclick="sendBotMsg()">→</button>
+  </div>
+</div>
 
 <script>
 // Глобальные флаги UI
@@ -4302,6 +4371,56 @@ function botThink(userMsg){
 }
 
 
+// ═══ BOT BRAIN — готовые ответы (без ИИ, мгновенно) ═══
+function getBotReply(msg){
+  var q = (msg || '').toLowerCase();
+  function has(){ for(var i=0;i<arguments.length;i++){ if(q.indexOf(arguments[i])!==-1) return true; } return false; }
+
+  // 50/30/20
+  if(has('50/30/20','50 30 20','распределение','правило')){
+    return {text:'**Правило 50/30/20** — как делить доход:\n\n**50%** — на жизнь (аренда, еда, материалы для работы)\n**30%** — на желания (отдых, обучение, приятное)\n**20%** — в капитал (накопления, подушка, инвестиции)\n\nЭто базовый ориентир. Главное — чтобы 20% уходили в капитал регулярно.',
+      chips:['Как добавить доход?','Что такое подушка?','Как платить налоги?']};
+  }
+  // Налоги
+  if(has('налог','ндфл','самозанят','ип ','патент')){
+    return {text:'**Налоги для мастеров:**\n\n• **Самозанятый (НПД)** — 4% с дохода от физлиц, 6% от юрлиц. Проще всего для старта.\n• **ИП на УСН** — 6% с дохода. Когда оборот вырос.\n\nВ разделе **Зарплата владельца** есть калькулятор налога ИП. Точную ставку уточняй у бухгалтера — правила меняются.',
+      chips:['Как вести учёт дохода?','Что такое 50/30/20?']};
+  }
+  // Онлайн-запись
+  if(has('запись','клиент','booking','ссылк','записать')){
+    return {text:'**Онлайн-запись клиентов:**\n\n1. Зайди в раздел **Онлайн-запись**\n2. Включи приём заявок и заполни услуги\n3. Скопируй свою ссылку и отправь клиентам (в Instagram, WhatsApp)\n4. Клиент сам выбирает время — ты получаешь уведомление\n\nЗаявки появляются в **Календаре**.',
+      chips:['Как настроить услуги?','Где смотреть записи?']};
+  }
+  // Доход / операция
+  if(has('доход','операци','добавить','внести','заработ','выручк')){
+    return {text:'**Как добавить доход:**\n\n1. Открой раздел **Финансы**\n2. В блоке быстрого ввода введи сумму\n3. Выбери тип (доход), категорию и сегмент — **Бизнес** или **Личное**\n4. Нажми «Добавить»\n\nСовет: вноси операцию в тот же день — так не теряются данные.',
+      chips:['Что такое 50/30/20?','Как платить налоги?']};
+  }
+  // Расход
+  if(has('расход','трата','потрат','материал')){
+    return {text:'**Как учитывать расходы:**\n\nВ разделе **Финансы** выбери тип «расход», укажи сумму, категорию (материалы, аренда, реклама) и сегмент. Раздельный учёт Бизнес/Личное покажет реальную прибыль, а не просто остаток на карте.',
+      chips:['Как добавить доход?','Где смотреть прибыль?']};
+  }
+  // Подушка / капитал / накопления
+  if(has('подушка','капитал','накоплен','накопить','сбереж')){
+    return {text:'**Подушка безопасности** — это запас на 3–6 месяцев твоих расходов на случай простоя.\n\nВ разделе **Капитал** виден накопленный капитал, прогресс к подушке и прогноз роста. Откладывай ~20% дохода — и подушка соберётся сама.',
+      chips:['Что такое 50/30/20?','Как добавить доход?']};
+  }
+  // Цена часа
+  if(has('цена часа','час','стоимость работы','сколько брать','ставк')){
+    return {text:'**Цена часа** помогает понять, сколько реально стоит твой час работы. Запиши рабочий день и доход — приложение посчитает твою часовую ставку. Это база, чтобы не работать себе в убыток и правильно ставить цены.',
+      chips:['Как добавить доход?','Что такое 50/30/20?']};
+  }
+  // Приветствие / благодарность
+  if(has('привет','здравств','добрый','хай','спасибо','благодар')){
+    return {text:'Рада помочь! ✦ Спрашивай про доходы, налоги, онлайн-запись или правило 50/30/20 — подскажу, как пользоваться приложением.',
+      chips:['Как добавить доход?','Как платить налоги?','Как настроить онлайн-запись?']};
+  }
+  // По умолчанию
+  return {text:'Я подскажу по работе с приложением: как вести **финансы**, считать **налоги**, настроить **онлайн-запись** и копить **капитал**. Выбери тему ниже или задай вопрос своими словами.',
+    chips:['Как добавить доход?','Как платить налоги?','Как настроить онлайн-запись?','Что такое 50/30/20?']};
+}
+
 // main.js
 
 // ═══ main.js — Капитал Мастера ═══
@@ -5409,8 +5528,70 @@ var HELP_CONTENT = {
     tip:'<strong>Первый шаг:</strong> введи свой средний доход в месяц. Тогда блок 50/30/20 покажет реальные суммы, а не абстрактные проценты.',
   },
 
+  clients:{
+    tag:'Раздел',
+    title:'Клиенты — твоя база и её ценность',
+    lead:'Все, кто у тебя записывался, собираются здесь автоматически. Ты видишь, кто приносит больше всего денег и кто давно не возвращался.',
+    sections:[
+      {title:'Как пользоваться',steps:[
+        {n:1,text:'База заполняется <strong>сама</strong> — каждый, кто записался, попадает сюда'},
+        {n:2,text:'Используй <strong>поиск</strong> по имени или телефону, чтобы быстро найти клиента'},
+        {n:3,text:'Смотри карточки сверху: всего клиентов, выручка, средний LTV, постоянные'},
+        {n:4,text:'<strong>LTV</strong> — сколько денег в среднем приносит один клиент за всё время'},
+      ]},
+      {title:'В чём польза',benefits:[
+        {icon:'💎',text:'Видишь самых ценных клиентов — на них стоит тратить больше внимания'},
+        {icon:'🔁',text:'Постоянные клиенты (2+ визита) — основа стабильного дохода'},
+        {icon:'📞',text:'Телефон под рукой — легко напомнить о себе тем, кто давно не был'},
+        {icon:'📈',text:'Средний LTV помогает понять, сколько можно вкладывать в привлечение'},
+      ]},
+    ],
+    tip:'<strong>Совет:</strong> раз в месяц просматривай тех, кто давно не возвращался, и напоминай о себе — вернуть старого клиента дешевле, чем найти нового.',
+  },
+
 };
 
+
+function openHelp(key){
+  var d = (typeof HELP_CONTENT !== 'undefined') ? HELP_CONTENT[key] : null;
+  if(!d){ return; }
+  var html = '';
+  if(d.tag)   html += '<div class="help-tag">' + d.tag + '</div>';
+  if(d.title) html += '<div class="help-title">' + d.title + '</div>';
+  if(d.lead)  html += '<div class="help-lead">' + d.lead + '</div>';
+  (d.sections || []).forEach(function(sec){
+    html += '<div class="help-section">';
+    if(sec.title) html += '<div class="help-section-title">' + sec.title + '</div>';
+    if(sec.steps){
+      html += '<div class="help-steps">';
+      sec.steps.forEach(function(s){
+        html += '<div class="help-step">' +
+                  '<div class="help-step-num">' + (s.n || '•') + '</div>' +
+                  '<div class="help-step-text">' + s.text + '</div>' +
+                '</div>';
+      });
+      html += '</div>';
+    }
+    if(sec.benefits){
+      html += '<div class="help-benefits">';
+      sec.benefits.forEach(function(b){
+        html += '<div class="help-benefit">' +
+                  '<span class="help-benefit-icon">' + (b.icon || '✓') + '</span>' +
+                  '<span>' + b.text + '</span>' +
+                '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  if(d.tip) html += '<div class="help-tip">' + d.tip + '</div>';
+  html += '<button class="help-close-btn" onclick="closeHelp()">Понятно, закрыть</button>';
+  var cont = document.getElementById('helpContent');
+  if(cont) cont.innerHTML = html;
+  var ov = document.getElementById('helpOverlay');
+  if(ov) ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
 
 function closeHelp(e){
   if(e&&e.target!==document.getElementById('helpOverlay'))return;
