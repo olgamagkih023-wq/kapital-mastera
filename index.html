@@ -4243,7 +4243,7 @@ function onbAddTx(){
   if(amount < 1){ onbNext(); return; }
   // Add transaction
   var txs = getTx();
-  var today_str = today();
+  var today_str = new Date().toISOString();
   txs.unshift({
     id: 'onb_' + Date.now(),
     date: today_str,
