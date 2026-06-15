@@ -1446,107 +1446,6 @@ body.demo-active #app{padding-top:46px}
 }
 
 
-/* ═══ ONBOARDING ═══ */
-.onb-overlay{
-  position:fixed;inset:0;z-index:9990;
-  background:rgba(12,13,10,0.92);backdrop-filter:blur(20px);
-  display:flex;align-items:flex-end;justify-content:center;
-  opacity:0;visibility:hidden;transition:all 0.35s;
-}
-.onb-overlay.open{opacity:1;visibility:visible}
-.onb-sheet{
-  background:var(--cream);width:100%;max-width:560px;
-  border-radius:24px 24px 0 0;
-  transform:translateY(60px);
-  transition:transform 0.4s cubic-bezier(0.34,1.1,0.64,1);
-  padding-bottom:env(safe-area-inset-bottom);
-  max-height:92vh;overflow-y:auto;
-}
-.onb-overlay.open .onb-sheet{transform:translateY(0)}
-.onb-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:14px auto 0}
-
-/* Slides */
-.onb-slides{display:flex;overflow:hidden;width:100%}
-.onb-slide{
-  min-width:100%;padding:28px 28px 0;
-  display:flex;flex-direction:column;
-  transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
-}
-.onb-emoji{font-size:3rem;margin-bottom:16px;display:block;text-align:center}
-.onb-num{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:28px;height:28px;border-radius:50%;
-  background:var(--em);color:#fff;
-  font-size:0.8rem;font-weight:700;margin-bottom:14px;
-  flex-shrink:0;
-}
-.onb-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.8rem;font-weight:400;color:var(--ink);
-  line-height:1.1;margin-bottom:12px;
-}
-.onb-title em{font-style:italic;color:var(--em)}
-.onb-desc{
-  font-size:0.92rem;color:var(--muted);line-height:1.75;
-  font-weight:300;margin-bottom:20px;
-}
-.onb-tips{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
-.onb-tip{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 14px;background:var(--cream2);
-  border-left:3px solid var(--em);
-  font-size:0.88rem;color:var(--ink);font-weight:400;
-}
-.onb-tip-icon{font-size:1.1rem;flex-shrink:0}
-.onb-tip b{color:var(--em);font-weight:700}
-
-/* Nav */
-.onb-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:20px 28px 28px;gap:12px;
-}
-.onb-dots{display:flex;gap:6px}
-.onb-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--border);transition:all 0.25s;
-}
-.onb-dot.active{background:var(--em);width:22px;border-radius:4px}
-.onb-prev{
-  padding:12px 20px;background:none;
-  border:1.5px solid var(--border);
-  font-family:'DM Sans',sans-serif;font-size:0.82rem;
-  font-weight:600;color:var(--muted);cursor:pointer;
-  transition:border-color 0.2s;
-}
-.onb-prev:hover{border-color:var(--ink);color:var(--ink)}
-.onb-next{
-  flex:1;padding:14px;background:var(--em);color:#fff;
-  border:none;font-family:'DM Sans',sans-serif;
-  font-size:0.88rem;font-weight:700;
-  letter-spacing:0.06em;text-transform:uppercase;
-  cursor:pointer;transition:background 0.2s;
-  touch-action:manipulation;
-}
-.onb-next:hover{background:var(--ink)}
-.onb-skip{
-  text-align:center;padding:0 28px 16px;
-  font-size:0.78rem;color:var(--muted);cursor:pointer;
-  text-decoration:underline;text-underline-offset:3px;
-}
-.onb-skip:hover{color:var(--ink)}
-
-/* Action button inside slide */
-.onb-action{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;background:var(--ink);color:#fff;
-  cursor:pointer;margin-bottom:8px;transition:background 0.2s;
-  touch-action:manipulation;
-}
-.onb-action:hover{background:var(--em)}
-.onb-action-text{font-size:0.9rem;font-weight:600}
-.onb-action-sub{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:2px}
-.onb-action-arr{font-size:1.2rem;flex-shrink:0}
-
 /* ═══ DOWNLOAD POPUP ═══ */
 .dl-popup-overlay{
   position:fixed;inset:0;z-index:10001;
@@ -6546,8 +6445,6 @@ function exitDemoToReg(){
 // ════════════════════════════════════════════
 // ONBOARDING
 // ════════════════════════════════════════════
-var ONB_STEP = 0;
-var ONB_TOTAL = 3; // slides 0..3
 
 
 
