@@ -2175,6 +2175,16 @@ body.demo-active #app{padding-top:46px}
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div class="form-field-app">
+                <label>Telegram (необязательно)</label>
+                <input type="text" id="apptTelegram" placeholder="@username">
+              </div>
+              <div class="form-field-app">
+                <label>ВКонтакте (необязательно)</label>
+                <input type="text" id="apptVk" placeholder="id или короткое имя">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div class="form-field-app">
                 <label>Дата *</label>
                 <input type="date" id="apptDate">
               </div>
@@ -3943,12 +3953,16 @@ function buildClientBase(){
       clients[key] = {
         name: a.client,
         phone: a.phone||'',
+        telegram: a.telegram||'',
+        vk: a.vk||'',
         visits: [],
         totalLtv: 0,
         lastDate: ''
       };
     }
     if(a.phone && !clients[key].phone) clients[key].phone = a.phone;
+    if(a.telegram && !clients[key].telegram) clients[key].telegram = a.telegram;
+    if(a.vk && !clients[key].vk) clients[key].vk = a.vk;
     clients[key].visits.push(a);
     clients[key].totalLtv += parseFloat(a.price)||0;
     if(!clients[key].lastDate || a.date > clients[key].lastDate) clients[key].lastDate = a.date;
@@ -4033,17 +4047,25 @@ function renderClientBase(search){
       sms.textContent = 'SMS';
       actions.appendChild(sms);
     }
-    // Telegram — поиск/шеринг (по номеру прямого диалога нет)
+    // Telegram — прямой диалог по username, иначе шеринг текста
     var tg = document.createElement('a');
-    tg.href = 'https://t.me/share/url?url=&text='+enc;
+    if(c.telegram){
+      tg.href = 'https://t.me/'+c.telegram.replace(/^@/,'');
+    } else {
+      tg.href = 'https://t.me/share/url?url=&text='+enc;
+    }
     tg.target = '_blank';
     tg.className = 'msg-btn';
     tg.style.cssText = 'padding:8px 12px;background:#229ED9;color:#fff;font-size:0.76rem;font-weight:700;text-decoration:none;display:inline-block;border-radius:4px';
     tg.textContent = 'Telegram';
     actions.appendChild(tg);
-    // ВКонтакте — шеринг (по номеру прямого диалога нет)
+    // ВКонтакте — прямой диалог, иначе шеринг
     var vk = document.createElement('a');
-    vk.href = 'https://vk.com/share.php?title='+enc+'&noparse=true';
+    if(c.vk){
+      vk.href = 'https://vk.com/'+c.vk.replace(/^.*vk\.com\//,'');
+    } else {
+      vk.href = 'https://vk.com/share.php?title='+enc+'&noparse=true';
+    }
     vk.target = '_blank';
     vk.className = 'msg-btn';
     vk.style.cssText = 'padding:8px 12px;background:#0077FF;color:#fff;font-size:0.76rem;font-weight:700;text-decoration:none;display:inline-block;border-radius:4px';
@@ -5175,6 +5197,9 @@ document.getElementById('calNext').onclick=()=>{calMonth++;if(calMonth>11){calMo
 
 document.getElementById('saveAppt').onclick=function(){
   const client=document.getElementById('apptClient').value.trim();
+  const phone=(document.getElementById('apptPhone')||{}).value||'';
+  const telegram=((document.getElementById('apptTelegram')||{}).value||'').trim().replace(/^@/,'');
+  const vk=((document.getElementById('apptVk')||{}).value||'').trim().replace(/^.*vk\.com\//,'');
   const service=document.getElementById('apptService').value.trim();
   const date=document.getElementById('apptDate').value;
   const time=document.getElementById('apptTime').value;
@@ -5182,12 +5207,15 @@ document.getElementById('saveAppt').onclick=function(){
   const note=document.getElementById('apptNote').value.trim();
   if(!client||!date){toast('Введите имя клиента и дату','error');return}
   const appts=getAppts();
-  appts.push({id:uid(),client,service:service||'Услуга',date,time,price,note,status:'confirmed',created:Date.now()});
+  appts.push({id:uid(),client,phone:phone.trim(),telegram,vk,service:service||'Услуга',date,time,price,note,status:'confirmed',created:Date.now()});
   saveAppts(appts);
   document.getElementById('apptClient').value='';
   document.getElementById('apptService').value='';
   document.getElementById('apptPrice').value='';
   document.getElementById('apptNote').value='';
+  if(document.getElementById('apptPhone'))document.getElementById('apptPhone').value='';
+  if(document.getElementById('apptTelegram'))document.getElementById('apptTelegram').value='';
+  if(document.getElementById('apptVk'))document.getElementById('apptVk').value='';
   toast('Запись добавлена ✓');
   renderCalendar();
   renderDashboard();

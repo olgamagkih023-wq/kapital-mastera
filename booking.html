@@ -147,6 +147,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);m
     <div class="err-msg" id="formErr"></div>
     <div class="field"><label>Ваше имя *</label><input type="text" id="cName" placeholder="Анна Иванова" autocomplete="name"></div>
     <div class="field"><label>Телефон *</label><input type="tel" id="cPhone" placeholder="+7 (999) 000-00-00" autocomplete="tel"></div>
+    <div class="field"><label>Telegram (необязательно)</label><input type="text" id="cTelegram" placeholder="@username"></div>
+    <div class="field"><label>ВКонтакте (необязательно)</label><input type="text" id="cVk" placeholder="ссылка или короткое имя"></div>
     <div class="field"><label>Пожелания</label><textarea id="cNote" placeholder="Особые пожелания..."></textarea></div>
     <button class="btn-next" onclick="submitBooking()">Записаться ✓</button>
     <button class="btn-back" onclick="goStep(3)">← Назад</button>
@@ -372,13 +374,15 @@ function row(l,v){return '<div class="sum-row"><span style="color:var(--muted)">
 function submitBooking(){
   var name=(document.getElementById('cName').value||'').trim();
   var phone=(document.getElementById('cPhone').value||'').trim();
+  var telegram=((document.getElementById('cTelegram')||{}).value||'').trim().replace(/^@/,'');
+  var vk=((document.getElementById('cVk')||{}).value||'').trim().replace(/^.*vk\.com\//,'');
   var note=(document.getElementById('cNote').value||'').trim();
   var err=document.getElementById('formErr');
   err.style.display='none';
   if(!name){err.textContent='Введите ваше имя';err.style.display='block';return;}
   if(!phone){err.textContent='Введите номер телефона';err.style.display='block';return;}
   var id='bk_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
-  var appt={id:id,client:name,phone:phone,service:S.svc?S.svc.name:'',date:S.date,time:S.time,price:S.svc?(S.svc.price||0):0,note:note,status:'pending',source:'online',created:Date.now()};
+  var appt={id:id,client:name,phone:phone,telegram:telegram,vk:vk,service:S.svc?S.svc.name:'',date:S.date,time:S.time,price:S.svc?(S.svc.price||0):0,note:note,status:'pending',source:'online',created:Date.now()};
   // Save to Firebase
   if(window.db&&MASTER_UID){
     window.db.ref('masters/'+MASTER_UID+'/appointments/'+id).set(appt)
@@ -401,6 +405,8 @@ function sendTgNotify(a){
     '\uD83D\uDC86 '+(a.service||'\u2014')+nl+
     '\uD83D\uDCC5 '+dr+'  \uD83D\uDD50 '+(a.time||'')+
     (a.price?nl+'\uD83D\uDCB0 '+Math.round(a.price).toLocaleString('ru-RU')+' \u20BD':'')+
+    (a.telegram?nl+'\u2708\uFE0F @'+a.telegram:'')+
+    (a.vk?nl+'\uD83D\uDD37 vk.com/'+a.vk:'')+
     (a.note?nl+'\uD83D\uDCAC '+a.note:'')+
     nl+nl+'\u2705 \u041E\u0442\u043A\u0440\u043E\u0439\u0442\u0435 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435';
   fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,parse_mode:'Markdown'})}).catch(function(){});
