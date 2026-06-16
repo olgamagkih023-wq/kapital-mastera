@@ -17,6 +17,22 @@
   --en-bordo:#7A2230;--en-bordo-soft:#9A3343;--en-ink:#2A2620;--en-ink-dim:#6E665A;--en-line:#D8CDB8;
   --sidebar:220px;
 }
+/* ═══ ТЁМНАЯ ТЕМА ═══ */
+[data-theme="dark"]{
+  --ink:#ECE7DC;            /* светлый текст */
+  --cream:#16181C;          /* основной фон — глубокий тёплый тёмный */
+  --cream2:#1E2127;         /* фон вторичный */
+  --white:#22262D;          /* карточки */
+  --border:#343A44;         /* границы */
+  --muted:#9AA0A8;          /* приглушённый текст */
+  --gold:#D4AF70;--gold2:#E0BE84;
+  /* изумруд чуть ярче для контраста на тёмном */
+  --em:#16A06A;--em2:#1FB87C;--em3:#28D894;
+  /* английская палитра (лендинг) тоже в тёмном */
+  --en-paper:#16181C;--en-beige:#1E2127;--en-em:#28D894;--en-em-deep:#16A06A;
+  --en-bordo:#E0607A;--en-bordo-soft:#E87D92;--en-ink:#ECE7DC;--en-ink-dim:#9AA0A8;--en-line:#343A44;
+}
+[data-theme="dark"] html,[data-theme="dark"] body{background:var(--cream);color:var(--ink)}
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);overflow:hidden;cursor:auto}
 
 /* ===== AUTH SCREEN ===== */
