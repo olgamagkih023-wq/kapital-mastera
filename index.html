@@ -4012,15 +4012,43 @@ function renderClientBase(search){
     rb.textContent = '📅 Записать снова';
     rb.onclick = (function(client){ return function(){ rebookClient(client); }; })(c);
     actions.appendChild(rb);
-    // WhatsApp button
-    if(c.phone){
+    // Messenger buttons (WhatsApp, Telegram, VK, SMS)
+    var digits = (c.phone||'').replace(/\D/g,'');
+    var inviteMsg = 'Здравствуйте, '+c.name+'! Давно вас не было — будем рады видеть снова. Хотите записаться?';
+    var enc = encodeURIComponent(inviteMsg);
+    if(digits){
+      // WhatsApp — прямой чат по номеру
       var wa = document.createElement('a');
-      wa.href = 'https://wa.me/'+c.phone.replace(/\D/g,'');
+      wa.href = 'https://wa.me/'+digits+'?text='+enc;
       wa.target = '_blank';
-      wa.style.cssText = 'padding:8px 14px;background:#25D366;color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;display:inline-block';
-      wa.textContent = 'WA';
+      wa.className = 'msg-btn';
+      wa.style.cssText = 'padding:8px 12px;background:#25D366;color:#fff;font-size:0.76rem;font-weight:700;text-decoration:none;display:inline-block;border-radius:4px';
+      wa.textContent = 'WhatsApp';
       actions.appendChild(wa);
+      // SMS — прямое сообщение по номеру
+      var sms = document.createElement('a');
+      sms.href = 'sms:+'+digits+'?&body='+enc;
+      sms.className = 'msg-btn';
+      sms.style.cssText = 'padding:8px 12px;background:#6E665A;color:#fff;font-size:0.76rem;font-weight:700;text-decoration:none;display:inline-block;border-radius:4px';
+      sms.textContent = 'SMS';
+      actions.appendChild(sms);
     }
+    // Telegram — поиск/шеринг (по номеру прямого диалога нет)
+    var tg = document.createElement('a');
+    tg.href = 'https://t.me/share/url?url=&text='+enc;
+    tg.target = '_blank';
+    tg.className = 'msg-btn';
+    tg.style.cssText = 'padding:8px 12px;background:#229ED9;color:#fff;font-size:0.76rem;font-weight:700;text-decoration:none;display:inline-block;border-radius:4px';
+    tg.textContent = 'Telegram';
+    actions.appendChild(tg);
+    // ВКонтакте — шеринг (по номеру прямого диалога нет)
+    var vk = document.createElement('a');
+    vk.href = 'https://vk.com/share.php?title='+enc+'&noparse=true';
+    vk.target = '_blank';
+    vk.className = 'msg-btn';
+    vk.style.cssText = 'padding:8px 12px;background:#0077FF;color:#fff;font-size:0.76rem;font-weight:700;text-decoration:none;display:inline-block;border-radius:4px';
+    vk.textContent = 'VK';
+    actions.appendChild(vk);
     el.appendChild(div);
   });
 }
@@ -5873,7 +5901,8 @@ function navigateTo(pg){
   // Page title
   const titles={dashboard:'Обзор',finances:'Финансы',capital:'Капитал',
     calendar:'Записи',settings:'Настройки',hour:'Цена часа',
-    owner:'Зарплата владельца',pulse:'Финансовый пульс',blog:'Блог'};
+    owner:'Зарплата владельца',pulse:'Финансовый пульс',blog:'Блог',
+    clients:'Клиенты',booking:'Онлайн-запись'};
   const titleEl=document.getElementById('pageTitle');
   if(titleEl)titleEl.textContent=titles[pg]||pg;
 
