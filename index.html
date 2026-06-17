@@ -13,9 +13,53 @@
   --gold:#B8975A;--gold2:#D4AF70;
   --red:#C0392B;--blue:#2471A3;--purple:#7D3C98;
   --muted:#6B6860;--border:#DDD4C4;--white:#fff;
+  --topbar-bg:rgba(249,245,238,0.95);
   --en-paper:#FBF8F1;--en-beige:#EFE7D7;--en-em:#1C5A41;--en-em-deep:#123E2D;
   --en-bordo:#7A2230;--en-bordo-soft:#9A3343;--en-ink:#2A2620;--en-ink-dim:#6E665A;--en-line:#D8CDB8;
   --sidebar:220px;
+}
+/* ═══ ТЁМНАЯ ТЕМА ═══ */
+[data-theme="dark"]{
+  --ink:#ECE7DC;            /* светлый текст */
+  --cream:#16181C;          /* основной фон — глубокий тёплый тёмный */
+  --cream2:#1E2127;         /* фон вторичный */
+  --white:#22262D;          /* карточки */
+  --border:#343A44;         /* границы */
+  --muted:#9AA0A8;          /* приглушённый текст */
+  --topbar-bg:rgba(22,24,28,0.95);
+  --gold:#D4AF70;--gold2:#E0BE84;
+  /* изумруд чуть ярче для контраста на тёмном */
+  --em:#16A06A;--em2:#1FB87C;--em3:#28D894;
+  /* английская палитра (лендинг) тоже в тёмном */
+  --en-paper:#16181C;--en-beige:#1E2127;--en-em:#28D894;--en-em-deep:#16A06A;
+  --en-bordo:#E0607A;--en-bordo-soft:#E87D92;--en-ink:#ECE7DC;--en-ink-dim:#9AA0A8;--en-line:#343A44;
+}
+[data-theme="dark"] html,[data-theme="dark"] body{background:var(--cream);color:var(--ink)}
+/* Карточки, которые ВСЕГДА тёмные с белым текстом — фиксируем фон, чтобы не инвертировались */
+[data-theme="dark"] .owner-insight-box,
+[data-theme="dark"] .pulse-result,
+[data-theme="dark"] .onb-sheet,
+[data-theme="dark"] .dl-popup-box,
+[data-theme="dark"] .dl-header,
+[data-theme="dark"] .dl-footer,
+[data-theme="dark"] #installBanner{
+  background:#1E2127;
+}
+/* Поля ввода и белые блоки в тёмной теме — чтобы текст и фон были видны */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select{
+  background:var(--white)!important;
+  color:var(--ink)!important;
+  border-color:var(--border)!important;
+}
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder{color:var(--muted)!important;opacity:0.7}
+/* блоки с жёстким белым фоном */
+[data-theme="dark"] [style*="background:#fff"],
+[data-theme="dark"] [style*="background:#FFF"],
+[data-theme="dark"] [style*="background: #fff"]{
+  background:var(--white)!important;color:var(--ink)!important;
 }
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);overflow:hidden;cursor:auto}
 
@@ -276,7 +320,7 @@ select.auth-field{cursor:pointer}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--cream)}
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:20px 36px;background:rgba(249,245,238,0.95);
+  padding:20px 36px;background:var(--topbar-bg);
   backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);
   position:sticky;top:0;z-index:50;flex-shrink:0;
@@ -383,7 +427,7 @@ select.auth-field{cursor:pointer}
 
 /* Quick entry */
 .quick-entry{
-  background:var(--ink);padding:24px;margin-bottom:20px;
+  background:#16181C;padding:24px;margin-bottom:20px;
 }
 .qe-title{
   font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;
@@ -1118,6 +1162,22 @@ select.auth-field{cursor:pointer}
   gap:12px;
   position:fixed;top:0;left:0;right:0;z-index:10000;
 }
+/* ═══ Кнопка голосового ввода (микрофон) ═══ */
+.mic-btn{
+  flex-shrink:0;width:38px;height:38px;border-radius:8px;
+  border:1px solid var(--border);background:var(--white);
+  cursor:pointer;font-size:1rem;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:all .2s;color:var(--ink);
+}
+.mic-btn:hover{border-color:var(--em);background:var(--cream2)}
+.mic-btn.mic-active{
+  background:var(--em);color:#fff;border-color:var(--em);
+  animation:micPulse 1s infinite;
+}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(19,196,126,0.5)}50%{box-shadow:0 0 0 6px rgba(19,196,126,0)}}
+.field-with-mic{display:flex;gap:8px;align-items:stretch;flex:1}
+.field-with-mic > input,.field-with-mic > textarea{flex:1;min-width:0}
 body.demo-active #app{padding-top:46px}
 @media(max-width:760px){body.demo-active #app{padding-top:58px}}
 .demo-banner-text{font-size:0.82rem;color:rgba(255,255,255,0.9);font-weight:500}
@@ -2021,7 +2081,7 @@ body.demo-active #app{padding-top:46px}
               <button class="tax-hint-mode" id="taxModeBtn" onclick="cycleTaxMode()">УСН 6%</button>
             </div>
             <div class="qe-row">
-              <input class="qe-input" id="qeDesc" placeholder="Описание" type="text">
+              <div class="field-with-mic"><input class="qe-input" id="qeDesc" placeholder="Описание" type="text"><button type="button" class="mic-btn" title="Голосовой ввод" onclick="startVoiceInput('qeDesc',this)">🎤</button></div>
               <select class="qe-input" id="qeCategory">
                 <option value="Клиент">Клиент</option>
                 <option value="Материалы">Материалы</option>
@@ -2156,7 +2216,7 @@ body.demo-active #app{padding-top:46px}
             </div>
             <div class="form-field-app">
               <label>Имя клиента *</label>
-              <input type="text" id="apptClient" placeholder="Анна Иванова">
+              <div class="field-with-mic"><input type="text" id="apptClient" placeholder="Анна Иванова"><button type="button" class="mic-btn" title="Голосовой ввод" onclick="startVoiceInput('apptClient',this)">🎤</button></div>
             </div>
             <div class="form-field-app">
               <label>Телефон клиента</label>
@@ -2195,7 +2255,7 @@ body.demo-active #app{padding-top:46px}
             </div>
             <div class="form-field-app">
               <label>Услуга</label>
-              <input type="text" id="apptService" placeholder="Стрижка, маникюр...">
+              <div class="field-with-mic"><input type="text" id="apptService" placeholder="Стрижка, маникюр..."><button type="button" class="mic-btn" title="Голосовой ввод" onclick="startVoiceInput('apptService',this)">🎤</button></div>
             </div>
             <div class="form-field-app">
               <label>Стоимость (₽)</label>
@@ -2203,7 +2263,7 @@ body.demo-active #app{padding-top:46px}
             </div>
             <div class="form-field-app">
               <label>Заметка</label>
-              <textarea id="apptNote" placeholder="Особые пожелания..." style="min-height:52px"></textarea>
+              <div class="field-with-mic"><textarea id="apptNote" placeholder="Особые пожелания..." style="min-height:52px"></textarea><button type="button" class="mic-btn" title="Голосовой ввод" onclick="startVoiceInput('apptNote',this)">🎤</button></div>
             </div>
             <button class="auth-btn" id="saveAppt" style="margin-bottom:8px">Сохранить запись</button>
             <!-- Notification buttons (shown after save) -->
@@ -3199,7 +3259,7 @@ body.demo-active #app{padding-top:46px}
           <div class="onb-title">Ссылка для клиентов</div>
           <p class="onb-sub">Скопируй ссылку и отправь клиентам — они сами запишутся онлайн, а ты получишь уведомление.</p>
           <div class="onb-link-box">
-            <div class="onb-link-url" id="onbBookingUrl">kapital-mastera.vercel.app/booking.html?master=...</div>
+            <div class="onb-link-url" id="onbBookingUrl">kapital-mastera.vercel.app/zapis</div>
             <button class="onb-copy-btn" onclick="onbCopyLink()">📋 Копировать</button>
           </div>
           <div class="onb-tip">После копирования отправь ссылку в Instagram, WhatsApp или в шапку профиля.</div>
@@ -3716,9 +3776,9 @@ function renderBookingLink(){
     var sess2 = load('km_session', {});
     var uid2 = sess2.id || 'default';
     var fullUrl = window.location.origin + '/booking.html?master=' + uid2;
-    // Short beautiful URL — redirects to booking.html via Vercel
-    var url = window.location.origin + '/%D0%BE%D0%BD%D0%BB%D0%B0%D0%B9%D0%BD-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C?master=' + uid2;
-    var displayUrl = window.location.origin + '/онлайн-запись';
+    // Короткая красивая ссылка (через rewrite в vercel.json: /zapis → booking.html)
+    var url = window.location.origin + '/zapis?master=' + uid2;
+    var displayUrl = window.location.origin + '/zapis';
     var display = slug
       ? window.location.origin + '/b/' + slug
       : url;
@@ -3773,8 +3833,8 @@ function copyBookLink(){
   if(!s.isOpen){ toast('Сначала включи приём заявок','error'); return; }
   var sess = load('km_session', {});
   var uid = sess.id || 'default';
-  // Copy beautiful short URL that redirects correctly
-  var url = window.location.origin + '/%D0%BE%D0%BD%D0%BB%D0%B0%D0%B9%D0%BD-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C?master=' + uid;
+  // Короткая красивая ссылка (rewrite /zapis → booking.html)
+  var url = window.location.origin + '/zapis?master=' + uid;
   if(navigator.clipboard){
     navigator.clipboard.writeText(url).then(function(){ toast('✓ Ссылка скопирована! Отправь клиентам'); });
   } else {
@@ -4195,7 +4255,7 @@ function showOnboarding(){
   if(sub && name) sub.textContent = 'Давай настроим «Капитал Мастера» за 2 минуты — и ты сразу увидишь свои финансы как на ладони.';
   // Set booking URL
   var urlEl = document.getElementById('onbBookingUrl');
-  if(urlEl && sess.id) urlEl.textContent = 'kapital-mastera.vercel.app/booking.html?master=' + sess.id;
+  if(urlEl && sess.id) urlEl.textContent = 'kapital-mastera.vercel.app/zapis?master=' + sess.id;
   ONB_STEP = 0;
   onbRender();
   var overlay = document.getElementById('onbOverlay');
@@ -4318,7 +4378,7 @@ function onbAddTx(){
 
 function onbCopyLink(){
   var sess = load('km_session',{});
-  var url  = 'https://kapital-mastera.vercel.app/booking.html?master=' + (sess.id || 'demo_user');
+  var url  = 'https://kapital-mastera.vercel.app/zapis?master=' + (sess.id || 'demo_user');
   if(navigator.clipboard){
     navigator.clipboard.writeText(url).then(function(){
       var btn = document.querySelector('.onb-copy-btn');
@@ -5953,6 +6013,71 @@ function navigateTo(pg){
 }
 
 // Открыть/закрыть всплывашку группы (для клика/тача)
+// ═══ ГОЛОСОВОЙ ВВОД (Web Speech API) ═══
+var VOICE_REC = null;       // текущий объект распознавания
+var VOICE_TARGET = null;    // поле, куда пишем
+var VOICE_BTN = null;       // активная кнопка-микрофон
+
+function voiceSupported(){
+  return ('webkitSpeechRecognition' in window) || ('SpeechRecognition' in window);
+}
+
+// Привязка голосового ввода к полю по id кнопки
+function startVoiceInput(fieldId, btn){
+  if(!voiceSupported()){
+    toast('Голосовой ввод не поддерживается в этом браузере. Попробуйте Chrome.','error');
+    return;
+  }
+  var field = document.getElementById(fieldId);
+  if(!field) return;
+
+  // Если уже слушаем — остановить (повторное нажатие = стоп)
+  if(VOICE_REC){
+    try{ VOICE_REC.stop(); }catch(e){}
+    return;
+  }
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var rec = new SR();
+  rec.lang = 'ru-RU';
+  rec.interimResults = true;
+  rec.continuous = false;
+  rec.maxAlternatives = 1;
+
+  VOICE_REC = rec;
+  VOICE_TARGET = field;
+  VOICE_BTN = btn || null;
+
+  var baseText = field.value ? field.value.trim() + ' ' : '';
+
+  if(VOICE_BTN){ VOICE_BTN.classList.add('mic-active'); VOICE_BTN.textContent = '●'; }
+
+  rec.onresult = function(e){
+    var text = '';
+    for(var i=e.resultIndex; i<e.results.length; i++){
+      text += e.results[i][0].transcript;
+    }
+    text = text.trim();
+    // первая буква заглавная
+    if(text) text = text.charAt(0).toUpperCase() + text.slice(1);
+    field.value = baseText + text;
+  };
+  rec.onerror = function(e){
+    if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
+      toast('Нет доступа к микрофону. Разрешите его в браузере.','error');
+    } else if(e.error === 'no-speech'){
+      toast('Не услышал речь — попробуйте ещё раз');
+    }
+  };
+  rec.onend = function(){
+    if(VOICE_BTN){ VOICE_BTN.classList.remove('mic-active'); VOICE_BTN.textContent = '🎤'; }
+    VOICE_REC = null; VOICE_TARGET = null; VOICE_BTN = null;
+  };
+
+  try{ rec.start(); toast('Говорите…'); }
+  catch(e){ rec = null; VOICE_REC = null; }
+}
+
 function toggleNavFlyout(group){
   var g = document.querySelector('.nav-group[data-group="'+group+'"]');
   if(!g) return;
