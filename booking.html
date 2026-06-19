@@ -23,82 +23,111 @@ try {
 </script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--em:#0D6E4A;--em3:#13C47E;--ink:#0C0D0A;--cream:#F9F5EE;--cream2:#F0E9DC;--border:#DDD4C4;--muted:#5A5750;--gold:#B8975A;--red:#C0392B;--white:#fff}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+:root{
+  --paper:#FBF8F1;      /* тёплая бумага — фон */
+  --cream:#FBF8F1;
+  --cream2:#F3EDE0;     /* кремовые карточки */
+  --em:#1C5A41;         /* благородный изумруд */
+  --em-deep:#123E2D;
+  --em3:#2E7D5B;
+  --bordo:#7A2230;      /* бордо — тонкие акценты */
+  --bordo-soft:#9A3343;
+  --gold:#B8975A;       /* мягкое золото — eyebrow */
+  --ink:#2A2620;        /* тёплые чернила */
+  --muted:#6E665A;
+  --border:#E0D6C4;     /* мягкая линия */
+  --white:#FFFEFB;
+  --red:#9A3343;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
 /* Loading */
 #loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;padding:24px;text-align:center}
-.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--em);border-radius:50%;animation:spin .8s linear infinite}
+.spinner{width:38px;height:38px;border:2px solid var(--border);border-top-color:var(--em);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.load-text{font-size:.9rem;color:var(--muted);font-weight:300}
+.load-text{font-size:.9rem;color:var(--muted);font-weight:300;font-family:'Cormorant Garamond',serif;font-size:1.1rem}
 .load-sub{font-size:.75rem;color:var(--border);margin-top:4px}
-.retry-btn{margin-top:12px;padding:11px 24px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;display:none}
-/* Wrap */
-.wrap{max-width:500px;margin:0 auto;display:none}
+.retry-btn{margin-top:12px;padding:11px 24px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.04em;cursor:pointer;display:none}
+/* Wrap — карточка-приглашение */
+.wrap{max-width:480px;margin:0 auto;display:none;background:var(--white);min-height:100vh;box-shadow:0 0 60px rgba(42,38,32,0.06)}
 .wrap.ready{display:block}
-/* Header */
-.bk-header{background:var(--ink);padding:28px 24px;text-align:center}
-.bk-logo{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px}
-.master-av{width:56px;height:56px;border-radius:50%;background:var(--em);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#fff;font-weight:500}
-.master-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:#fff;margin-bottom:3px}
-.master-prof{font-size:.78rem;color:rgba(255,255,255,.35);letter-spacing:.06em}
-.closed-banner{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.3);color:var(--red);padding:12px 16px;font-size:.88rem;font-weight:500;text-align:center}
-/* Progress */
-.progress{display:flex;gap:4px;padding:12px 24px 0;background:var(--ink)}
-.prog-step{flex:1;height:3px;background:rgba(255,255,255,.12);border-radius:2px;transition:background .3s}
-.prog-step.done{background:var(--em3)}
+@media(min-width:520px){.wrap{margin:24px auto;min-height:auto;border:1px solid var(--border)}}
+/* Header — изумрудный с бордовой линией */
+.bk-header{background:var(--em);padding:34px 24px 30px;text-align:center;position:relative;border-bottom:2px solid var(--bordo)}
+.bk-logo{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(251,248,241,.55);margin-bottom:18px;font-weight:500}
+.bk-logo::before,.bk-logo::after{content:'·';margin:0 8px;color:var(--gold)}
+.master-av{width:62px;height:62px;border-radius:50%;background:transparent;border:1.5px solid var(--gold);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:#fff;font-weight:500;font-style:italic}
+.master-name{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:500;color:#fff;margin-bottom:4px;letter-spacing:.01em}
+.master-prof{font-size:.72rem;color:rgba(251,248,241,.6);letter-spacing:.14em;text-transform:uppercase;font-weight:400}
+.closed-banner{background:rgba(154,51,67,.1);border:1px solid rgba(154,51,67,.25);color:var(--bordo);padding:13px 16px;font-size:.86rem;font-weight:500;text-align:center}
+/* Progress — тонкие изумрудные сегменты */
+.progress{display:flex;gap:5px;padding:18px 24px 0;background:var(--white)}
+.prog-step{flex:1;height:2px;background:var(--border);transition:background .35s}
+.prog-step.done{background:var(--em)}
 /* Steps */
-.step{display:none;padding:20px 20px 40px}
+.step{display:none;padding:26px 24px 40px}
 .step.active{display:block}
-.step-tag{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;font-weight:600}
-.step-title{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:400;color:var(--ink);margin-bottom:18px}
+.step-tag{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:600;display:flex;align-items:center;gap:10px}
+.step-tag::before{content:'';width:24px;height:1px;background:var(--bordo)}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:500;color:var(--ink);margin-bottom:22px;line-height:1.1}
 /* Services */
-.svc-list{display:flex;flex-direction:column;gap:8px}
-.svc-card{padding:14px 16px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all .18s;display:flex;justify-content:space-between;align-items:center}
-.svc-card.sel,.svc-card:active{border-color:var(--em);background:rgba(13,110,74,.04)}
-.svc-name{font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:3px}
-.svc-dur{font-size:.78rem;color:var(--muted)}
-.svc-price{font-size:.95rem;font-weight:700;color:var(--em);margin-left:12px;white-space:nowrap}
+.svc-list{display:flex;flex-direction:column;gap:10px}
+.svc-card{padding:16px 18px;border:1px solid var(--border);background:var(--white);cursor:pointer;transition:all .2s;display:flex;justify-content:space-between;align-items:center}
+.svc-card:hover{border-color:var(--em)}
+.svc-card.sel,.svc-card:active{border-color:var(--em);background:rgba(28,90,65,.04);box-shadow:inset 3px 0 0 var(--em)}
+.svc-name{font-size:.96rem;font-weight:600;color:var(--ink);margin-bottom:3px}
+.svc-dur{font-size:.76rem;color:var(--muted);letter-spacing:.02em}
+.svc-price{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--bordo);margin-left:12px;white-space:nowrap}
 /* Calendar */
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.cal-nav-btn{width:34px;height:34px;background:none;border:1.5px solid var(--border);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
-.cal-month{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-nav-btn{width:36px;height:36px;background:none;border:1px solid var(--border);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:all .2s}
+.cal-nav-btn:hover{border-color:var(--em);color:var(--em)}
+.cal-month{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;color:var(--ink)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px}
-.cal-wd{font-size:.6rem;font-weight:700;text-align:center;color:var(--muted);padding:4px 0;text-transform:uppercase}
-.cal-day{height:38px;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:500;cursor:pointer;border-radius:4px;transition:all .15s}
+.cal-wd{font-size:.58rem;font-weight:700;text-align:center;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:.08em}
+.cal-day{height:40px;display:flex;align-items:center;justify-content:center;font-size:.84rem;font-weight:500;cursor:pointer;transition:all .15s;border-radius:2px}
 .cal-day.off{color:var(--border);cursor:default}
-.cal-day.avail:hover{background:rgba(13,110,74,.1)}
-.cal-day.today{border:2px solid var(--em);color:var(--em);font-weight:700}
-.cal-day.sel{background:var(--em);color:#fff;border-radius:50%}
+.cal-day.avail:hover{background:rgba(28,90,65,.08);color:var(--em)}
+.cal-day.today{box-shadow:inset 0 0 0 1px var(--gold);color:var(--em);font-weight:700}
+.cal-day.sel{background:var(--em);color:#fff;font-weight:600}
 /* Time */
-.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.time-slot{padding:12px 4px;text-align:center;border:1.5px solid var(--border);cursor:pointer;font-size:.88rem;font-weight:500;transition:all .15s;background:var(--white)}
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.time-slot{padding:13px 4px;text-align:center;border:1px solid var(--border);cursor:pointer;font-size:.88rem;font-weight:500;transition:all .18s;background:var(--white)}
+.time-slot:hover:not(.taken){border-color:var(--em);color:var(--em)}
 .time-slot.sel,.time-slot:active:not(.taken){background:var(--em);color:#fff;border-color:var(--em)}
 .time-slot.taken{background:var(--cream2);color:var(--border);cursor:default;text-decoration:line-through}
 /* Form */
-.field{margin-bottom:14px}
-.field label{display:block;font-size:.78rem;font-weight:600;color:var(--ink);margin-bottom:5px}
-.field input,.field textarea{width:100%;padding:13px 14px;border:2px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--ink);outline:none;transition:border-color .2s;border-radius:0}
-.field input:focus,.field textarea:focus{border-color:var(--em)}
-.field textarea{resize:vertical;min-height:56px}
-.sum-box{background:var(--cream2);padding:14px 16px;margin-bottom:16px;border-left:3px solid var(--em)}
-.sum-row{display:flex;justify-content:space-between;font-size:.88rem;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.06)}
-.sum-row:last-child{border:none;padding-top:8px;font-weight:700;font-size:.95rem;color:var(--em)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.74rem;font-weight:600;color:var(--ink);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.field input,.field textarea{width:100%;padding:14px 15px;border:1px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--ink);outline:none;transition:border-color .2s;border-radius:0}
+.field input:focus,.field textarea:focus{border-color:var(--em);box-shadow:inset 2px 0 0 var(--em)}
+.field textarea{resize:vertical;min-height:60px}
+.sum-box{background:var(--cream2);padding:18px 18px;margin-bottom:18px;border-left:2px solid var(--bordo)}
+.sum-row{display:flex;justify-content:space-between;font-size:.88rem;padding:6px 0;border-bottom:1px solid rgba(42,38,32,.07);color:var(--muted)}
+.sum-row:last-child{border:none;padding-top:10px;font-weight:600;font-size:1.05rem;color:var(--ink);font-family:'Cormorant Garamond',serif}
+.sum-row:last-child span:last-child{color:var(--bordo)}
 /* Buttons */
-.btn-next{width:100%;padding:15px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-top:8px}
-.btn-next:active{background:var(--ink)}
-.btn-next:disabled{background:var(--border);cursor:default}
-.btn-back{width:100%;padding:13px;background:none;border:2px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;margin-top:8px}
-.err-msg{color:var(--red);font-size:.82rem;padding:10px 14px;background:rgba(192,57,43,.08);margin-bottom:10px;display:none;border-left:3px solid var(--red)}
-/* Success */
-.success{text-align:center;padding:36px 20px 48px}
+.btn-next{width:100%;padding:16px;background:var(--em);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;margin-top:10px;transition:background .2s}
+.btn-next:hover{background:var(--em-deep)}
+.btn-next:active{background:var(--em-deep)}
+.btn-next:disabled{background:var(--border);cursor:default;color:#fff}
+.btn-back{width:100%;padding:13px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-top:10px;transition:all .2s}
+.btn-back:hover{border-color:var(--muted)}
+.err-msg{color:var(--bordo);font-size:.82rem;padding:11px 14px;background:rgba(154,51,67,.07);margin-bottom:12px;display:none;border-left:2px solid var(--bordo)}
+/* Success — премиальное подтверждение */
+.success{text-align:center;padding:44px 28px 52px}
+.success-seal{width:72px;height:72px;border-radius:50%;border:1.5px solid var(--gold);margin:0 auto 22px;display:flex;align-items:center;justify-content:center;color:var(--em);font-size:1.8rem;position:relative}
+.success-seal::after{content:'';position:absolute;inset:-7px;border-radius:50%;border:1px solid var(--border)}
 .success-icon{font-size:3rem;display:block;margin-bottom:16px}
-.success-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--ink);margin-bottom:8px}
-.success-det{background:var(--cream2);padding:14px 16px;margin:16px 0;text-align:left;border-left:3px solid var(--em)}
-.success-det-row{display:flex;justify-content:space-between;font-size:.88rem;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.success-eyebrow{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.05}
+.success-det{background:var(--cream2);padding:20px 20px;margin:22px 0;text-align:left;border-top:2px solid var(--em);border-bottom:2px solid var(--bordo)}
+.success-det-row{display:flex;justify-content:space-between;font-size:.9rem;padding:7px 0;border-bottom:1px solid rgba(42,38,32,.07);color:var(--muted)}
 .success-det-row:last-child{border:none}
-.success-sub{font-size:.85rem;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.success-det-row b{color:var(--ink);font-weight:600}
+.success-sub{font-size:.86rem;color:var(--muted);line-height:1.75;margin-bottom:20px;font-weight:300}
 .msg-btns{display:flex;flex-direction:column;gap:10px;margin-top:4px}
-.msg-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;color:#fff;text-decoration:none;font-size:.9rem;font-weight:700;font-family:'DM Sans',sans-serif}
+.msg-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;color:#fff;text-decoration:none;font-size:.84rem;font-weight:600;letter-spacing:.04em;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.msg-btn:hover{opacity:.9}
 </style>
 </head>
 <body>
@@ -112,7 +141,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);m
 
 <div class="wrap" id="mainWrap">
   <div class="bk-header">
-    <div class="bk-logo">Капитал Мастера · Онлайн-запись</div>
+    <div class="bk-logo">Запись на приём</div>
     <div class="master-av" id="masterAv">М</div>
     <div class="master-name" id="masterName">Мастер</div>
     <div class="master-prof" id="masterProf"></div>
@@ -155,10 +184,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);m
   </div>
   <div class="step" id="sDone">
     <div class="success">
-      <span class="success-icon">✅</span>
-      <div class="success-title">Вы записаны!</div>
+      <div class="success-seal">✓</div>
+      <div class="success-eyebrow">Запись подтверждена</div>
+      <div class="success-title">Будем вас ждать</div>
       <div class="success-det" id="successDet"></div>
-      <div class="success-sub">Мастер получил уведомление. Напишите напрямую:</div>
+      <div class="success-sub">Мастер получил уведомление о вашей записи. Если нужно что-то уточнить — напишите напрямую:</div>
       <div class="msg-btns" id="msgBtns"></div>
     </div>
   </div>
