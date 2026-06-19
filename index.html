@@ -518,6 +518,11 @@ select.auth-field{cursor:pointer}
   font-size:1rem;transition:color 0.2s;padding:4px 8px;
 }
 .tx-del:hover{color:var(--red)}
+.tx-edit{
+  background:none;border:none;color:var(--border);cursor:pointer;
+  font-size:0.95rem;transition:color 0.2s;padding:4px 6px;
+}
+.tx-edit:hover{color:var(--em)}
 
 /* Summary side */
 .summary-card{background:var(--white);border:1px solid var(--border);padding:24px;margin-bottom:16px}
@@ -1177,6 +1182,68 @@ select.auth-field{cursor:pointer}
 }
 @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(19,196,126,0.5)}50%{box-shadow:0 0 0 6px rgba(19,196,126,0)}}
 .field-with-mic{display:flex;gap:8px;align-items:stretch;flex:1}
+/* ОПУ блоки */
+.pnl-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.pnl-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:20px;border-top:3px solid var(--em)}
+.pnl-card#pnlPers{border-top-color:var(--gold)}
+.pnl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}
+.pnl-title{font-size:0.82rem;font-weight:700;color:var(--ink);letter-spacing:0.01em}
+.pnl-verdict{font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.pnl-verdict.good{background:rgba(19,196,126,0.12);color:#0D6E4A}
+.pnl-verdict.bad{background:rgba(192,57,43,0.12);color:#C0392B}
+.pnl-verdict.neutral{background:var(--cream2);color:var(--muted)}
+.pnl-rows{display:flex;flex-direction:column;gap:9px}
+.pnl-row{display:flex;align-items:center;justify-content:space-between;font-size:0.9rem;color:var(--muted)}
+.pnl-row span:first-child{font-weight:400}
+.pnl-pos{color:#0D6E4A;font-weight:600}
+.pnl-neg{color:#C0392B;font-weight:600}
+.pnl-total{border-top:1px solid var(--border);padding-top:10px;margin-top:3px;font-size:1.05rem;color:var(--ink)}
+.pnl-total span{font-weight:700}
+.pnl-total span:last-child.profit{color:#0D6E4A}
+.pnl-total span:last-child.loss{color:#C0392B}
+.pnl-note{font-size:0.74rem;color:var(--muted);margin-top:12px}
+@media(max-width:760px){.pnl-grid{grid-template-columns:1fr}}
+/* Переключатель периода ОПУ */
+.pnl-period{display:flex;gap:6px;margin-bottom:12px}
+.pnl-period-btn{padding:7px 16px;border:1px solid var(--border);background:var(--white);color:var(--muted);font-size:0.82rem;font-weight:600;cursor:pointer;border-radius:6px;font-family:'DM Sans',sans-serif;transition:all .2s}
+.pnl-period-btn:hover{border-color:var(--em);color:var(--em)}
+.pnl-period-btn.active{background:var(--em);color:#fff;border-color:var(--em)}
+/* Кнопка календаря и текущий период */
+.pnl-cal-btn{padding:7px 12px;border:1px solid var(--border);background:var(--white);cursor:pointer;border-radius:6px;font-size:0.9rem}
+.pnl-cal-btn:hover{border-color:var(--em)}
+.pnl-cur-period{font-size:0.82rem;color:var(--muted);font-weight:600;align-self:center}
+/* Всплывающий календарь */
+.pnl-cal{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;max-width:420px;box-shadow:0 8px 30px rgba(42,38,32,0.12)}
+.pnl-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pnl-cal-head span{font-size:1.05rem;font-weight:700;color:var(--ink);font-family:'Cormorant Garamond',serif}
+.pnl-cal-head button{width:32px;height:32px;border:1px solid var(--border);background:var(--white);border-radius:6px;cursor:pointer;font-size:1.1rem;color:var(--ink)}
+.pnl-cal-head button:hover{border-color:var(--em);color:var(--em)}
+.pnl-cal-section-title{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:10px 0 8px}
+.pnl-cal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pnl-cal-qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pnl-cal-cell{padding:9px 4px;border:1px solid var(--border);background:var(--white);border-radius:6px;cursor:pointer;font-size:0.82rem;color:var(--ink);text-align:center;font-family:'DM Sans',sans-serif;transition:all .15s}
+.pnl-cal-cell:hover{border-color:var(--em);color:var(--em)}
+.pnl-cal-cell.active{background:var(--em);color:#fff;border-color:var(--em);font-weight:700}
+.pnl-cal-actions{display:flex;gap:8px;margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+.pnl-cal-actions button{flex:1;padding:9px;border:1px solid var(--border);background:var(--white);border-radius:6px;cursor:pointer;font-size:0.82rem;color:var(--ink);font-family:'DM Sans',sans-serif;font-weight:600}
+.pnl-cal-actions button:hover{border-color:var(--em);color:var(--em)}
+/* Блок зарплаты в личном ОПУ */
+.pnl-salary{margin-top:14px;padding-top:12px;border-top:1px dashed var(--border)}
+.pnl-salary-line{display:flex;align-items:center;justify-content:space-between;font-size:0.84rem;color:var(--muted);margin-bottom:8px}
+.pnl-salary-line span:last-child{font-weight:700;color:var(--ink)}
+.pnl-salary-bar{height:8px;background:var(--cream2);border-radius:4px;overflow:hidden}
+.pnl-salary-fill{height:100%;border-radius:4px;transition:width .4s;background:var(--em)}
+.pnl-salary-fill.over{background:var(--red)}
+.pnl-salary-hint{font-size:0.76rem;margin-top:8px;font-weight:600}
+.pnl-salary-hint.ok{color:#0D6E4A}
+.pnl-salary-hint.over{color:#C0392B}
+/* Анимация подтверждения кнопки */
+.btn-confirmed{
+  background:#13C47E !important;color:#fff !important;
+  border-color:#13C47E !important;
+  animation:btnConfirm .4s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes btnConfirm{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
 .field-with-mic > input,.field-with-mic > textarea{flex:1;min-width:0}
 body.demo-active #app{padding-top:46px}
 @media(max-width:760px){body.demo-active #app{padding-top:58px}}
@@ -2008,6 +2075,64 @@ body.demo-active #app{padding-top:46px}
         </div>
       </div>
 
+      <!-- ОПУ: Бизнес и Личное -->
+      <div class="pnl-period">
+        <button class="pnl-period-btn active" data-period="month" onclick="setPnlPeriod('month')">Месяц</button>
+        <button class="pnl-period-btn" data-period="quarter" onclick="setPnlPeriod('quarter')">Квартал</button>
+        <button class="pnl-period-btn" data-period="year" onclick="setPnlPeriod('year')">Год</button>
+        <button class="pnl-cal-btn" onclick="togglePnlCal()" title="Выбрать период">📅</button>
+        <span class="pnl-cur-period" id="pnlCurPeriod"></span>
+        <button class="help-btn" onclick="openHelp('pnl')" style="margin-left:auto">?</button>
+      </div>
+
+      <div class="pnl-cal" id="pnlCal" style="display:none">
+        <div class="pnl-cal-head">
+          <button type="button" onclick="pnlCalYear(-1)">‹</button>
+          <span id="pnlCalYearLabel">2026</span>
+          <button type="button" onclick="pnlCalYear(1)">›</button>
+        </div>
+        <div class="pnl-cal-section-title">Месяц</div>
+        <div class="pnl-cal-grid" id="pnlCalMonthGrid"></div>
+        <div class="pnl-cal-section-title">Квартал</div>
+        <div class="pnl-cal-qgrid" id="pnlCalQuarterGrid"></div>
+        <div class="pnl-cal-actions">
+          <button type="button" onclick="pnlCalPickYear()">Весь год</button>
+          <button type="button" onclick="pnlCalReset()">Текущий период</button>
+        </div>
+      </div>
+      <div class="pnl-grid">
+        <div class="pnl-card" id="pnlBiz">
+          <div class="pnl-head">
+            <span class="pnl-title">◈ Бизнес — прибыль/убыток</span>
+            <span class="pnl-verdict" id="pnlBizVerdict">—</span>
+          </div>
+          <div class="pnl-rows">
+            <div class="pnl-row"><span>Доходы</span><span class="pnl-pos" id="pnlBizInc">0 ₽</span></div>
+            <div class="pnl-row"><span>Расходы</span><span class="pnl-neg" id="pnlBizExp">0 ₽</span></div>
+            <div class="pnl-row pnl-total"><span>Чистая прибыль</span><span id="pnlBizNet">0 ₽</span></div>
+          </div>
+          <div class="pnl-note" id="pnlBizNote">за текущий месяц</div>
+        </div>
+
+        <div class="pnl-card" id="pnlPers">
+          <div class="pnl-head">
+            <span class="pnl-title">◎ Личное — баланс</span>
+            <span class="pnl-verdict" id="pnlPersVerdict">—</span>
+          </div>
+          <div class="pnl-rows">
+            <div class="pnl-row"><span>Доходы / зарплата</span><span class="pnl-pos" id="pnlPersInc">0 ₽</span></div>
+            <div class="pnl-row"><span>Расходы</span><span class="pnl-neg" id="pnlPersExp">0 ₽</span></div>
+            <div class="pnl-row pnl-total"><span>Остаток</span><span id="pnlPersNet">0 ₽</span></div>
+          </div>
+          <div class="pnl-salary" id="pnlSalaryRow">
+            <div class="pnl-salary-line"><span>Назначенная зарплата</span><span id="pnlSalaryPlan">0 ₽</span></div>
+            <div class="pnl-salary-bar"><div class="pnl-salary-fill" id="pnlSalaryFill"></div></div>
+            <div class="pnl-salary-hint" id="pnlSalaryHint"></div>
+          </div>
+          <div class="pnl-note" id="pnlPersNote">за текущий месяц</div>
+        </div>
+      </div>
+
       <div class="dash-grid">
         <div>
           <div class="dash-card" style="margin-bottom:20px">
@@ -2095,6 +2220,9 @@ body.demo-active #app{padding-top:46px}
                 <option value="Инвестиции">Инвестиции</option>
                 <option value="Прочее">Прочее</option>
               </select>
+            </div>
+            <div class="qe-row" style="margin-top:8px">
+              <input class="qe-input" id="qeDate" type="date" title="Дата операции" style="flex:1">
             </div>
             <div class="qe-seg">
               <button class="qe-seg-btn active" id="segBiz">◈ Бизнес</button>
@@ -2226,10 +2354,6 @@ body.demo-active #app{padding-top:46px}
                   style="padding:10px 12px;background:#25D366;color:#fff;border:none;cursor:pointer;font-size:1rem;flex-shrink:0;touch-action:manipulation;display:none">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 </button>
-                <button id="sendMaxBtn" onclick="sendApptMax()" title="Отправить в MAX"
-                  style="padding:10px 12px;background:#005BFF;color:#fff;border:none;cursor:pointer;font-size:0.75rem;font-weight:700;flex-shrink:0;touch-action:manipulation;font-family:'DM Sans',sans-serif;display:none">
-                  MAX
-                </button>
               </div>
               <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Введи телефон — появятся кнопки отправки уведомления</div>
             </div>
@@ -2274,10 +2398,6 @@ body.demo-active #app{padding-top:46px}
                   style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:#25D366;color:#fff;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                   WhatsApp
-                </button>
-                <button id="notifyMaxBtn"
-                  style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:#005BFF;color:#fff;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation">
-                  MAX
                 </button>
               </div>
             </div>
@@ -2711,9 +2831,9 @@ body.demo-active #app{padding-top:46px}
           <div class="settings-card">
             <div class="settings-title">Контакт мастера</div>
             <div class="form-field-app" style="margin-bottom:12px">
-              <label>Телефон (WhatsApp / MAX)</label>
+              <label>Телефон (WhatsApp)</label>
               <input id="masterPhone" type="tel" placeholder="+7 (999) 000-00-00" onchange="saveBookingSettings()">
-              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Для уведомлений через WhatsApp и MAX</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Для уведомлений через WhatsApp</div>
             </div>
             <div class="form-field-app" style="margin-bottom:12px">
               <label>Telegram username</label>
@@ -2794,6 +2914,23 @@ body.demo-active #app{padding-top:46px}
               <button onclick="openHelp('booking')" style="padding:11px 14px;background:none;border:1.5px solid var(--border);color:var(--muted);font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif">
                 ? Как работает
               </button>
+            </div>
+          </div>
+
+          <!-- Подсказка: как сделать ссылку короче -->
+          <div style="margin-top:14px;padding:16px;background:var(--cream2);border-left:3px solid var(--em)">
+            <div style="font-size:0.86rem;font-weight:700;color:var(--ink);margin-bottom:8px">✂️ Хотите ссылку короче?</div>
+            <div style="font-size:0.84rem;color:var(--muted);line-height:1.7;font-weight:300">
+              Ссылку можно бесплатно укоротить за минуту:
+              <div style="margin:10px 0 0;padding-left:2px">
+                <div style="margin-bottom:6px"><strong style="color:var(--ink)">1.</strong> Нажмите «Скопировать ссылку» выше</div>
+                <div style="margin-bottom:6px"><strong style="color:var(--ink)">2.</strong> Откройте <a href="https://clck.ru" target="_blank" rel="noopener" style="color:var(--em);font-weight:600">clck.ru</a> (сокращатель от Яндекса)</div>
+                <div style="margin-bottom:6px"><strong style="color:var(--ink)">3.</strong> Вставьте ссылку в поле и нажмите «Сократить»</div>
+                <div><strong style="color:var(--ink)">4.</strong> Скопируйте короткую ссылку вида <em>clck.ru/3Xy…</em> и отправляйте клиентам</div>
+              </div>
+              <div style="margin-top:10px;font-size:0.78rem;color:var(--muted)">
+                💡 Так же работают <a href="https://vk.cc" target="_blank" rel="noopener" style="color:var(--em)">vk.cc</a> (ВКонтакте) и другие сокращатели.
+              </div>
             </div>
           </div>
 
@@ -3956,13 +4093,7 @@ function renderIncomingList(){
       waA.target = '_blank';
       waA.style.cssText = 'padding:8px 12px;background:#25D366;color:#fff;font-size:0.75rem;font-weight:700;text-decoration:none';
       waA.textContent = 'WA';
-      var maxA = document.createElement('a');
-      maxA.href = 'https://max.ru/chat/'+phone+'?'+msg;
-      maxA.target = '_blank';
-      maxA.style.cssText = 'padding:8px 12px;background:#005BFF;color:#fff;font-size:0.75rem;font-weight:700;text-decoration:none';
-      maxA.textContent = 'MAX';
       actions.appendChild(waA);
-      actions.appendChild(maxA);
     }
     el.appendChild(div);
   });
@@ -4529,6 +4660,27 @@ function getBotReply(msg){
   var q = (msg || '').toLowerCase();
   function has(){ for(var i=0;i<arguments.length;i++){ if(q.indexOf(arguments[i])!==-1) return true; } return false; }
 
+  // ОПУ — отчёт о прибылях и убытках
+  if(has('опу','о.п.у','прибыл','убыт','отчёт','отчет','рентабел','зарабатыва ли','в плюсе','в минусе','прибыль/убыток')){
+    return {text:'**ОПУ — отчёт о прибылях и убытках.** Это два блока на главном экране, которые показывают в чистом виде: зарабатываешь ты или работаешь в минус.\n\n**◈ Блок «Бизнес»** — доходы от клиентов минус рабочие расходы (материалы, аренда, реклама). Если итог зелёный — бизнес **прибыльный**, если красный — **убыточный**.\n\n**◎ Блок «Личное»** — твои личные доходы и траты. Видно, укладываешься ли ты в свою зарплату или идёт перерасход.\n\nФормула простая: **Доходы − Расходы = Прибыль (или убыток)**.',
+      chips:['Как выбрать период?','Что за сравнение с зарплатой?','Зачем делить бизнес и личное?']};
+  }
+  // ОПУ — периоды
+  if(has('период','месяц квартал','квартал','за год','выбрать месяц','календарь опу','другой месяц')){
+    return {text:'**Период в ОПУ можно менять.** Над блоками есть кнопки **Месяц / Квартал / Год** и значок 📅.\n\nНажми 📅 — откроется календарь, где можно выбрать любой конкретный период: нужный месяц, квартал или весь год, и даже прошлые. Кнопка «Текущий период» вернёт к сегодняшнему.\n\nТак удобно сравнивать: например, прибыль в этом месяце против прошлого, или итог за весь год.',
+      chips:['Что такое ОПУ?','Что за сравнение с зарплатой?']};
+  }
+  // ОПУ — зарплата
+  if(has('зарплат','назначенная зарплата','перерасход','уложился','сравнение с зарплат')){
+    return {text:'**Сравнение с зарплатой** — в личном блоке ОПУ.\n\nТы задаёшь себе «зарплату» в **Настройках** (поле «Ежемесячный доход»). Приложение сравнивает твои личные расходы с этой суммой:\n\n• Полоса **зелёная** — уложился в зарплату, видно сколько осталось\n• Полоса **красная** — перерасход, тратишь больше, чем себе назначил\n\nЗа квартал и год зарплата автоматически умножается (×3 и ×12), чтобы сравнение было честным.',
+      chips:['Что такое ОПУ?','Как выбрать период?','Что такое 50/30/20?']};
+  }
+  // ОПУ — зачем делить бизнес и личное
+  if(has('делить бизнес','бизнес и личное','зачем сегмент','бизнес или личное','разделение')){
+    return {text:'**Зачем делить деньги на «Бизнес» и «Личное»?**\n\nЭто защищает от главной ловушки мастеров: «деньги на карте есть — значит всё хорошо». На самом деле часть этих денег — оборотные средства бизнеса (на материалы, аренду), а не твой личный доход.\n\nРазделение показывает правду: реально ли бизнес прибыльный, и не проедаешь ли ты больше своей зарплаты. Поэтому при каждой операции выбирай сегмент — **◈ Бизнес** или **◎ Личное**.',
+      chips:['Что такое ОПУ?','Что за сравнение с зарплатой?']};
+  }
+
   // 50/30/20
   if(has('50/30/20','50 30 20','распределение','правило')){
     return {text:'**Правило 50/30/20** — как делить доход:\n\n**50%** — на жизнь (аренда, еда, материалы для работы)\n**30%** — на желания (отдых, обучение, приятное)\n**20%** — в капитал (накопления, подушка, инвестиции)\n\nЭто базовый ориентир. Главное — чтобы 20% уходили в капитал регулярно.',
@@ -4566,12 +4718,12 @@ function getBotReply(msg){
   }
   // Приветствие / благодарность
   if(has('привет','здравств','добрый','хай','спасибо','благодар')){
-    return {text:'Рада помочь! ✦ Спрашивай про доходы, налоги, онлайн-запись или правило 50/30/20 — подскажу, как пользоваться приложением.',
-      chips:['Как добавить доход?','Как платить налоги?','Как настроить онлайн-запись?']};
+    return {text:'Рада помочь! ✦ Спрашивай про доходы, налоги, онлайн-запись, отчёт о прибыли (ОПУ) или правило 50/30/20 — подскажу, как пользоваться приложением.',
+      chips:['Что такое ОПУ?','Как добавить доход?','Как платить налоги?']};
   }
   // По умолчанию
-  return {text:'Я подскажу по работе с приложением: как вести **финансы**, считать **налоги**, настроить **онлайн-запись** и копить **капитал**. Выбери тему ниже или задай вопрос своими словами.',
-    chips:['Как добавить доход?','Как платить налоги?','Как настроить онлайн-запись?','Что такое 50/30/20?']};
+  return {text:'Я подскажу по работе с приложением: как вести **финансы**, смотреть **прибыль/убыток (ОПУ)**, считать **налоги**, настроить **онлайн-запись** и копить **капитал**. Выбери тему ниже или задай вопрос своими словами.',
+    chips:['Что такое ОПУ?','Как добавить доход?','Как платить налоги?','Что такое 50/30/20?']};
 }
 
 // main.js
@@ -4813,6 +4965,29 @@ function toast(msg,type='success'){
   setTimeout(()=>t.className='',2500);
 }
 
+function setText(id, text){
+  var el=document.getElementById(id);
+  if(el) el.textContent=text;
+}
+
+// Подтверждение действия: вибрация + анимация кнопки "✓ Готово" + тост
+function confirmFeedback(btn, msg){
+  // 1) Вибрация телефона (если поддерживается)
+  try{ if(navigator.vibrate) navigator.vibrate([15, 30, 15]); }catch(e){}
+  // 2) Анимация кнопки — временно показываем "✓ Добавлено"
+  if(btn){
+    if(!btn.dataset.origText){ btn.dataset.origText = btn.innerHTML; }
+    btn.classList.add('btn-confirmed');
+    btn.innerHTML = '✓ Добавлено';
+    setTimeout(function(){
+      btn.classList.remove('btn-confirmed');
+      if(btn.dataset.origText){ btn.innerHTML = btn.dataset.origText; }
+    }, 1400);
+  }
+  // 3) Тост-уведомление
+  if(msg) toast(msg);
+}
+
 // ===== FINANCES =====
 var txFilter='all';
 var qeType='income';
@@ -4856,13 +5031,23 @@ function addTransaction(){
   const desc=document.getElementById('qeDesc').value.trim()||'Операция';
   const cat=document.getElementById('qeCategory').value;
   if(!amount||amount<=0){toast('Введите сумму','error');return}
-  const tx={id:uid(),date:new Date().toISOString(),amount,desc,cat,type:qeType,segment:qeSegment};
+  // дата: выбранная пользователем или сегодня
+  var dateField=document.getElementById('qeDate');
+  var txDate;
+  if(dateField && dateField.value){
+    // сохраняем выбранную дату с текущим временем (для корректной сортировки)
+    txDate=new Date(dateField.value+'T12:00:00').toISOString();
+  } else {
+    txDate=new Date().toISOString();
+  }
+  const tx={id:uid(),date:txDate,amount,desc,cat,type:qeType,segment:qeSegment};
   const txs=getTx();
   txs.unshift(tx);
   saveTx(txs);
   document.getElementById('qeAmount').value='';
   document.getElementById('qeDesc').value='';
-  toast(qeType==='income'?`+${fmt(amount)} добавлено`:`-${fmt(amount)} записано`);
+  if(dateField) dateField.value=new Date().toISOString().split('T')[0];
+  confirmFeedback(document.getElementById('qeSubmit'), qeType==='income'?`+${fmt(amount)} добавлено`:`-${fmt(amount)} записано`);
   renderFinances();
   renderDashboard();
   updateCapitalRing();
@@ -4871,6 +5056,80 @@ function addTransaction(){
 function fmt(n){return Math.round(n).toLocaleString('ru-RU')}
 function fmtDate(iso){const d=new Date(iso);return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`}
 function thisMonth(iso){const d=new Date(iso),n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()}
+
+// Период для ОПУ
+var PNL_PERIOD = 'month';        // 'month' | 'quarter' | 'year'
+var PNL_YEAR = new Date().getFullYear();   // выбранный год
+var PNL_MONTH = new Date().getMonth();     // выбранный месяц (0-11)
+var PNL_QUARTER = Math.floor(new Date().getMonth()/3); // выбранный квартал (0-3)
+
+function inPeriod(iso, period){
+  var d=new Date(iso);
+  if(d.getFullYear()!==PNL_YEAR) return false;
+  if(period==='year') return true;
+  if(period==='quarter') return Math.floor(d.getMonth()/3)===PNL_QUARTER;
+  return d.getMonth()===PNL_MONTH; // month
+}
+function pnlPeriodMonths(period){ return period==='year'?12 : period==='quarter'?3 : 1; }
+function pnlPeriodLabel(period){
+  var months=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+  if(period==='year') return PNL_YEAR+' год';
+  if(period==='quarter') return (PNL_QUARTER+1)+'-й квартал '+PNL_YEAR;
+  return months[PNL_MONTH]+' '+PNL_YEAR;
+}
+function setPnlPeriod(p){
+  PNL_PERIOD=p;
+  document.querySelectorAll('.pnl-period-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.period===p);
+  });
+  renderDashboard();
+}
+
+// ── Всплывающий календарь выбора периода ──
+function togglePnlCal(){
+  var cal=document.getElementById('pnlCal');
+  if(!cal) return;
+  if(cal.style.display==='none'){ cal.style.display='block'; renderPnlCal(); }
+  else cal.style.display='none';
+}
+function pnlCalYear(delta){ PNL_YEAR+=delta; renderPnlCal(); }
+function renderPnlCal(){
+  var yl=document.getElementById('pnlCalYearLabel');
+  if(yl) yl.textContent=PNL_YEAR;
+  var months=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+  var mg=document.getElementById('pnlCalMonthGrid');
+  if(mg){
+    mg.innerHTML=months.map(function(m,i){
+      var active=(PNL_PERIOD==='month'&&PNL_MONTH===i)?' active':'';
+      return '<button type="button" class="pnl-cal-cell'+active+'" onclick="pnlCalPickMonth('+i+')">'+m+'</button>';
+    }).join('');
+  }
+  var qg=document.getElementById('pnlCalQuarterGrid');
+  if(qg){
+    qg.innerHTML=[0,1,2,3].map(function(q){
+      var active=(PNL_PERIOD==='quarter'&&PNL_QUARTER===q)?' active':'';
+      return '<button type="button" class="pnl-cal-cell'+active+'" onclick="pnlCalPickQuarter('+q+')">'+(q+1)+'-й кв</button>';
+    }).join('');
+  }
+}
+function pnlCalPickMonth(i){ PNL_MONTH=i; PNL_PERIOD='month'; syncPnlButtons(); closePnlCalAndRender(); }
+function pnlCalPickQuarter(q){ PNL_QUARTER=q; PNL_PERIOD='quarter'; syncPnlButtons(); closePnlCalAndRender(); }
+function pnlCalPickYear(){ PNL_PERIOD='year'; syncPnlButtons(); closePnlCalAndRender(); }
+function pnlCalReset(){
+  var n=new Date();
+  PNL_YEAR=n.getFullYear(); PNL_MONTH=n.getMonth(); PNL_QUARTER=Math.floor(n.getMonth()/3);
+  PNL_PERIOD='month'; syncPnlButtons(); closePnlCalAndRender();
+}
+function syncPnlButtons(){
+  document.querySelectorAll('.pnl-period-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.period===PNL_PERIOD);
+  });
+}
+function closePnlCalAndRender(){
+  var cal=document.getElementById('pnlCal');
+  if(cal) cal.style.display='none';
+  renderDashboard();
+}
 
 function renderFinances(){
   const txs=getTx();
@@ -4896,12 +5155,16 @@ function renderFinances(){
       '<span><span class="tx-cat-badge '+(t.segment==='business'?'badge-biz':'badge-pers')+'">'+t.cat+'</span></span>'+
       '<span class="tx-segment">'+(t.segment==='business'?'Бизнес':'Личное')+'</span>'+
       '<span class="tx-amount-cell '+t.type+'">'+(t.type==='income'?'+':'−')+fmt(t.amount)+' ₽</span>'+
+      '<button class="tx-edit" data-txid="'+t.id+'" title="Изменить">✎</button>'+
       '<button class="tx-del" data-txid="'+t.id+'">×</button>'+
     '</div>';
   }
   tbody.innerHTML=txHTML;
   tbody.querySelectorAll('.tx-del').forEach(function(btn){
     btn.onclick=function(){deleteTx(this.getAttribute('data-txid'))};
+  });
+  tbody.querySelectorAll('.tx-edit').forEach(function(btn){
+    btn.onclick=function(){editTx(this.getAttribute('data-txid'))};
   });
 
   // Toggle button
@@ -4951,6 +5214,36 @@ function deleteTx(id){
   toast('Операция удалена');
 }
 
+function editTx(id){
+  var txs=getTx();
+  var t=txs.find(function(x){return x.id===id});
+  if(!t){return}
+  // Сумма
+  var newAmount=prompt('Сумма операции (₽):', Math.round(t.amount));
+  if(newAmount===null) return; // отмена
+  newAmount=parseFloat(String(newAmount).replace(',','.'));
+  if(!newAmount||newAmount<=0){toast('Неверная сумма','error');return}
+  // Описание
+  var newDesc=prompt('Описание:', t.desc);
+  if(newDesc===null) return;
+  newDesc=newDesc.trim()||t.desc;
+  // Дата (ГГГГ-ММ-ДД)
+  var curDate=(t.date||'').split('T')[0];
+  var newDate=prompt('Дата (ГГГГ-ММ-ДД):', curDate);
+  if(newDate===null) return;
+  newDate=newDate.trim();
+  var dateOk=/^\d{4}-\d{2}-\d{2}$/.test(newDate);
+  // Применяем изменения
+  t.amount=newAmount;
+  t.desc=newDesc;
+  if(dateOk){ t.date=new Date(newDate+'T12:00:00').toISOString(); }
+  saveTx(txs);
+  renderFinances();
+  renderDashboard();
+  updateCapitalRing();
+  confirmFeedback(null, 'Операция изменена ✓');
+}
+
 // Segment filter
 document.querySelectorAll('.seg-btn').forEach(btn=>{
   btn.onclick=function(){
@@ -4996,6 +5289,82 @@ function renderDashboard(){
   document.getElementById('kpi-pers-exp').innerHTML=fmt(persExp)+' <small>₽</small>';
   document.getElementById('kpi-capital').innerHTML=fmt(capital)+' <small>₽</small>';
   document.getElementById('kpi-appts').textContent=monthAppts.length;
+
+  // ─── ОПУ: Бизнес и Личное (за выбранный период) ───
+  var periodTx = txs.filter(function(t){ return inPeriod(t.date, PNL_PERIOD); });
+  var bizIncP = periodTx.filter(t=>t.type==='income'&&t.segment==='business').reduce((a,t)=>a+t.amount,0);
+  var bizExpP = periodTx.filter(t=>t.type==='expense'&&t.segment==='business').reduce((a,t)=>a+t.amount,0);
+  var persIncP = periodTx.filter(t=>t.type==='income'&&t.segment==='personal').reduce((a,t)=>a+t.amount,0);
+  var persExpP = periodTx.filter(t=>t.type==='expense'&&t.segment==='personal').reduce((a,t)=>a+t.amount,0);
+  var bizNet = bizIncP - bizExpP;
+  var persNet = persIncP - persExpP;
+  var periodLabel = pnlPeriodLabel(PNL_PERIOD);
+  setText('pnlCurPeriod', '· '+periodLabel);
+
+  // Бизнес
+  setText('pnlBizInc', '+'+fmt(bizIncP)+' ₽');
+  setText('pnlBizExp', '−'+fmt(bizExpP)+' ₽');
+  var bizNetEl = document.getElementById('pnlBizNet');
+  if(bizNetEl){
+    bizNetEl.textContent = (bizNet>=0?'+':'−')+fmt(Math.abs(bizNet))+' ₽';
+    bizNetEl.className = bizNet>=0?'profit':'loss';
+  }
+  var bizV = document.getElementById('pnlBizVerdict');
+  if(bizV){
+    if(bizIncP===0 && bizExpP===0){ bizV.textContent='нет данных'; bizV.className='pnl-verdict neutral'; }
+    else if(bizNet>0){ bizV.textContent='Прибыльный'; bizV.className='pnl-verdict good'; }
+    else if(bizNet<0){ bizV.textContent='Убыточный'; bizV.className='pnl-verdict bad'; }
+    else { bizV.textContent='В ноль'; bizV.className='pnl-verdict neutral'; }
+  }
+  var bizNote=document.getElementById('pnlBizNote');
+  if(bizNote){
+    if(bizNet>0) bizNote.textContent='Бизнес зарабатывает больше, чем тратит — так держать.';
+    else if(bizNet<0) bizNote.textContent='Расходы превышают доход. Проверьте, на что уходят деньги.';
+    else bizNote.textContent=periodLabel;
+  }
+
+  // Личное
+  setText('pnlPersInc', '+'+fmt(persIncP)+' ₽');
+  setText('pnlPersExp', '−'+fmt(persExpP)+' ₽');
+  var persNetEl = document.getElementById('pnlPersNet');
+  if(persNetEl){
+    persNetEl.textContent = (persNet>=0?'+':'−')+fmt(Math.abs(persNet))+' ₽';
+    persNetEl.className = persNet>=0?'profit':'loss';
+  }
+  var persV = document.getElementById('pnlPersVerdict');
+  if(persV){
+    if(persIncP===0 && persExpP===0){ persV.textContent='нет данных'; persV.className='pnl-verdict neutral'; }
+    else if(persNet>=0){ persV.textContent='В рамках'; persV.className='pnl-verdict good'; }
+    else { persV.textContent='Перерасход'; persV.className='pnl-verdict bad'; }
+  }
+  var persNote=document.getElementById('pnlPersNote');
+  if(persNote){ persNote.textContent=periodLabel; }
+
+  // Сравнение личных расходов с назначенной зарплатой (за период)
+  var salaryMonth = getSettings().income || 0;
+  var salaryPeriod = salaryMonth * pnlPeriodMonths(PNL_PERIOD);
+  setText('pnlSalaryPlan', fmt(salaryPeriod)+' ₽');
+  var fill = document.getElementById('pnlSalaryFill');
+  var hint = document.getElementById('pnlSalaryHint');
+  if(fill && hint){
+    if(salaryPeriod<=0){
+      fill.style.width='0%';
+      hint.textContent='Назначь зарплату в Настройках, чтобы видеть сравнение';
+      hint.className='pnl-salary-hint';
+    } else {
+      var ratio = persExpP / salaryPeriod;
+      fill.style.width = Math.min(ratio*100,100)+'%';
+      if(ratio>1){
+        fill.className='pnl-salary-fill over';
+        hint.textContent='Перерасход: потрачено на '+fmt(persExpP-salaryPeriod)+' ₽ больше зарплаты';
+        hint.className='pnl-salary-hint over';
+      } else {
+        fill.className='pnl-salary-fill';
+        hint.textContent='Уложились в зарплату: остаётся '+fmt(salaryPeriod-persExpP)+' ₽ ('+Math.round((1-ratio)*100)+'%)';
+        hint.className='pnl-salary-hint ok';
+      }
+    }
+  }
 
   // Recent tx
   const recent=txs.slice(0,5);
@@ -5276,7 +5645,7 @@ document.getElementById('saveAppt').onclick=function(){
   if(document.getElementById('apptPhone'))document.getElementById('apptPhone').value='';
   if(document.getElementById('apptTelegram'))document.getElementById('apptTelegram').value='';
   if(document.getElementById('apptVk'))document.getElementById('apptVk').value='';
-  toast('Запись добавлена ✓');
+  confirmFeedback(document.getElementById('saveAppt'), 'Запись добавлена ✓');
   renderCalendar();
   renderDashboard();
 };
@@ -5456,6 +5825,7 @@ document.getElementById('resetData').onclick=function(){
 
 // Set today's date as default for appointments
 document.getElementById('apptDate').value=new Date().toISOString().split('T')[0];
+if(document.getElementById('qeDate'))document.getElementById('qeDate').value=new Date().toISOString().split('T')[0];
 
 
 
@@ -5464,6 +5834,32 @@ document.getElementById('apptDate').value=new Date().toISOString().split('T')[0]
 // HELP SYSTEM
 // ════════════════════════════════════════════
 var HELP_CONTENT = {
+
+  pnl:{
+    tag:'Отчёт',
+    title:'ОПУ — отчёт о прибылях и убытках',
+    lead:'Два блока, которые показывают в чистом виде: зарабатывает ли ваш бизнес и укладываются ли личные траты в доход. Это главный инструмент, чтобы понимать своё финансовое здоровье без бухгалтера.',
+    sections:[
+      {title:'Что это такое',benefits:[
+        {icon:'◈',text:'<strong>Бизнес</strong>: доходы от работы минус расходы на работу (материалы, аренда, реклама). Остаток — ваша чистая прибыль.'},
+        {icon:'◎',text:'<strong>Личное</strong>: ваши личные доходы и траты на себя. Показывает, не живёте ли вы в минус.'},
+        {icon:'➖',text:'Формула простая: <strong>Доходы − Расходы = Итог</strong>. Плюс — хорошо, минус — повод разобраться.'},
+      ]},
+      {title:'В чём польза',benefits:[
+        {icon:'🔍',text:'Видно реальную прибыль, а не просто остаток на карте. Деньги на счету ≠ прибыль.'},
+        {icon:'⚖️',text:'Бизнес и личное разделены — вы не путаете деньги дела с личными тратами.'},
+        {icon:'📉',text:'Сразу заметно, если бизнес уходит в убыток или вы тратите больше зарплаты.'},
+        {icon:'🎯',text:'Сравнение с назначенной зарплатой показывает, держите ли вы себя в рамках.'},
+      ]},
+      {title:'Как использовать',steps:[
+        {n:1,text:'Записывай каждую операцию и указывай сегмент — <strong>Бизнес</strong> или <strong>Личное</strong>'},
+        {n:2,text:'Переключай период — <strong>Месяц / Квартал / Год</strong> — чтобы видеть картину вблизи или в целом'},
+        {n:3,text:'Смотри на вердикт: <strong>«Прибыльный»</strong> или <strong>«Убыточный»</strong> для бизнеса, <strong>«В рамках»</strong> или <strong>«Перерасход»</strong> для личного'},
+        {n:4,text:'Назначь себе зарплату в Настройках — и следи, чтобы личные траты в неё укладывались'},
+      ]},
+    ],
+    tip:'<strong>Правило здорового бизнеса:</strong> бизнес должен быть стабильно прибыльным, а личные траты — не превышать зарплату, которую ты себе назначил. Тогда разница идёт в капитал и накопления.',
+  },
 
   dashboard:{
     tag:'Раздел',
@@ -5624,7 +6020,7 @@ var HELP_CONTENT = {
         {n:1,text:'Перейди в раздел <strong>«🔗 Онлайн-запись»</strong> в боковом меню'},
         {n:2,text:'Добавь <strong>услуги</strong> — название, длительность в минутах и цену'},
         {n:3,text:'Укажи <strong>рабочие дни</strong> (нажми нужные кнопки Пн–Вс) и <strong>часы работы</strong> (с / до)'},
-        {n:4,text:'Введи свой <strong>номер телефона</strong> в поле «Телефон для записи» — клиент сможет написать в WhatsApp или MAX'},
+        {n:4,text:'Введи свой <strong>номер телефона</strong> в поле «Телефон для записи» — клиент сможет написать в WhatsApp'},
         {n:5,text:'Включи тумблер <strong>«Приём заявок активен»</strong> — появится твоя ссылка'},
         {n:6,text:'Нажми <strong>«📋 Скопировать»</strong> — ссылка готова к отправке'},
       ]},
@@ -5634,12 +6030,18 @@ var HELP_CONTENT = {
         {icon:'📲',text:'Stories — добавь как наклейку-ссылку'},
         {icon:'🖨️',text:'QR-код — распечатай и поставь на рабочем месте'},
       ]},
+      {title:'Как сделать ссылку короче (бесплатно)',steps:[
+        {n:1,text:'Нажми <strong>«📋 Скопировать ссылку»</strong>'},
+        {n:2,text:'Открой <strong>clck.ru</strong> (сокращатель от Яндекса) или <strong>vk.cc</strong> (ВКонтакте)'},
+        {n:3,text:'Вставь ссылку в поле и нажми <strong>«Сократить»</strong>'},
+        {n:4,text:'Скопируй короткую ссылку вида <strong>clck.ru/3Xy…</strong> — её удобно отправлять клиентам и ставить в профиль'},
+      ]},
       {title:'Как работает для клиента',steps:[
         {n:1,text:'Клиент открывает ссылку в браузере — видит <strong>твоё имя и список услуг</strong>'},
         {n:2,text:'Выбирает <strong>услугу → дату → время</strong> из доступных слотов'},
         {n:3,text:'Вводит <strong>имя и телефон</strong>, при желании — комментарий'},
         {n:4,text:'Нажимает «Записаться» — заявка сразу появляется у тебя во <strong>«Входящих заявках»</strong>'},
-        {n:5,text:'Клиент видит кнопки <strong>«Написать в WhatsApp»</strong> и <strong>«Написать в MAX»</strong> — нажимает и отправляет тебе готовое сообщение с деталями'},
+        {n:5,text:'Клиент видит кнопку <strong>«Написать в WhatsApp»</strong> — нажимает и отправляет тебе готовое сообщение с деталями'},
       ]},
     ],
     tip:'<strong>Лайфхак:</strong> добавь ссылку в шапку Instagram один раз — и клиенты будут записываться сами, даже ночью. Ты проснёшься с готовыми заявками в приложении.',
@@ -5706,6 +6108,32 @@ var HELP_CONTENT = {
       ]},
     ],
     tip:'<strong>Совет:</strong> раз в месяц просматривай тех, кто давно не возвращался, и напоминай о себе — вернуть старого клиента дешевле, чем найти нового.',
+  },
+
+  pnl:{
+    tag:'Отчёт',
+    title:'ОПУ — отчёт о прибылях и убытках',
+    lead:'ОПУ показывает в чистом виде: зарабатываешь ты или работаешь в минус. Это главный отчёт, по которому видно здоровье твоих финансов — отдельно по бизнесу и отдельно по личным деньгам.',
+    sections:[
+      {title:'Что это простыми словами',benefits:[
+        {icon:'📊',text:'<strong>ОПУ</strong> = Доходы − Расходы за период. Если больше нуля — прибыль, если меньше — убыток'},
+        {icon:'◈',text:'<strong>Блок «Бизнес»</strong> — сколько заработал на клиентах за вычетом рабочих расходов (материалы, аренда, реклама)'},
+        {icon:'◎',text:'<strong>Блок «Личное»</strong> — твои личные доходы и траты, не связанные с работой'},
+      ]},
+      {title:'Как пользоваться',steps:[
+        {n:1,text:'Выбери период вверху: <strong>Месяц</strong>, <strong>Квартал</strong> или <strong>Год</strong>'},
+        {n:2,text:'Смотри строку <strong>«Чистая прибыль»</strong> в бизнесе — зелёная значит прибыль, красная значит убыток'},
+        {n:3,text:'В личном блоке сравни расходы с <strong>назначенной зарплатой</strong> (задаётся в Настройках)'},
+        {n:4,text:'Полоса зелёная — уложился в зарплату, красная — перерасход'},
+      ]},
+      {title:'В чём польза',benefits:[
+        {icon:'✅',text:'Сразу видно, прибыльный бизнес или убыточный — без подсчётов в голове'},
+        {icon:'🛡️',text:'Разделение бизнеса и личного защищает от иллюзии «деньги на карте есть, значит всё хорошо»'},
+        {icon:'🎯',text:'Видно, не проедаешь ли ты больше своей зарплаты — частая ловушка мастеров'},
+        {icon:'📈',text:'Сравнение по периодам показывает, растёшь ты или падаешь'},
+      ]},
+    ],
+    tip:'<strong>Правило мастера-миллионера:</strong> сначала плати себе фиксированную зарплату, а прибыль бизнеса оставляй в деле. Если личный блок «в рамках», а бизнес «прибыльный» — ты на верном пути.',
   },
 
 };
@@ -5876,9 +6304,7 @@ function cancelAppt(id){
 document.getElementById('apptPhone') && document.getElementById('apptPhone').addEventListener('input', function(){
   var phone = this.value.trim();
   var waBtn = document.getElementById('sendWaBtn');
-  var maxBtn = document.getElementById('sendMaxBtn');
   if(waBtn) waBtn.style.display = phone.length > 5 ? 'block' : 'none';
-  if(maxBtn) maxBtn.style.display = phone.length > 5 ? 'block' : 'none';
 });
 
 function buildApptMessage(a){
@@ -5907,19 +6333,6 @@ function sendApptWhatsApp(){
   window.open('https://wa.me/'+phoneClean+'?text='+msg,'_blank');
 }
 
-function sendApptMax(){
-  var phone = (document.getElementById('apptPhone')||{}).value||'';
-  var client = (document.getElementById('apptClient')||{}).value||'';
-  var service = (document.getElementById('apptService')||{}).value||'';
-  var date = (document.getElementById('apptDate')||{}).value||'';
-  var time = (document.getElementById('apptTime')||{}).value||'';
-  var price = (document.getElementById('apptPrice')||{}).value||'';
-  var phoneClean = phone.replace(/\D/g,'');
-  if(!phoneClean){ toast('Введи телефон клиента','error'); return; }
-  var msg = buildApptMessage({client:client,service:service,date:date,time:time,price:price});
-  window.open('https://max.ru/chat/'+phoneClean+'?text='+msg,'_blank');
-}
-
 // After save appt — show notify panel
 (function(){
   var saveBtn = document.getElementById('saveAppt');
@@ -5939,9 +6352,7 @@ function sendApptMax(){
         var price = (document.getElementById('apptPrice')||{}).value||'';
         var msg = buildApptMessage({client:client,service:service,date:date,time:time,price:price});
         var waBtn = document.getElementById('notifyWaBtn');
-        var maxBtn = document.getElementById('notifyMaxBtn');
         if(waBtn) waBtn.onclick = function(){ window.open('https://wa.me/'+phoneClean+'?text='+msg,'_blank'); };
-        if(maxBtn) maxBtn.onclick = function(){ window.open('https://max.ru/chat/'+phoneClean+'?text='+msg,'_blank'); };
       }
     }, 300);
   });

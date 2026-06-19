@@ -425,7 +425,7 @@ function showSuccess(a){
   if(phone){
     var wa=phone.length===10?'7'+phone:phone;
     btns.appendChild(mkBtn('https://wa.me/'+wa+'?text='+msg,'#25D366',waIco(),' WhatsApp'));
-    btns.appendChild(mkBtn('https://vk.me/+'+wa,'#005BFF',msgIco(),' MAX / VK'));
+    btns.appendChild(mkBtn('https://vk.me/+'+wa,'#005BFF',msgIco(),' ВКонтакте'));
   }
   if(tg){var tu=/^\d+$/.test(tg)?'https://t.me/+'+tg:'https://t.me/'+tg+'?text='+msg;btns.appendChild(mkBtn(tu,'#229ED9',tgIco(),' Telegram'));}
   if(!phone&&!tg)btns.innerHTML='<div style="color:var(--muted);font-size:.85rem;padding:12px 0">\u041c\u0430\u0441\u0442\u0435\u0440 \u0441\u0432\u044f\u0436\u0435\u0442\u0441\u044f \u0441 \u0432\u0430\u043c\u0438 \u0434\u043b\u044f \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f.</div>';
