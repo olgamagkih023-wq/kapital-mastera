@@ -101,6 +101,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .field input,.field textarea{width:100%;padding:14px 15px;border:1px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--ink);outline:none;transition:border-color .2s;border-radius:0}
 .field input:focus,.field textarea:focus{border-color:var(--em);box-shadow:inset 2px 0 0 var(--em)}
 .field textarea{resize:vertical;min-height:60px}
+.field-hint{font-size:.72rem;color:var(--muted);margin-top:5px;font-weight:300;line-height:1.4}
 .sum-box{background:var(--cream2);padding:18px 18px;margin-bottom:18px;border-left:2px solid var(--bordo)}
 .sum-row{display:flex;justify-content:space-between;font-size:.88rem;padding:6px 0;border-bottom:1px solid rgba(42,38,32,.07);color:var(--muted)}
 .sum-row:last-child{border:none;padding-top:10px;font-weight:600;font-size:1.05rem;color:var(--ink);font-family:'Cormorant Garamond',serif}
@@ -175,9 +176,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <div class="sum-box" id="sumBox"></div>
     <div class="err-msg" id="formErr"></div>
     <div class="field"><label>Ваше имя *</label><input type="text" id="cName" placeholder="Анна Иванова" autocomplete="name"></div>
-    <div class="field"><label>Телефон *</label><input type="tel" id="cPhone" placeholder="+7 (999) 000-00-00" autocomplete="tel"></div>
-    <div class="field"><label>Telegram (необязательно)</label><input type="text" id="cTelegram" placeholder="@username"></div>
-    <div class="field"><label>ВКонтакте (необязательно)</label><input type="text" id="cVk" placeholder="ссылка или короткое имя"></div>
+    <div class="field"><label>Телефон *</label><input type="tel" id="cPhone" placeholder="+7 (___) ___-__-__" inputmode="numeric" autocomplete="tel"><div class="field-hint">Просто введите цифры — формат подставится сам</div></div>
+    <div class="field"><label>Telegram (необязательно)</label><input type="text" id="cTelegram" placeholder="username"><div class="field-hint">Без @ и ссылки — просто имя пользователя, символ @ добавится сам</div></div>
+    <div class="field"><label>ВКонтакте (необязательно)</label><input type="text" id="cVk" placeholder="id или короткое имя"><div class="field-hint">Можно вставить ссылку vk.com/… — оставим только имя</div></div>
     <div class="field"><label>Пожелания</label><textarea id="cNote" placeholder="Особые пожелания..."></textarea></div>
     <button class="btn-next" onclick="submitBooking()">Записаться ✓</button>
     <button class="btn-back" onclick="goStep(3)">← Назад</button>
@@ -195,6 +196,64 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 </div>
 
 <script>
+// ─── Форматирование и проверка полей ───
+function formatPhoneRu(value){
+  // оставляем только цифры
+  var d = value.replace(/\D/g,'');
+  // если начинается с 8 или 7 — нормализуем к 7
+  if(d.length && (d[0]==='8'||d[0]==='7')) d = '7'+d.slice(1);
+  else if(d.length) d = '7'+d; // любой другой первый символ — считаем номером после +7
+  d = d.slice(0,11); // 7 + 10 цифр
+  var r = '+7';
+  if(d.length>1) r += ' (' + d.slice(1,4);
+  if(d.length>=5) r += ') ' + d.slice(4,7);
+  if(d.length>=8) r += '-' + d.slice(7,9);
+  if(d.length>=10) r += '-' + d.slice(9,11);
+  return r;
+}
+function phoneDigits(value){ // 10 цифр после +7, или '' если неполный
+  var d = value.replace(/\D/g,'');
+  if(d.length && (d[0]==='8')) d='7'+d.slice(1);
+  if(d[0]!=='7') d='7'+d;
+  return d.slice(1,11);
+}
+function normTelegram(value){
+  var v = value.trim();
+  v = v.replace(/^https?:\/\/(t\.me|telegram\.me)\//i,''); // ссылка → username
+  v = v.replace(/^@/,''); // убрать ведущий @
+  v = v.replace(/[^a-zA-Z0-9_]/g,''); // только допустимые символы
+  return v;
+}
+function normVk(value){
+  var v = value.trim();
+  v = v.replace(/^https?:\/\/(vk\.com|m\.vk\.com)\//i,''); // ссылка → id
+  v = v.replace(/^@/,'');
+  v = v.replace(/[^a-zA-Z0-9_.]/g,'');
+  return v;
+}
+// Навешиваем маску на поля после загрузки
+function attachFieldMasks(){
+  var ph = document.getElementById('cPhone');
+  if(ph){
+    ph.addEventListener('input', function(){
+      var pos = this.selectionStart;
+      var before = this.value;
+      this.value = formatPhoneRu(this.value);
+      // курсор в конец, если печатали в конце
+      if(pos >= before.length) this.setSelectionRange(this.value.length, this.value.length);
+    });
+    ph.addEventListener('focus', function(){ if(!this.value) this.value='+7 ('; });
+  }
+  var tg = document.getElementById('cTelegram');
+  if(tg){
+    tg.addEventListener('blur', function(){ if(this.value.trim()){ this.value='@'+normTelegram(this.value); } });
+  }
+  var vk = document.getElementById('cVk');
+  if(vk){
+    vk.addEventListener('blur', function(){ this.value=normVk(this.value); });
+  }
+}
+
 var S={svc:null,date:null,time:null,cy:new Date().getFullYear(),cm:new Date().getMonth()};
 var CFG={isOpen:false,masterName:'Мастер',masterProf:'',masterPhone:'',masterTelegram:'',services:[],workDays:[1,2,3,4,5],workStart:'10:00',workEnd:'19:00'};
 var MASTER_UID='';
@@ -301,7 +360,7 @@ function goStep(n){
   if(n===1)renderServices();
   if(n===2)renderCalendar();
   if(n===3)renderTimes();
-  if(n===4)renderSummary();
+  if(n===4){renderSummary();attachFieldMasks();}
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -403,14 +462,16 @@ function row(l,v){return '<div class="sum-row"><span style="color:var(--muted)">
 
 function submitBooking(){
   var name=(document.getElementById('cName').value||'').trim();
-  var phone=(document.getElementById('cPhone').value||'').trim();
-  var telegram=((document.getElementById('cTelegram')||{}).value||'').trim().replace(/^@/,'');
-  var vk=((document.getElementById('cVk')||{}).value||'').trim().replace(/^.*vk\.com\//,'');
+  var phoneRaw=(document.getElementById('cPhone').value||'').trim();
+  var digits=phoneDigits(phoneRaw); // 10 цифр после +7
+  var phone=digits?('+7'+digits):'';
+  var telegram=normTelegram((document.getElementById('cTelegram')||{}).value||'');
+  var vk=normVk((document.getElementById('cVk')||{}).value||'');
   var note=(document.getElementById('cNote').value||'').trim();
   var err=document.getElementById('formErr');
   err.style.display='none';
-  if(!name){err.textContent='Введите ваше имя';err.style.display='block';return;}
-  if(!phone){err.textContent='Введите номер телефона';err.style.display='block';return;}
+  if(!name){err.textContent='Пожалуйста, укажите ваше имя';err.style.display='block';return;}
+  if(digits.length!==10){err.textContent='Проверьте номер телефона — нужно 10 цифр после +7';err.style.display='block';document.getElementById('cPhone').focus();return;}
   var id='bk_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
   var appt={id:id,client:name,phone:phone,telegram:telegram,vk:vk,service:S.svc?S.svc.name:'',date:S.date,time:S.time,price:S.svc?(S.svc.price||0):0,note:note,status:'pending',source:'online',created:Date.now()};
   // Save to Firebase
