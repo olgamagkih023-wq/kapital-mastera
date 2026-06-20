@@ -71,69 +71,71 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
   display:grid;grid-template-columns:1.12fr 0.88fr;
 }
 
-/* ── English-style landing (left column) ── */
+/* ── English-style landing (left column) — яркий изумруд ── */
 .al-landing{
   padding:56px 56px 56px 72px;
   display:flex;flex-direction:column;
-  border-right:1px solid var(--en-line);
-  text-align:left;background:var(--en-paper);position:relative;overflow:visible;
+  border-right:none;
+  text-align:left;
+  background:linear-gradient(155deg,var(--en-em) 0%,var(--en-em-deep) 100%);
+  position:relative;overflow:visible;
 }
 .al-logo{
   display:flex;align-items:center;gap:13px;
   font-family:'Cormorant Garamond',serif;
-  font-size:1.55rem;font-weight:500;color:var(--en-em);
+  font-size:1.55rem;font-weight:500;color:#fff;
   letter-spacing:0.03em;margin-bottom:0;
 }
 .al-logo::before{
   content:'\25C8';width:36px;height:36px;flex-shrink:0;
-  border:1.5px solid var(--en-em);border-radius:50%;
+  border:1.5px solid var(--en-gold,#B8975A);border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:1rem;color:var(--en-em);
+  font-size:1rem;color:var(--en-gold,#B8975A);
 }
-.al-logo span{color:var(--en-em)}
+.al-logo span{color:#fff}
 .al-center{margin-top:auto;margin-bottom:auto;padding:40px 0}
 .al-eyebrow{
   display:flex;align-items:center;gap:14px;
   font-size:0.74rem;letter-spacing:0.24em;text-transform:uppercase;
-  color:var(--en-ink-dim);font-weight:500;margin-bottom:30px;
+  color:var(--en-gold,#B8975A);font-weight:600;margin-bottom:30px;
 }
-.al-eyebrow::before{content:'';width:42px;height:1px;background:var(--en-bordo)}
+.al-eyebrow::before{content:'';width:42px;height:1px;background:var(--en-gold,#B8975A)}
 .al-title{
   font-family:'Cormorant Garamond',serif;font-weight:300;
   font-size:clamp(2.7rem,5vw,4.6rem);line-height:1.02;
-  letter-spacing:-0.01em;color:var(--en-ink);margin-bottom:0;
+  letter-spacing:-0.01em;color:#FBF8F1;margin-bottom:0;
 }
-.al-title em{font-style:italic;font-weight:400;color:var(--en-em)}
-.al-title .cap{display:inline-block;position:relative;font-weight:500;color:var(--en-ink)}
+.al-title em{font-style:italic;font-weight:400;color:#F0D9A8}
+.al-title .cap{display:inline-block;position:relative;font-weight:500;color:#fff}
 .al-title .cap::after{
   content:'';position:absolute;left:0;right:0;bottom:0.08em;height:2px;
-  background:var(--en-bordo);transform:scaleX(0);transform-origin:left;
+  background:var(--en-bordo-soft,#E0607A);transform:scaleX(0);transform-origin:left;
   animation:alDraw 1s 0.5s cubic-bezier(.2,.7,.2,1) forwards;
 }
 @keyframes alDraw{to{transform:scaleX(1)}}
 .al-sub{
-  font-size:1.05rem;color:var(--en-ink-dim);font-weight:300;
+  font-size:1.05rem;color:rgba(251,248,241,0.82);font-weight:300;
   line-height:1.7;max-width:33ch;margin:30px 0 0;
 }
 .al-rule{display:flex;align-items:center;gap:16px;margin-top:auto;padding-top:38px}
-.al-rule .l{flex:1;height:1px;background:var(--en-line)}
-.al-rule .d{width:5px;height:5px;background:var(--en-bordo);transform:rotate(45deg)}
+.al-rule .l{flex:1;height:1px;background:rgba(255,255,255,0.18)}
+.al-rule .d{width:5px;height:5px;background:var(--en-gold,#B8975A);transform:rotate(45deg)}
 .al-stats{display:flex;gap:46px;margin:24px 0 0;border:none}
 .al-stat{flex:0 0 auto;max-width:none;padding:0;border:none}
-.al-stat-v{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:var(--en-em);line-height:1}
-.al-stat-l{font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--en-ink-dim);margin-top:3px}
+.al-stat-v{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:#F0D9A8;line-height:1}
+.al-stat-l{font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(251,248,241,0.6);margin-top:3px}
 #authScreen .al-author{
   display:flex;align-items:center;gap:13px;
   padding:22px 0 0;margin-top:22px;
-  border-top:1px solid var(--en-line);background:none;
+  border-top:1px solid rgba(255,255,255,0.18);background:none;
 }
 #authScreen .al-av{
   width:42px;height:42px;border-radius:50%;flex-shrink:0;
-  background:var(--en-em);display:flex;align-items:center;justify-content:center;
-  font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--en-paper);font-weight:500;
+  background:var(--en-gold,#B8975A);display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#fff;font-weight:500;
 }
-#authScreen .al-name{font-size:0.9rem;font-weight:500;color:var(--en-ink)}
-#authScreen .al-role{font-size:0.78rem;color:var(--en-ink-dim);margin-top:2px}
+#authScreen .al-name{font-size:0.9rem;font-weight:500;color:#fff}
+#authScreen .al-role{font-size:0.78rem;color:rgba(251,248,241,0.6);margin-top:2px}
 
 /* ── Auth form section (right column) ── */
 .auth-form-section{
@@ -736,7 +738,7 @@ select.auth-field{cursor:pointer}
 
 /* --- Цена часа --- */
 .hour-hero{
-  background:var(--ink);padding:48px;
+  background:#16181C;padding:48px;
   display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;
   margin-bottom:20px;
 }
@@ -773,7 +775,7 @@ select.auth-field{cursor:pointer}
 
 /* --- Зарплата владельца --- */
 .owner-hero{
-  background:linear-gradient(135deg,var(--ink) 60%,rgba(13,110,74,0.4));
+  background:linear-gradient(135deg,#16181C 60%,rgba(13,110,74,0.4));
   padding:48px;margin-bottom:20px;
   display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;
 }
@@ -1051,7 +1053,7 @@ select.auth-field{cursor:pointer}
 
 /* Blog header */
 .blog-header{
-  background:var(--ink);padding:36px 40px;margin-bottom:20px;
+  background:#16181C;padding:36px 40px;margin-bottom:20px;
   display:grid;grid-template-columns:1fr auto;align-items:center;gap:24px;
 }
 .bh-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;color:#fff;margin-bottom:6px}
@@ -1364,10 +1366,10 @@ body.demo-active #app{padding-top:46px}
   .topbar{
     padding:16px 16px;
     padding-top:calc(16px + env(safe-area-inset-top));
-    background:#fff;
-    border-bottom:2px solid var(--ink);
+    background:var(--topbar-bg);
+    border-bottom:2px solid var(--border);
   }
-  .topbar-title{font-size:1.4rem;font-weight:600;color:var(--ink)}
+  .topbar-title{font-size:1.4rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw}
   .topbar-actions .btn-sm{font-size:0.78rem;padding:10px 16px;font-weight:700}
 
   /* ── Main scroll area ── */
@@ -1788,7 +1790,7 @@ body.demo-active #app{padding-top:46px}
 /* Cookie banner */
 #cookieBanner{
   position:fixed;bottom:0;left:0;right:0;z-index:9996;
-  background:var(--ink);border-top:1px solid rgba(255,255,255,0.08);
+  background:#16181C;border-top:1px solid rgba(255,255,255,0.08);
   padding:16px 20px;display:none;align-items:center;gap:14px;
   flex-wrap:wrap;
   padding-bottom:calc(16px + env(safe-area-inset-bottom));
@@ -1896,7 +1898,7 @@ body.demo-active #app{padding-top:46px}
   <div class="al-landing">
     <div class="al-logo">Капитал <span>Мастера</span></div>
     <div class="al-center">
-      <div class="al-eyebrow">Финансы для мастеров красоты</div>
+      <div class="al-eyebrow">Финансы для творческих профессий</div>
       <h1 class="al-title">Твоё <em>искусство</em><br>становится <span class="cap">капиталом</span></h1>
       <p class="al-sub">Учёт дохода, накопления и онлайн-запись клиентов — в одном спокойном пространстве, созданном для тех, кто живёт своим ремеслом.</p>
     </div>
@@ -1941,10 +1943,14 @@ body.demo-active #app{padding-top:46px}
         <input class="auth-field" type="text"     id="rName"  placeholder="Имя и фамилия" autocomplete="name">
         <select class="auth-field" id="rProf">
           <option value="">Ваша профессия...</option>
-          <option>Бьюти-мастер</option><option>Визажист</option><option>Парикмахер</option>
-          <option>Маникюрист</option><option>Стилист</option><option>Барбер</option>
           <option>Фотограф</option><option>Видеограф</option><option>Дизайнер</option>
-          <option>Художник</option><option>Флорист</option><option>Другое</option>
+          <option>Художник</option><option>Иллюстратор</option><option>Стилист</option>
+          <option>Визажист</option><option>Парикмахер</option><option>Маникюрист</option>
+          <option>Барбер</option><option>Бьюти-мастер</option><option>Косметолог</option>
+          <option>Мастер рукоделия</option><option>Флорист</option><option>Кондитер</option>
+          <option>Музыкант</option><option>Репетитор</option><option>Психолог</option>
+          <option>Копирайтер</option><option>Мастер маникюра</option><option>Татуировщик</option>
+          <option>Другое</option>
         </select>
         <input class="auth-field" type="tel"      id="rPhone" placeholder="Телефон" autocomplete="tel">
         <input class="auth-field" type="password" id="rPass"  placeholder="Пароль (мин. 6 символов)" autocomplete="new-password">
@@ -2902,7 +2908,7 @@ body.demo-active #app{padding-top:46px}
                 onchange="saveBookingSettings()">
             </div>
             <div id="slugPreview" style="font-size:0.75rem;color:var(--muted);margin-top:6px">
-              Например: <em>olga</em>, <em>anna-nail</em>, <em>beauty-pro</em> — только латиница и цифры
+              Например: <em>olga</em>, <em>studio-art</em>, <em>master-pro</em> — только латиница и цифры
             </div>
           </div>
 
@@ -3388,7 +3394,7 @@ body.demo-active #app{padding-top:46px}
           <span class="onb-emoji">✍️</span>
           <div class="onb-title">Первая операция</div>
           <p class="onb-sub">Добавь последний доход — и дашборд сразу оживёт с твоими данными.</p>
-          <input class="onb-input" type="text" id="onbTxDesc" placeholder="Что это было? (маникюр, фотосессия...)" style="margin-bottom:10px">
+          <input class="onb-input" type="text" id="onbTxDesc" placeholder="Что это было? (заказ, съёмка, консультация...)" style="margin-bottom:10px">
           <div class="onb-income-row">
             <input class="onb-income-input" type="number" id="onbTxAmount" placeholder="0" min="0"
               onkeydown="if(event.key==='Enter')onbAddTx()">
@@ -6025,7 +6031,7 @@ var HELP_CONTENT = {
         {icon:'🧠',text:'Мышление переключается с "я устала" на "мой час стал дороже"'},
       ]},
     ],
-    tip:'<strong>Ориентир:</strong> бьюти-мастер среднего уровня — 800-1200 ₽/час. Топ-специалист в Москве — 3000-8000 ₽/час. Где ты сейчас?',
+    tip:'<strong>Ориентир:</strong> специалист среднего уровня — 800-1500 ₽/час. Топ-эксперт в крупном городе — 3000-8000 ₽/час и выше. Где ты сейчас?',
   },
 
   owner:{
@@ -7430,7 +7436,7 @@ var LEGAL_DOCS = {
 <p>Регистрация в сервисе означает полное и безоговорочное принятие условий настоящего Соглашения.</p>
 
 <h2>2. Описание сервиса</h2>
-<p>«Капитал Мастера» — веб-приложение для учёта личных финансов, предназначенное для специалистов творческих и бьюти-профессий. Сервис предоставляется в режиме «как есть» (as is).</p>
+<p>«Капитал Мастера» — веб-приложение для учёта личных финансов, предназначенное для специалистов креативных индустрий и творческих профессий. Сервис предоставляется в режиме «как есть» (as is).</p>
 
 <h2>3. Права и обязанности пользователя</h2>
 <p>Пользователь вправе:</p>
