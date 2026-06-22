@@ -319,7 +319,7 @@ select.auth-field{cursor:pointer}
 .logout-btn:hover{color:var(--red)}
 
 /* MAIN CONTENT */
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--cream)}
+.main{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;background:var(--cream)}
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:20px 36px;background:var(--topbar-bg);
@@ -490,15 +490,15 @@ select.auth-field{cursor:pointer}
 }
 
 /* Transactions table */
-.tx-table{background:var(--white);border:1px solid var(--border)}
+.tx-table{background:var(--white);border:1px solid var(--border);min-width:0;overflow:hidden}
 .tx-table-head{
-  display:grid;grid-template-columns:100px 1fr 120px 80px 100px 48px;
+  display:grid;grid-template-columns:100px 1fr 120px 80px 100px 40px 40px;
   gap:0;padding:12px 20px;
   border-bottom:1px solid var(--border);
   font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);
 }
 .tx-row{
-  display:grid;grid-template-columns:100px 1fr 120px 80px 100px 48px;
+  display:grid;grid-template-columns:100px 1fr 120px 80px 100px 40px 40px;
   gap:0;padding:14px 20px;
   border-bottom:1px solid var(--cream2);
   transition:background 0.15s;align-items:center;
@@ -548,6 +548,7 @@ select.auth-field{cursor:pointer}
 
 /* ===== CALENDAR PAGE ===== */
 .cal-layout{display:grid;grid-template-columns:1fr 300px;gap:20px}
+.book-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .cal-nav{display:flex;align-items:center;gap:16px}
 .cal-nav-btn{
@@ -1401,6 +1402,9 @@ body.demo-active #app{padding-top:46px}
 
   /* ── Finances ── */
   .fin-layout{grid-template-columns:1fr;gap:14px}
+  .fin-layout>*{min-width:0}
+  .book-cols{grid-template-columns:1fr;gap:14px}
+  .book-cols>*{min-width:0}
   .fin-header{flex-wrap:wrap;gap:6px}
   .seg-btn{font-size:0.78rem;padding:9px 16px;font-weight:600;border-width:2px}
   .tx-table-head{display:none}
@@ -1414,7 +1418,8 @@ body.demo-active #app{padding-top:46px}
   .tx-amount-cell{font-size:1rem;grid-column:2;grid-row:1;font-weight:700}
   .tx-cat-badge{display:none}
   .tx-segment{display:none}
-  .tx-del{grid-column:2;grid-row:2;font-size:0.85rem;padding:0;text-align:right;color:var(--border)}
+  .tx-edit{grid-column:2;grid-row:2;font-size:0.85rem;padding:0 8px 0 0;text-align:right;color:var(--border)}
+  .tx-del{grid-column:2;grid-row:2;font-size:0.85rem;padding:0;text-align:right;color:var(--border);justify-self:end}
 
   /* Quick entry on mobile */
   .quick-entry{padding:18px 16px}
@@ -2047,7 +2052,7 @@ body.demo-active #app{padding-top:46px}
       <button onclick="openLegal('offer')">Оферта</button>
       <button onclick="openLegal('requisites')">Реквизиты</button>
     </div>
-    <div class="legal-footer-copy">© 2025 Капитал Мастера</div>
+    <div class="legal-footer-copy">© 2026 Капитал Мастера · Все права защищены. Копирование и создание аналогов преследуется по закону РФ</div>
   </div>
 
 </div>
@@ -2913,7 +2918,7 @@ body.demo-active #app{padding-top:46px}
 
       <!-- TAB 2: Settings -->
       <div id="bookTab2" style="display:none">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="book-cols">
           <div class="settings-card">
             <div class="settings-title">Услуги и цены</div>
             <div class="service-list" id="serviceList"></div>
@@ -3607,21 +3612,18 @@ function fbLoadProfile(uid, callback){
     .then(function(snap){
       var data = snap.val();
       if(!data){ callback(); return; }
-      // Массивы записей — СЛИВАЕМ с локальными по id (защита от потери данных)
-      if(data.tx)     store('km_tx',     mergeById(load('km_tx',[]),     data.tx));
-      if(data.appts)  store('km_appts',  mergeById(load('km_appts',[]),  data.appts));
-      if(data.hours)  store('km_hours',  mergeById(load('km_hours',[]),  data.hours));
-      if(data.blog)   store('km_blog',   mergeById(load('km_blog',[]),   data.blog));
+      // Массивы записей — СЛИВАЕМ с локальными по id (защита от потери данных).
+      // Идём через DB — единый слой данных с правильными ключами.
+      if(data.tx)    DB.saveTx(mergeById(DB.getTx(), data.tx));
+      if(data.appts) DB.saveAppts(mergeById(DB.getAppts(), data.appts));
+      if(data.hours) DB.saveHours(mergeById(DB.getHours(), data.hours));
+      if(data.blog)  DB.saveBlog(mergeById(DB.getBlog(), data.blog));
       // Объекты-настройки — берём облачные (они меняются редко и осознанно)
-      if(data.settings)  store('km_settings', data.settings);
-      if(data.capital)   store('km_capital', data.capital);
-      if(data.pulse)     store('km_pulse', data.pulse);
-      if(data.booking)   store('km_booking_settings', data.booking);
-      // После слияния — отправляем объединённый набор обратно в облако,
-      // чтобы оба устройства пришли к одному состоянию
-      fbWrite('tx', load('km_tx',[]));
-      fbWrite('appts', load('km_appts',[]));
-      console.log('✓ Profile loaded & merged from Firebase');
+      if(data.settings) DB.saveSettings(data.settings);
+      if(data.capital)  DB.saveCapital(data.capital);
+      if(data.pulse)    DB.savePulse(data.pulse);
+      if(data.booking)  DB.saveBooking(data.booking);
+      console.log('✓ Profile loaded & merged from Firebase (via DB layer)');
       callback();
     })
     .catch(function(e){
@@ -3953,17 +3955,12 @@ function seedDemo(){
 
 
 function getBookingSettings(){
-  return load('km_booking_settings',{
-    isOpen:false, services:[], workDays:[1,2,3,4,5],
-    workStart:'10:00', workEnd:'19:00',
-    masterName:'', masterProf:'',
-    masterPhone:'', masterTelegram:'', customSlug:''
-  });
+  return DB.getBooking();
 }
 
 function saveBookingSettingsData(d){
-  store('km_booking_settings', d);
-  fbSaveBookingSettings(d);  // sync to Firebase
+  DB.saveBooking(d);          // localStorage (единый слой)
+  fbSaveBookingSettings(d);   // публичный путь мастера для онлайн-записи
 }
 
 function switchBookTab(n){
@@ -4959,7 +4956,6 @@ var firebaseConfig = {
 
 // ===== STORAGE HELPERS =====
 var hsh = simpleHash;
-function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){console.warn('store error',e)}}
 function load(k,d){try{var v=localStorage.getItem(k);return v!==null?JSON.parse(v):d}catch(e){return d}}
 
 // ════════════════════════════════════════════
@@ -4978,49 +4974,78 @@ var FB_WRITE_TIMERS = {};
 
 
 // Patched save functions — write local + sync to Firebase
-function getTx(){ return load('km_tx',[]); }
-function saveTx(a){
-  store('km_tx', a);
-  fbWrite('tx', a);
-}
-function getAppts(){ return load('km_appts',[]); }
-function saveAppts(a){
-  store('km_appts', a);
-  fbWrite('appts', a);
-}
-function getSettings(){
-  return load('km_settings',{
+// ═══════════════════════════════════════════════════════════
+//  ЕДИНЫЙ СЛОЙ ДОСТУПА К ДАННЫМ — DB
+//  Все обращения к хранилищу идут ТОЛЬКО через этот объект.
+//  Сейчас адаптер — localStorage + Firebase. Для РФ-версии
+//  достаточно заменить тело методов на вызовы своего API,
+//  не трогая остальной код приложения.
+// ═══════════════════════════════════════════════════════════
+var DB = {
+  // низкоуровневые примитивы
+  _local: function(key, def){ return load(key, def); },
+  _save: function(key, value, fbKey){
+    store(key, value);
+    if(fbKey) fbWrite(fbKey, value);
+  },
+
+  // дефолты настроек в одном месте
+  _defaultSettings: {
     goal:300000, monthly:20000, yield:12, income:100000,
     categories:['Клиент','Материалы','Аренда','Обучение','Маркетинг','Продукты','Транспорт','Развлечения','Здоровье','Инвестиции','Прочее'],
     incomeCategories:['Заказ','Предоплата','Продажа продукта','Консультация','Чаевые','Прочее']
-  });
-}
-function saveSettings(s){
-  store('km_settings', s);
-  fbWrite('settings', s);
-}
+  },
 
-// Hour logs
-function getHours(){ return load('km_hours',[]); }
-function saveHours(h){
-  store('km_hours', h);
-  fbWrite('hours', h);
-}
+  // ── Операции (доходы/расходы) ──
+  getTx:   function(){ return this._local('km_tx', []); },
+  saveTx:  function(a){ this._save('km_tx', a, 'tx'); },
+  // ── Записи (календарь) ──
+  getAppts:  function(){ return this._local('km_appts', []); },
+  saveAppts: function(a){ this._save('km_appts', a, 'appts'); },
+  // ── Часы работы ──
+  getHours:  function(){ return this._local('km_hour_logs', []); },
+  saveHours: function(h){ this._save('km_hour_logs', h, 'hours'); },
+  // ── Инвестиции ──
+  getInvests:  function(){ return this._local('km_invest', []); },
+  saveInvests: function(a){ this._save('km_invest', a, 'invest'); },
+  // ── Настройки ──
+  getSettings:  function(){ return this._local('km_settings', JSON.parse(JSON.stringify(this._defaultSettings))); },
+  saveSettings: function(s){ this._save('km_settings', s, 'settings'); },
+  // ── Капитал / пульс / блог / настройки записи ──
+  getCapital:  function(){ return this._local('km_capital', {}); },
+  saveCapital: function(c){ this._save('km_capital', c, 'capital'); },
+  getBlog:     function(){ return this._local('km_blog', []); },
+  saveBlog:    function(b){ this._save('km_blog', b, 'blog'); },
+  getPulse:    function(){ return this._local('km_pulse', {answers:{},history:[],streak:0,lastWeek:'',habits:{},diary:[]}); },
+  savePulse:   function(p){ this._save('km_pulse', p, 'pulse'); },
+  _defaultBooking: {
+    isOpen:false, services:[], workDays:[1,2,3,4,5],
+    workStart:'10:00', workEnd:'19:00',
+    masterName:'', masterProf:'',
+    masterPhone:'', masterTelegram:'', customSlug:''
+  },
+  getBooking:  function(){ return this._local('km_booking_settings', JSON.parse(JSON.stringify(this._defaultBooking))); },
+  saveBooking: function(d){ this._save('km_booking_settings', d); },
+  // ── Пользователи (для офлайн-режима) ──
+  getUsers:  function(){ return this._local('km_users', []); },
+  saveUsers: function(u){ this._save('km_users', u); }
+};
 
-// Capital/investments — intercept store calls for capital keys
-var _origStore = store;
+// Тонкие обёртки — чтобы существующий код (200+ вызовов) работал без правок.
+// Все они делегируют в DB. Единственный источник правды — объект DB выше.
+function getTx(){ return DB.getTx(); }
+function saveTx(a){ DB.saveTx(a); }
+function getAppts(){ return DB.getAppts(); }
+function saveAppts(a){ DB.saveAppts(a); }
+function getSettings(){ return DB.getSettings(); }
+function saveSettings(s){ DB.saveSettings(s); }
+function getInvests(){ return DB.getInvests(); }
+function saveInvests(a){ DB.saveInvests(a); }
+
+// Единый примитив записи в localStorage. Вся Firebase-синхронизация
+// идёт через DB._save (с явным fbKey), чтобы не было двойной отправки.
 function store(k, v){
   try{ localStorage.setItem(k, JSON.stringify(v)); } catch(e){ console.warn('store error',e); }
-  // Sync capital data to Firebase
-  if(FB_UID && db){
-    var fbMap = {
-      'km_capital':          'capital',
-      'km_pulse':            'pulse',
-      'km_blog':             'blog',
-      'km_booking_settings': 'booking',
-    };
-    if(fbMap[k]) fbWrite(fbMap[k], v);
-  }
 }
 
 
@@ -5029,8 +5054,8 @@ function store(k, v){
 const authScreen=document.getElementById('authScreen');
 const appEl=document.getElementById('app');
 
-function getUsers(){return load('km_users',[])}
-function saveUsers(u){store('km_users',u)}
+function getUsers(){return DB.getUsers()}
+function saveUsers(u){DB.saveUsers(u)}
 
 function doRegister(){
   const name=document.getElementById('rName').value.trim();
@@ -5142,15 +5167,6 @@ document.querySelectorAll('.nav-item[data-page]').forEach(btn=>{
 
 // ===== DATA KEYS =====
 function uid(){return 't_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)}
-function getTx(){return load('km_tx',[])}
-function saveTx(a){store('km_tx',a)}
-function getAppts(){return load('km_appts',[])}
-function saveAppts(a){store('km_appts',a)}
-function getInvests(){return load('km_invest',[])}
-function saveInvests(a){store('km_invest',a)}
-function getSettings(){return load('km_settings',{goal:300000,monthly:20000,yield:12,income:100000,categories:['Клиент','Материалы','Аренда','Обучение','Маркетинг','Продукты','Транспорт','Развлечения','Здоровье','Инвестиции','Прочее'],incomeCategories:['Заказ','Предоплата','Продажа продукта','Консультация','Чаевые','Прочее']})}
-function saveSettings(s){store('km_settings',s)}
-
 // ===== TOAST =====
 function toast(msg,type='success'){
   const t=document.getElementById('toast');
@@ -6826,8 +6842,8 @@ document.getElementById('addApptBtn')?.addEventListener('click',()=>{
 // MODULE: БЛОГ
 // ════════════════════════════════════════════
 function focusComposer(){const el=document.getElementById('postTitleInput');if(el)el.focus();}
-function getBlogPosts(){return load('km_blog',[])}
-function saveBlogPosts(d){store('km_blog',d)}
+function getBlogPosts(){return DB.getBlog()}
+function saveBlogPosts(d){DB.saveBlog(d)}
 const AVATAR_COLORS=['#0D6E4A','#2471A3','#7D3C98','#B8975A','#C0392B','#1A5276','#117864','#6E2F0D'];
 function avatarColor(str){let h=0;for(let c of(str||'M'))h=(h<<5)-h+c.charCodeAt(0);return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length]}
 function initials(name){return(name||'М').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
@@ -6993,8 +7009,8 @@ function renderBlogPage(){
 // ════════════════════════════════════════════
 // MODULE: ЦЕНА ЧАСА
 // ════════════════════════════════════════════
-function getHourLogs(){return load('km_hour_logs',[])}
-function saveHourLogs(d){store('km_hour_logs',d)}
+function getHourLogs(){return DB.getHours()}
+function saveHourLogs(d){DB.saveHours(d)}
 
 document.getElementById('hlDate').value = new Date().toISOString().split('T')[0];
 
@@ -7232,8 +7248,8 @@ const DIARY_PROMPTS = [
   'Какую финансовую привычку я хочу выработать?',
 ];
 
-function getPulseData(){return load('km_pulse',{answers:{},history:[],streak:0,lastWeek:'',habits:{},diary:[]})}
-function savePulseData(d){store('km_pulse',d)}
+function getPulseData(){return DB.getPulse()}
+function savePulseData(d){DB.savePulse(d)}
 
 const pulseAnswers = {salary:null, invest:null, passive:null};
 
@@ -7675,7 +7691,7 @@ var LEGAL_DOCS = {
 <div class="highlight-box"><strong>Важно:</strong> Сервис является инструментом для личного учёта финансов и не является финансовым советником, инвестиционным консультантом или налоговым агентом. Все финансовые решения Пользователь принимает самостоятельно.</div>
 
 <h2>6. Интеллектуальная собственность</h2>
-<p>Все права на сервис, его дизайн, логотипы, наименования принадлежат Правообладателю. Запрещается копирование, распространение и переработка материалов без письменного согласия Правообладателя.</p>
+<p>Все права на сервис, его дизайн, логотипы, наименования принадлежат Правообладателю. Запрещается копирование, распространение, переработка материалов, а также создание аналогов или производных продуктов без письменного согласия Правообладателя. Нарушение влечёт ответственность в соответствии с законодательством Российской Федерации.</p>
 
 <h2>7. Применимое право</h2>
 <p>К настоящему Соглашению применяется законодательство Российской Федерации. Все споры разрешаются в судебном порядке по месту нахождения Правообладателя.</p>
@@ -7754,6 +7770,11 @@ var LEGAL_DOCS = {
 <h2>Обратная связь</h2>
 <p>По вопросам персональных данных, жалобам и предложениям: kapitalmastera@mail.ru</p>
 <p>Роскомнадзор (по вопросам ПДн): rkn.gov.ru</p>
+
+<h2>Авторские права</h2>
+<p>Сервис «Капитал Мастера», его дизайн, программный код, структура, тексты, графические элементы и иные материалы являются объектами интеллектуальной собственности и охраняются законодательством Российской Федерации (часть четвёртая Гражданского кодекса РФ).</p>
+<p>Все права защищены. Исключительные права на сервис принадлежат ИП Мягких Ольга Александровна.</p>
+<p>Любое копирование, воспроизведение, переработка, распространение, а также создание аналогов или производных продуктов на основе сервиса без письменного разрешения правообладателя запрещены и влекут гражданско-правовую, административную и уголовную ответственность в соответствии с законодательством Российской Федерации (ст. 1252, 1301 ГК РФ, ст. 7.12 КоАП РФ, ст. 146 УК РФ).</p>
     `
   }
 };
