@@ -1896,9 +1896,10 @@ body.demo-active #app{padding-top:46px}
   <meta name="apple-mobile-web-app-title" content="Капитал Мастера">
   <meta name="application-name" content="Капитал Мастера">
   <meta name="msapplication-TileColor" content="#0D6E4A">
-  <meta name="msapplication-TileImage" content="/icons/icon-144.png">
+  <meta name="msapplication-TileImage" content="/app/icons/icon-144.png">
   <!-- Apple touch icons -->
-  <link rel="apple-touch-icon" href="/app/icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/app/icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/app/icons/icon-152.png">
   <link rel="apple-touch-icon" sizes="192x192" href="/app/icons/icon-192.png">
   <link rel="apple-touch-icon" sizes="512x512" href="/app/icons/icon-512.png">
   <!-- Splash screens iOS -->
@@ -7954,9 +7955,28 @@ var DL_STEPS = {
 
 
 
+// Сохранённое событие установки PWA (приходит из beforeinstallprompt)
+var deferredPrompt = null;
+
+// Браузер сообщает, что приложение можно установить — ловим событие
+// и показываем наш баннер (если пользователь его раньше не закрывал).
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt = e;
+  if(localStorage.getItem('km_install_dismissed')) return;
+  showInstallBanner();
+});
+
+// Показать баннер «Установить приложение»
 function showInstallBanner(){
   var banner=document.getElementById('installBanner');
-  if(banner) bannner.style.display='none';
+  if(banner) banner.style.display='block';
+}
+
+// Нажата кнопка «Установить» — запускаем системное окно установки
+function installPWA(){
+  var banner=document.getElementById('installBanner');
+  if(banner) banner.style.display='none';
   if(deferredPrompt){
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(function(result){
@@ -7969,12 +7989,14 @@ function showInstallBanner(){
 }
 
 function dismissInstall(){
-  installBanner.style.display='none';
+  var banner=document.getElementById('installBanner');
+  if(banner) banner.style.display='none';
   localStorage.setItem('km_install_dismissed','1');
 }
 
 window.addEventListener('appinstalled', function(){
-  installBanner.style.display='none';
+  var banner=document.getElementById('installBanner');
+  if(banner) banner.style.display='none';
   deferredPrompt=null;
   console.log('PWA installed successfully');
 });
