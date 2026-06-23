@@ -68,7 +68,7 @@
       "destination": "/app/$1"
     },
     {
-      "source": "/((?!booking\\.html|offline\\.html|app/).*)",
+      "source": "/((?!booking\\.html|offline\\.html|app/|api/).*)",
       "destination": "/index.html"
     }
   ]
