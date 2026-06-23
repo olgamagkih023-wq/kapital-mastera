@@ -474,15 +474,16 @@ function submitBooking(){
   if(digits.length!==10){err.textContent='Проверьте номер телефона — нужно 10 цифр после +7';err.style.display='block';document.getElementById('cPhone').focus();return;}
   var id='bk_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
   var appt={id:id,client:name,phone:phone,telegram:telegram,vk:vk,service:S.svc?S.svc.name:'',date:S.date,time:S.time,price:S.svc?(S.svc.price||0):0,note:note,status:'pending',source:'online',created:Date.now()};
-  // Save to Firebase
+  // Save to Firebase (запись в базу)
   if(window.db&&MASTER_UID){
     window.db.ref('masters/'+MASTER_UID+'/appointments/'+id).set(appt)
-      .then(function(){sendTgNotify(appt);})
-      .catch(function(e){console.warn('FB save error:',e);});
+      .then(function(){console.log('✓ Запись сохранена в Firebase');})
+      .catch(function(e){console.error('✗ Firebase: запись НЕ сохранена (проверьте правила базы):', e && e.message ? e.message : e);});
   } else {
     try{var a=JSON.parse(localStorage.getItem('km_appts')||'[]');a.push(appt);localStorage.setItem('km_appts',JSON.stringify(a));}catch(e){}
-    sendTgNotify(appt);
   }
+  // Уведомление в Telegram отправляем ВСЕГДА — независимо от записи в базу
+  sendTgNotify(appt);
   showSuccess(appt);
 }
 
@@ -500,7 +501,16 @@ function sendTgNotify(a){
     (a.vk?nl+'\uD83D\uDD37 vk.com/'+a.vk:'')+
     (a.note?nl+'\uD83D\uDCAC '+a.note:'')+
     nl+nl+'\u2705 \u041E\u0442\u043A\u0440\u043E\u0439\u0442\u0435 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435';
-  fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,parse_mode:'Markdown'})}).catch(function(){});
+  fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,parse_mode:'Markdown'})})
+    .then(function(r){ return r.json().then(function(d){ return {status:r.status, body:d}; }).catch(function(){ return {status:r.status, body:null}; }); })
+    .then(function(res){
+      if(res.status>=200 && res.status<300 && res.body && res.body.ok){
+        console.log('✓ Telegram-уведомление отправлено');
+      } else {
+        console.error('✗ Telegram-уведомление НЕ отправлено. HTTP', res.status, res.body);
+      }
+    })
+    .catch(function(e){ console.error('✗ Запрос к /api/notify не выполнен:', e && e.message ? e.message : e); });
 }
 
 function showSuccess(a){
