@@ -1,50 +1,48 @@
-// api/notify.js — Telegram notification proxy
-// Required Vercel env vars: TG_BOT_TOKEN, TG_CHAT_ID
+// ═══ api/notify.js — Капитал Мастера ═══
+// Отправляет уведомление мастеру в Telegram при новой записи.
+// Переменные окружения в Vercel: TG_BOT_TOKEN, TG_CHAT_ID.
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-
-  // GET health check
-  if (req.method === 'GET') {
-    const token  = process.env.TG_BOT_TOKEN;
-    const chatId = process.env.TG_CHAT_ID;
-    return res.status(200).json({
-      status: 'ok',
-      tg_token_set:    !!token,
-      tg_chat_id_set:  !!chatId,
-      tg_token_preview: token  ? token.slice(0,8)+'...' : null,
-      tg_chat_preview:  chatId || null,
-    });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ ok: false, error: 'Только POST' });
   }
-
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const token  = process.env.TG_BOT_TOKEN;
   const chatId = process.env.TG_CHAT_ID;
 
-  if (!token)  return res.status(500).json({ error: 'TG_BOT_TOKEN not set in Vercel env' });
-  if (!chatId) return res.status(500).json({ error: 'TG_CHAT_ID not set in Vercel env' });
+  if (!token || !chatId) {
+    return res.status(500).json({
+      ok: false,
+      error: 'Не заданы TG_BOT_TOKEN или TG_CHAT_ID в переменных окружения Vercel'
+    });
+  }
 
-  const { text, parse_mode } = req.body || {};
-  if (!text) return res.status(400).json({ error: 'text required' });
+  // Тело запроса может прийти строкой — на всякий случай разбираем сами.
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) { body = {}; }
+  }
+  const text       = (body && body.text) || '';
+  const parse_mode = (body && body.parse_mode) || undefined;
+
+  if (!text) {
+    return res.status(400).json({ ok: false, error: 'Пустой текст сообщения' });
+  }
 
   try {
     const tgRes = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text.slice(0, 4096),
-        parse_mode: parse_mode || 'Markdown'
-      })
+      body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: parse_mode })
     });
     const data = await tgRes.json();
-    if (!data.ok) return res.status(400).json({ ok: false, error: data.description, error_code: data.error_code });
+
+    if (!data.ok) {
+      // Telegram сам объясняет причину: "chat not found", "bot was blocked" и т.п.
+      return res.status(502).json({ ok: false, error: 'Telegram отклонил сообщение', telegram: data });
+    }
     return res.status(200).json({ ok: true });
-  } catch(e) {
-    return res.status(500).json({ error: e.message });
+  } catch (e) {
+    return res.status(500).json({ ok: false, error: 'Сбой запроса к Telegram', detail: String(e) });
   }
 }
