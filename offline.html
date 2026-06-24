@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0D6E4A">
+<title>Нет подключения — Капитал Мастера</title>
+<style>
+  *{ box-sizing:border-box; margin:0; }
+  body{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+        background:#0D6E4A; color:#F5F0E6; min-height:100vh; display:flex;
+        align-items:center; justify-content:center; padding:24px; text-align:center; }
+  .box{ max-width:380px; }
+  .mono{ width:92px; height:92px; border:2px solid #C19C56; border-radius:50%;
+         display:flex; align-items:center; justify-content:center; margin:0 auto 24px;
+         font-family:Georgia,serif; font-size:2rem; font-weight:600; color:#C19C56; }
+  h1{ font-family:Georgia,serif; font-weight:500; font-size:1.5rem; margin-bottom:12px; }
+  p{ font-size:.95rem; line-height:1.55; opacity:.9; margin-bottom:24px; }
+  button{ padding:14px 28px; font-size:.9rem; font-weight:700; letter-spacing:.03em;
+          background:#C19C56; color:#0D6E4A; border:none; border-radius:8px; cursor:pointer; }
+  .small{ margin-top:18px; font-size:.78rem; opacity:.7; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="mono">КМ</div>
+    <h1>Нет подключения к интернету</h1>
+    <p>Похоже, сеть сейчас недоступна. Уже открытые данные сохранены на устройстве — как только связь вернётся, всё синхронизируется автоматически.</p>
+    <button onclick="location.reload()">Попробовать снова</button>
+    <div class="small">Капитал Мастера</div>
+  </div>
+</body>
+</html>

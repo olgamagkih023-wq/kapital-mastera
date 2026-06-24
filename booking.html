@@ -580,5 +580,25 @@ function cancelBooking(id){
 
 boot();
 </script>
+<script>
+// Режим Т9 — подсказки/автозамена клавиатуры на текстовых полях записи
+(function(){
+  function applyT9(el){
+    if(!el || el.nodeType !== 1) return;
+    var tag=(el.tagName||'').toLowerCase();
+    var type=(el.getAttribute('type')||'text').toLowerCase();
+    if(tag!=='textarea' && !(tag==='input' && type==='text')) return;
+    var id=(el.id||'').toLowerCase();
+    var im=(el.getAttribute('inputmode')||'').toLowerCase();
+    if(im==='numeric'||im==='decimal'||im==='tel') return;
+    if(/phone|tel|telegram|vk|email|url/.test(id)) return;
+    el.setAttribute('autocorrect','on');
+    el.setAttribute('autocapitalize', /name/.test(id) ? 'words' : 'sentences');
+    el.setAttribute('spellcheck','true');
+  }
+  function run(){ document.querySelectorAll('input[type=text], input:not([type]), textarea').forEach(applyT9); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run); else run();
+})();
+</script>
 </body>
 </html>
