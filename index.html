@@ -1890,8 +1890,10 @@ body.demo-active #app{padding-top:46px}
   <!-- ═══ PWA ═══ -->
   <link rel="manifest" href="/app/manifest.json">
   <meta name="theme-color" content="#0D6E4A">
+  <meta name="color-scheme" content="light">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Капитал Мастера">
   <meta name="application-name" content="Капитал Мастера">
@@ -1971,6 +1973,7 @@ input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 /* единое сглаживание шрифта и масштаб текста */
 html,body{
+  color-scheme:light;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   -webkit-text-size-adjust:100%;
@@ -2198,7 +2201,7 @@ html,body{
     <div class="topbar">
       <div class="topbar-title" id="pageTitle">Обзор</div>
       <div class="topbar-actions">
-        <button id="themeToggleBtn" onclick="toggleTheme()" title="Сменить тему" style="width:38px;height:38px;border-radius:50%;background:none;border:2px solid var(--border);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;touch-action:manipulation">🌙</button>
+        <button id="themeToggleBtn" onclick="toggleTheme()" title="Сменить тему" style="display:none;width:38px;height:38px;border-radius:50%;background:none;border:2px solid var(--border);cursor:pointer;font-size:1.1rem;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;touch-action:manipulation">🌙</button>
         <button class="btn-sm btn-outline-sm" id="quickEntryBtn">+ Операция</button>
         <button class="btn-sm btn-primary-sm" id="addApptBtn">+ Запись</button>
       </div>
@@ -3209,7 +3212,7 @@ html,body{
 <div id="moreDrawer" style="display:none;position:fixed;inset:0;z-index:150;background:rgba(12,13,10,0.7);backdrop-filter:blur(8px)" onclick="closeMoreDrawer(event)">
   <div id="morePanel" style="position:absolute;bottom:0;left:0;right:0;background:var(--cream);padding:8px 0 calc(80px + env(safe-area-inset-bottom))">
     <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 20px"></div>
-    <button onclick="toggleTheme();closeMoreDrawer()" style="display:flex;align-items:center;gap:14px;width:100%;padding:16px 24px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;color:var(--ink);text-align:left;transition:background 0.15s;border-bottom:1px solid var(--border)">
+    <button onclick="toggleTheme();closeMoreDrawer()" style="display:none;align-items:center;gap:14px;width:100%;padding:16px 24px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;color:var(--ink);text-align:left;transition:background 0.15s;border-bottom:1px solid var(--border)">
       <span id="themeToggleMob" style="font-size:1.2rem">🌙</span> Тема оформления
     </button>
     
@@ -6608,24 +6611,13 @@ function closeHelp(e){
 // THEME — LIGHT / DARK
 // ════════════════════════════════════════════
 function applyTheme(theme){
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('km_theme', theme);
-  var isDark = theme === 'dark';
-  var icon = isDark ? '☀️' : '🌙';
-  var btn = document.getElementById('themeToggleBtn');
-  var mob = document.getElementById('themeToggleMob');
-  if(btn) btn.textContent = icon;
-  if(mob) mob.textContent = icon;
+  // Приложение работает только в светлой теме (тёмная отключена)
+  document.documentElement.setAttribute('data-theme', 'light');
+  localStorage.setItem('km_theme', 'light');
 }
-function toggleTheme(){
-  var current = document.documentElement.getAttribute('data-theme') || 'light';
-  applyTheme(current === 'dark' ? 'light' : 'dark');
-}
-// Apply saved theme on load
-(function(){
-  var saved = localStorage.getItem('km_theme') || 'light';
-  applyTheme(saved);
-})();
+function toggleTheme(){ /* тёмная тема отключена — всегда светлая */ applyTheme('light'); }
+// Принудительно светлая тема при загрузке (перезапишет старый тёмный выбор)
+(function(){ applyTheme('light'); })();
 
 // Telegram notify for master app (Firebase listener)
 // Telegram notify for master app
